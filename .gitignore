@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+*.log
+docker-data
+prisma/*.db
+prisma/*.db-journal
+.DS_Store
+Thumbs.db
