@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { IClientRepository } from '../../../../domain/clients/repositories/client.repository.interface';
-import { Client as ClientEntity } from '../../../../domain/clients/entities/client.entity';
-import { Prisma, Client as PrismaClient } from '@prisma/client';
+import { IClientRepository } from '../../../../domain/repositories/client.repository.interface';
+import { Client as ClientEntity } from '../../../../domain/entities/client.entity';
+import { Prisma } from '@prisma/client';
+import { ClientMapper } from '../mappers/client.mapper';
+import { BusinessException } from '../../../../domain/exceptions/business.exception';
 
 @Injectable()
 export class PrismaClientRepository extends IClientRepository {
@@ -12,27 +14,34 @@ export class PrismaClientRepository extends IClientRepository {
 
   async findAll(): Promise<ClientEntity[]> {
     const clients = await this.prisma.client.findMany();
-    return clients.map((client) => this.mapToEntity(client));
+    return clients.map((client) => ClientMapper.toEntity(client));
   }
 
   async findById(id: number): Promise<ClientEntity | null> {
     const client = await this.prisma.client.findUnique({
       where: { id },
     });
-    return client ? this.mapToEntity(client) : null;
+    return client ? ClientMapper.toEntity(client) : null;
   }
 
   async create(client: ClientEntity): Promise<ClientEntity> {
-    const newClient = await this.prisma.client.create({
-      data: {
-        firstName: client.firstName,
-        lastName: client.lastName,
-        phone: client.phone,
-        address: client.address,
-        email: client.email,
-      },
-    });
-    return this.mapToEntity(newClient);
+    try {
+      const newClient = await this.prisma.client.create({
+        data: ClientMapper.toPersistence(client),
+      });
+      return ClientMapper.toEntity(newClient);
+    } catch (error: unknown) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new BusinessException(
+          `A client with this information already exists`,
+          'DUPLICATE_CLIENT',
+        );
+      }
+      throw error;
+    }
   }
 
   async update(
@@ -40,19 +49,19 @@ export class PrismaClientRepository extends IClientRepository {
     client: Partial<ClientEntity>,
   ): Promise<ClientEntity> {
     try {
+      const data: Prisma.ClientUpdateInput = {};
+      if (client.firstName) data.firstName = client.firstName;
+      if (client.lastName) data.lastName = client.lastName;
+      if (client.email) data.email = client.email;
+      if (client.phone) data.phone = client.phone;
+      if (client.address) data.address = client.address;
+
       const updatedClient = await this.prisma.client.update({
         where: { id },
-        data: {
-          firstName: client.firstName,
-          lastName: client.lastName,
-          phone: client.phone,
-          address: client.address,
-          email: client.email,
-        },
+        data,
       });
-      return this.mapToEntity(updatedClient);
+      return ClientMapper.toEntity(updatedClient);
     } catch (error: unknown) {
-
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2025'
@@ -77,16 +86,5 @@ export class PrismaClientRepository extends IClientRepository {
       }
       throw error;
     }
-  }
-
-  private mapToEntity(prismaClient: PrismaClient): ClientEntity {
-    const client = new ClientEntity();
-    client.id = prismaClient.id;
-    client.firstName = prismaClient.firstName ?? '';
-    client.lastName = prismaClient.lastName ?? '';
-    client.phone = prismaClient.phone ?? '';
-    client.address = prismaClient.address ?? '';
-    client.email = prismaClient.email ?? '';
-    return client;
   }
 }

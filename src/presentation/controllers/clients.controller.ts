@@ -17,7 +17,7 @@ import { UpdateClientCommand } from '../../application/clients/commands/update-c
 import { DeleteClientCommand } from '../../application/clients/commands/delete-client.command';
 import { GetClientsQuery } from '../../application/clients/queries/get-clients.query';
 import { GetClientQuery } from '../../application/clients/queries/get-client.query';
-import { Client } from '../../domain/clients/entities/client.entity';
+import { Client } from '../../domain/entities/client.entity';
 
 @ApiTags('clients')
 @Controller('clients')
@@ -32,6 +32,10 @@ export class ClientsController {
   @ApiResponse({
     status: 201,
     description: 'The client has been successfully created.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Business rule violation (e.g. invalid data or duplicate client).',
   })
   async create(@Body() createClientDto: CreateClientDto): Promise<Client> {
     return this.commandBus.execute(

@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetProductQuery } from '../queries/get-product.query';
-import { IProductRepository } from '../../../domain/products/repositories/product.repository.interface';
-import { Product } from '../../../domain/products/entities/product.entity';
+import { IProductRepository } from '../../../domain/repositories/product.repository.interface';
+import { Product } from '../../../domain/entities/product.entity';
 import { Inject, NotFoundException } from '@nestjs/common';
 
 @QueryHandler(GetProductQuery)

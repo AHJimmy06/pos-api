@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateClientCommand } from '../commands/update-client.command';
-import { Inject } from '@nestjs/common';
-import { IClientRepository } from '../../../domain/clients/repositories/client.repository.interface';
-import { Client } from '../../../domain/clients/entities/client.entity';
+import { Inject, NotFoundException } from '@nestjs/common';
+import { IClientRepository } from '../../../domain/repositories/client.repository.interface';
+import { Client } from '../../../domain/entities/client.entity';
 
 @CommandHandler(UpdateClientCommand)
 export class UpdateClientHandler implements ICommandHandler<UpdateClientCommand> {
@@ -13,6 +13,36 @@ export class UpdateClientHandler implements ICommandHandler<UpdateClientCommand>
 
   async execute(command: UpdateClientCommand): Promise<Client> {
     const { id, clientData } = command;
-    return this.clientRepository.update(id, clientData);
+    const client = await this.clientRepository.findById(id);
+
+    if (!client) {
+      throw new NotFoundException(`Client with ID ${id} not found`);
+    }
+
+    // Rehidratamos la entidad
+    const clientEntity = new Client(
+      client.firstName,
+      client.lastName,
+      client.email,
+    );
+    clientEntity.id = client.id;
+    clientEntity.phone = client.phone;
+    clientEntity.address = client.address;
+
+    if (clientData.firstName || clientData.lastName) {
+      clientEntity.updateName(
+        clientData.firstName ?? clientEntity.firstName,
+        clientData.lastName ?? clientEntity.lastName,
+      );
+    }
+
+    if (clientData.email) {
+      clientEntity.updateEmail(clientData.email);
+    }
+
+    if (clientData.phone) clientEntity.phone = clientData.phone;
+    if (clientData.address) clientEntity.address = clientData.address;
+
+    return this.clientRepository.update(id, clientEntity);
   }
 }

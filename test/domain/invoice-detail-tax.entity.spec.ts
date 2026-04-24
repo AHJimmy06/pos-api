@@ -1,4 +1,4 @@
-import { InvoiceDetailTax } from './invoice-detail-tax.entity';
+import { InvoiceDetailTax } from '../../src/domain/entities/invoice-detail-tax.entity';
 
 describe('InvoiceDetailTax', () => {
   it('should create an InvoiceDetailTax instance', () => {

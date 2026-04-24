@@ -1,8 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetClientsQuery } from '../queries/get-clients.query';
 import { Inject } from '@nestjs/common';
-import { IClientRepository } from '../../../domain/clients/repositories/client.repository.interface';
-import { Client } from '../../../domain/clients/entities/client.entity';
+import { IClientRepository } from '../../../domain/repositories/client.repository.interface';
+import { Client } from '../../../domain/entities/client.entity';
 
 @QueryHandler(GetClientsQuery)
 export class GetClientsHandler implements IQueryHandler<GetClientsQuery> {

@@ -1,4 +1,4 @@
-import { Tax } from '../../../domain/taxes/entities/tax.entity';
+import { Tax } from '../../../domain/entities/tax.entity';
 
 export class UpdateTaxCommand {
   constructor(

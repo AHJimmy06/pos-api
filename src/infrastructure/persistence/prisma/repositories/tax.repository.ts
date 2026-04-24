@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { ITaxRepository } from '../../../../domain/taxes/repositories/tax.repository.interface';
-import { Tax as TaxEntity } from '../../../../domain/taxes/entities/tax.entity';
-import { Prisma, Tax as PrismaTax } from '@prisma/client';
+import { ITaxRepository } from '../../../../domain/repositories/tax.repository.interface';
+import { Tax as TaxEntity } from '../../../../domain/entities/tax.entity';
+import { Prisma } from '@prisma/client';
+import { TaxMapper } from '../mappers/tax.mapper';
 
 @Injectable()
 export class PrismaTaxRepository extends ITaxRepository {
@@ -12,24 +13,21 @@ export class PrismaTaxRepository extends ITaxRepository {
 
   async findAll(): Promise<TaxEntity[]> {
     const taxes = await this.prisma.tax.findMany();
-    return taxes.map((tax) => this.mapToEntity(tax));
+    return taxes.map((tax) => TaxMapper.toEntity(tax));
   }
 
   async findById(id: number): Promise<TaxEntity | null> {
     const tax = await this.prisma.tax.findUnique({
       where: { id },
     });
-    return tax ? this.mapToEntity(tax) : null;
+    return tax ? TaxMapper.toEntity(tax) : null;
   }
 
   async create(tax: TaxEntity): Promise<TaxEntity> {
     const newTax = await this.prisma.tax.create({
-      data: {
-        name: tax.name,
-        currentRate: new Prisma.Decimal(tax.currentRate),
-      },
+      data: TaxMapper.toPersistence(tax),
     });
-    return this.mapToEntity(newTax);
+    return TaxMapper.toEntity(newTax);
   }
 
   async update(id: number, tax: Partial<TaxEntity>): Promise<TaxEntity> {
@@ -43,7 +41,7 @@ export class PrismaTaxRepository extends ITaxRepository {
         where: { id },
         data,
       });
-      return this.mapToEntity(updatedTax);
+      return TaxMapper.toEntity(updatedTax);
     } catch (error: unknown) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -69,14 +67,5 @@ export class PrismaTaxRepository extends ITaxRepository {
       }
       throw error;
     }
-  }
-
-  private mapToEntity(prismaTax: PrismaTax): TaxEntity {
-    const tax = new TaxEntity();
-    tax.id = prismaTax.id;
-    tax.name = prismaTax.name ?? '';
-
-    tax.currentRate = Number(prismaTax.currentRate ?? 0);
-    return tax;
   }
 }

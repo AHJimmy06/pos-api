@@ -17,7 +17,7 @@ import { UpdateTaxCommand } from '../../application/taxes/commands/update-tax.co
 import { DeleteTaxCommand } from '../../application/taxes/commands/delete-tax.command';
 import { GetTaxesQuery } from '../../application/taxes/queries/get-taxes.query';
 import { GetTaxQuery } from '../../application/taxes/queries/get-tax.query';
-import { Tax } from '../../domain/taxes/entities/tax.entity';
+import { Tax } from '../../domain/entities/tax.entity';
 
 @ApiTags('taxes')
 @Controller('taxes')
@@ -33,6 +33,7 @@ export class TaxesController {
     status: 201,
     description: 'The tax has been successfully created.',
   })
+  @ApiResponse({ status: 400, description: 'Business rule violation.' })
   async create(@Body() createTaxDto: CreateTaxDto): Promise<Tax> {
     return this.commandBus.execute(
       new CreateTaxCommand(createTaxDto.name, createTaxDto.currentRate),
@@ -47,12 +48,16 @@ export class TaxesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a tax by id' })
+  @ApiResponse({ status: 404, description: 'Tax not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Tax> {
     return this.queryBus.execute(new GetTaxQuery(id));
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a tax' })
+  @ApiResponse({ status: 200, description: 'Tax updated successfully.' })
+  @ApiResponse({ status: 400, description: 'Business rule violation.' })
+  @ApiResponse({ status: 404, description: 'Tax not found.' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaxDto: UpdateTaxDto,
@@ -62,6 +67,8 @@ export class TaxesController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a tax' })
+  @ApiResponse({ status: 204, description: 'Tax deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'Tax not found.' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.commandBus.execute(new DeleteTaxCommand(id));
   }

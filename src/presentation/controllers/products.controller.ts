@@ -17,7 +17,7 @@ import { UpdateProductCommand } from '../../application/products/commands/update
 import { DeleteProductCommand } from '../../application/products/commands/delete-product.command';
 import { GetProductsQuery } from '../../application/products/queries/get-products.query';
 import { GetProductQuery } from '../../application/products/queries/get-product.query';
-import { Product } from '../../domain/products/entities/product.entity';
+import { Product } from '../../domain/entities/product.entity';
 
 @ApiTags('products')
 @Controller('products')
@@ -33,6 +33,7 @@ export class ProductsController {
     status: 201,
     description: 'The product has been successfully created.',
   })
+  @ApiResponse({ status: 400, description: 'Business rule violation.' })
   async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return this.commandBus.execute(
       new CreateProductCommand(
@@ -51,12 +52,16 @@ export class ProductsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by id' })
+  @ApiResponse({ status: 404, description: 'Product not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return this.queryBus.execute(new GetProductQuery(id));
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a product' })
+  @ApiResponse({ status: 200, description: 'Product updated successfully.' })
+  @ApiResponse({ status: 400, description: 'Business rule violation.' })
+  @ApiResponse({ status: 404, description: 'Product not found.' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
@@ -68,6 +73,8 @@ export class ProductsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a product' })
+  @ApiResponse({ status: 204, description: 'Product deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'Product not found.' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.commandBus.execute(new DeleteProductCommand(id));
   }

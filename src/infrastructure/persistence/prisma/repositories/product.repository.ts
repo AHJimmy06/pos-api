@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { IProductRepository } from '../../../../domain/products/repositories/product.repository.interface';
-import { Product as ProductEntity } from '../../../../domain/products/entities/product.entity';
-import { Prisma, Product as PrismaProduct } from '@prisma/client';
+import { IProductRepository } from '../../../../domain/repositories/product.repository.interface';
+import { Product as ProductEntity } from '../../../../domain/entities/product.entity';
+import { Prisma } from '@prisma/client';
+import { ProductMapper } from '../mappers/product.mapper';
 
 @Injectable()
 export class PrismaProductRepository extends IProductRepository {
@@ -12,25 +13,21 @@ export class PrismaProductRepository extends IProductRepository {
 
   async findAll(): Promise<ProductEntity[]> {
     const products = await this.prisma.product.findMany();
-    return products.map((product) => this.mapToEntity(product));
+    return products.map((product) => ProductMapper.toEntity(product));
   }
 
   async findById(id: number): Promise<ProductEntity | null> {
     const product = await this.prisma.product.findUnique({
       where: { id },
     });
-    return product ? this.mapToEntity(product) : null;
+    return product ? ProductMapper.toEntity(product) : null;
   }
 
   async create(product: ProductEntity): Promise<ProductEntity> {
     const newProduct = await this.prisma.product.create({
-      data: {
-        name: product.name,
-        price: new Prisma.Decimal(product.price),
-        stock: product.stock,
-      },
+      data: ProductMapper.toPersistence(product),
     });
-    return this.mapToEntity(newProduct);
+    return ProductMapper.toEntity(newProduct);
   }
 
   async update(
@@ -48,7 +45,7 @@ export class PrismaProductRepository extends IProductRepository {
         where: { id },
         data,
       });
-      return this.mapToEntity(updatedProduct);
+      return ProductMapper.toEntity(updatedProduct);
     } catch (error: unknown) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -74,15 +71,5 @@ export class PrismaProductRepository extends IProductRepository {
       }
       throw error;
     }
-  }
-
-  private mapToEntity(prismaProduct: PrismaProduct): ProductEntity {
-    const product = new ProductEntity();
-    product.id = prismaProduct.id;
-    product.name = prismaProduct.name ?? '';
-
-    product.price = Number(prismaProduct.price ?? 0);
-    product.stock = prismaProduct.stock ?? 0;
-    return product;
   }
 }

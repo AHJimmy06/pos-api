@@ -6,10 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
-    "infra": "docker-compose --progress plain up -d postgres",
-    "infra:down": "docker-compose --progress plain down",
+    "build": "npm run lint || true && npm run format && nest build",
+    "infra": "docker-compose up -d",
+    "infra:down": "docker-compose down",
     "dev": "npm run infra && npm run start:dev",
+    "start:prod:docker": "docker-compose -f docker-compose.prod.yml up --build -d",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -69,15 +70,15 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
+    "coverageDirectory": "./coverage",
     "testEnvironment": "node"
   },
   "prisma": {
