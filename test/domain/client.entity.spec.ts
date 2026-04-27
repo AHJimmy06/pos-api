@@ -10,17 +10,27 @@ describe('Client Entity', () => {
   });
 
   it('should throw BusinessException for short first name', () => {
-    expect(() => new Client('J', 'Doe', 'john.doe@example.com')).toThrow(BusinessException);
-    expect(() => new Client('J', 'Doe', 'john.doe@example.com')).toThrow('Name must be at least 2 characters long');
+    expect(() => new Client('J', 'Doe', 'john.doe@example.com')).toThrow(
+      BusinessException,
+    );
+    expect(() => new Client('J', 'Doe', 'john.doe@example.com')).toThrow(
+      'Name must be at least 2 characters long',
+    );
   });
 
   it('should throw BusinessException for short last name', () => {
-    expect(() => new Client('John', 'D', 'john.doe@example.com')).toThrow(BusinessException);
+    expect(() => new Client('John', 'D', 'john.doe@example.com')).toThrow(
+      BusinessException,
+    );
   });
 
   it('should throw BusinessException for invalid email format', () => {
-    expect(() => new Client('John', 'Doe', 'invalid-email')).toThrow(BusinessException);
-    expect(() => new Client('John', 'Doe', 'invalid-email')).toThrow('Invalid email format');
+    expect(() => new Client('John', 'Doe', 'invalid-email')).toThrow(
+      BusinessException,
+    );
+    expect(() => new Client('John', 'Doe', 'invalid-email')).toThrow(
+      'Invalid email format',
+    );
   });
 
   it('should update name correctly', () => {
