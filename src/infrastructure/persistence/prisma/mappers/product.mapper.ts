@@ -9,6 +9,7 @@ export class ProductMapper {
       prismaProduct.stock || 0,
     );
     entity.id = prismaProduct.id;
+    entity.version = prismaProduct.version ?? 0;
     entity.taxIds =
       prismaProduct.productTaxes?.map((pt: any) => pt.taxId) || [];
     return entity;

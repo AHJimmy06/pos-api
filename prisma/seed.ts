@@ -94,6 +94,7 @@ async function main() {
         name: p.name,
         price: p.price,
         stock: p.stock,
+        version: 0,
       },
     });
 

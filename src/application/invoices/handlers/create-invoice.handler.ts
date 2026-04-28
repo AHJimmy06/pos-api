@@ -39,7 +39,7 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
     const invoice = new Invoice(clientId);
 
     for (const item of items) {
-      // Fetch product only for stock validation and if snapshot data not provided
+      // Fresh stock check before reduce (Opción C)
       const productData = await this.productRepository.findById(item.productId);
       if (!productData) {
         throw new NotFoundException(
@@ -47,17 +47,31 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
         );
       }
 
-      // Validate stock
       if (productData.stock < item.quantity) {
         throw new BusinessException(
-          `Insufficient stock for product ${item.productId}. Available: ${productData.stock}, requested: ${item.quantity}`,
+          `Stock insuficiente para producto ${item.productId}. Disponible: ${productData.stock}, solicitado: ${item.quantity}`,
         );
       }
 
-      // Reduce stock
-      await this.productRepository.update(productData.id, {
-        stock: productData.stock - item.quantity,
+      const success = await this.productRepository.reduceStock({
+        productId: item.productId,
+        quantity: item.quantity,
+        expectedVersion: productData.version,
       });
+
+      if (!success) {
+        const current = await this.productRepository.findById(item.productId).catch(() => null);
+        if (!current) {
+          throw new BusinessException(
+            `Error de concurrencia con producto ${item.productId}. Reintente la operación.`,
+          );
+        }
+        throw new BusinessException(
+          current.stock < item.quantity
+            ? `Stock insuficiente para producto ${item.productId}. Disponible: ${current.stock}, solicitado: ${item.quantity}`
+            : `El stock del producto ${item.productId} fue modificado por otro proceso. Reintente.`,
+        );
+      }
 
       // Use provided snapshot data, fallback to product data
       const productName = item.productName || productData.name;

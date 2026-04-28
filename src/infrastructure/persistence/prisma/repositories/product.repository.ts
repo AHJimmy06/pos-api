@@ -117,4 +117,24 @@ export class PrismaProductRepository extends IProductRepository {
       throw error;
     }
   }
+
+  async reduceStock(params: {
+    productId: number;
+    quantity: number;
+    expectedVersion: number;
+  }): Promise<boolean> {
+    const result = await this.prisma.product.updateMany({
+      where: {
+        id: params.productId,
+        version: params.expectedVersion,
+        stock: { gte: params.quantity },
+      },
+      data: {
+        stock: { decrement: params.quantity },
+        version: { increment: 1 },
+      },
+    });
+
+    return result.count > 0;
+  }
 }

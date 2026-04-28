@@ -6,4 +6,9 @@ export abstract class IProductRepository {
   abstract create(product: Product): Promise<Product>;
   abstract update(id: number, product: Partial<Product>): Promise<Product>;
   abstract delete(id: number): Promise<void>;
+  abstract reduceStock(params: {
+    productId: number;
+    quantity: number;
+    expectedVersion: number;
+  }): Promise<boolean>;
 }
