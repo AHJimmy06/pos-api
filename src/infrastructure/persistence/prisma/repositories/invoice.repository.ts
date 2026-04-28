@@ -16,6 +16,7 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
         details: {
           include: {
             detailTaxes: true,
+            product: true,
           },
         },
       },
@@ -31,6 +32,7 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
         details: {
           include: {
             detailTaxes: true,
+            product: true,
           },
         },
       },
@@ -51,6 +53,7 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
         details: {
           include: {
             detailTaxes: true,
+            product: true,
           },
         },
       },

@@ -1,15 +1,16 @@
 import { Product as ProductEntity } from '../../../../domain/entities/product.entity';
-import { Product as PrismaProduct } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
 export class ProductMapper {
-  static toEntity(prismaProduct: PrismaProduct): ProductEntity {
+  static toEntity(prismaProduct: any): ProductEntity {
     const entity = new ProductEntity(
       prismaProduct.name || '',
       Number(prismaProduct.price || 0),
       prismaProduct.stock || 0,
     );
     entity.id = prismaProduct.id;
+    entity.taxIds =
+      prismaProduct.productTaxes?.map((pt: any) => pt.taxId) || [];
     return entity;
   }
 
@@ -18,6 +19,14 @@ export class ProductMapper {
       name: entity.name,
       price: new Prisma.Decimal(entity.price),
       stock: entity.stock,
+      productTaxes:
+        entity.taxIds.length > 0
+          ? {
+              create: entity.taxIds.map((tid) => ({
+                tax: { connect: { id: tid } },
+              })),
+            }
+          : undefined,
     };
   }
 }

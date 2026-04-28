@@ -26,10 +26,12 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
       product.stock,
     );
     productEntity.id = product.id;
+    productEntity.taxIds = product.taxIds;
 
     if (data.name) productEntity.name = data.name;
     if (data.price !== undefined) productEntity.updatePrice(data.price);
     if (data.stock !== undefined) productEntity.stock = data.stock;
+    if (data.taxIds !== undefined) productEntity.taxIds = data.taxIds;
 
     return this.productRepository.update(id, productEntity);
   }

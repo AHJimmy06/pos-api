@@ -12,21 +12,36 @@ export class PrismaProductRepository extends IProductRepository {
   }
 
   async findAll(): Promise<ProductEntity[]> {
-    const products = await this.prisma.product.findMany();
+    const products = await this.prisma.product.findMany({
+      include: { productTaxes: { include: { tax: true } } },
+    });
     return products.map((product) => ProductMapper.toEntity(product));
   }
 
   async findById(id: number): Promise<ProductEntity | null> {
     const product = await this.prisma.product.findUnique({
       where: { id },
+      include: { productTaxes: { include: { tax: true } } },
     });
     return product ? ProductMapper.toEntity(product) : null;
   }
 
   async create(product: ProductEntity): Promise<ProductEntity> {
-    const newProduct = await this.prisma.product.create({
-      data: ProductMapper.toPersistence(product),
-    });
+    const data: Prisma.ProductCreateInput = {
+      name: product.name,
+      price: new Prisma.Decimal(product.price),
+      stock: product.stock,
+    };
+
+    if (product.taxIds.length > 0) {
+      data.productTaxes = {
+        create: product.taxIds.map((tid) => ({
+          tax: { connect: { id: tid } },
+        })),
+      };
+    }
+
+    const newProduct = await this.prisma.product.create({ data });
     return ProductMapper.toEntity(newProduct);
   }
 
@@ -35,15 +50,44 @@ export class PrismaProductRepository extends IProductRepository {
     product: Partial<ProductEntity>,
   ): Promise<ProductEntity> {
     try {
+      // First get current product with relations
+      const current = await this.prisma.product.findUnique({
+        where: { id },
+        include: { productTaxes: true },
+      });
+
+      if (!current) {
+        throw new NotFoundException(`Product with ID ${id} not found`);
+      }
+
       const data: Prisma.ProductUpdateInput = {};
       if (product.name !== undefined) data.name = product.name;
       if (product.price !== undefined)
         data.price = new Prisma.Decimal(product.price);
       if (product.stock !== undefined) data.stock = product.stock;
 
+      // Handle tax relations update if provided
+      if (product.taxIds !== undefined) {
+        // Delete existing relations
+        if (current.productTaxes.length > 0) {
+          await this.prisma.productTax.deleteMany({
+            where: { productId: id },
+          });
+        }
+        // Create new relations
+        if (product.taxIds.length > 0) {
+          data.productTaxes = {
+            create: product.taxIds.map((tid) => ({
+              tax: { connect: { id: tid } },
+            })),
+          };
+        }
+      }
+
       const updatedProduct = await this.prisma.product.update({
         where: { id },
         data,
+        include: { productTaxes: { include: { tax: true } } },
       });
       return ProductMapper.toEntity(updatedProduct);
     } catch (error: unknown) {

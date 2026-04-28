@@ -41,6 +41,9 @@ export class InvoicesController {
       new CreateInvoiceCommand(
         createInvoiceDto.clientId,
         createInvoiceDto.items,
+        createInvoiceDto.subtotalSnapshot,
+        createInvoiceDto.taxTotalSnapshot,
+        createInvoiceDto.totalSnapshot,
       ),
     );
   }

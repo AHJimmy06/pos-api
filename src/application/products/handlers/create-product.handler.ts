@@ -12,8 +12,9 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
   ) {}
 
   async execute(command: CreateProductCommand): Promise<Product> {
-    const { name, price, stock } = command;
+    const { name, price, stock, taxIds } = command;
     const product = new Product(name, price, stock);
+    product.taxIds = taxIds ?? [];
 
     return this.productRepository.create(product);
   }

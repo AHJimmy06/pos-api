@@ -40,6 +40,7 @@ export class ProductsController {
         createProductDto.name,
         createProductDto.price,
         createProductDto.stock,
+        createProductDto.taxIds,
       ),
     );
   }

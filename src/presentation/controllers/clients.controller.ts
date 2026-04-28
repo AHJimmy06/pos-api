@@ -35,7 +35,8 @@ export class ClientsController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Business rule violation (e.g. invalid data or duplicate client).',
+    description:
+      'Business rule violation (e.g. invalid data or duplicate client).',
   })
   async create(@Body() createClientDto: CreateClientDto): Promise<Client> {
     return this.commandBus.execute(

@@ -24,15 +24,27 @@ model Product {
   name            String?         @unique @db.VarChar(255)
   price           Decimal?        @db.Decimal(12, 2)
   stock           Int?
+  productTaxes    ProductTax[]
   invoiceDetails InvoiceDetail[]
 
   @@map("products")
+}
+
+model ProductTax {
+  id       Int     @id @default(autoincrement())
+  productId Int    @map("product_id")
+  taxId    Int     @map("tax_id")
+  product  Product @relation(fields: [productId], references: [id])
+  tax      Tax     @relation(fields: [taxId], references: [id])
+
+  @@map("product_taxes")
 }
 
 model Tax {
   id              Int                @id @default(autoincrement())
   name            String?            @unique @db.VarChar(255)
   currentRate     Decimal?           @map("current_rate") @db.Decimal(5, 2)
+  productTaxes    ProductTax[]
   detailTaxes    InvoiceDetailTax[]
 
   @@map("taxes")
@@ -56,6 +68,7 @@ model InvoiceDetail {
   id                Int                @id @default(autoincrement())
   invoiceId         Int?               @map("invoice_id")
   productId         Int?               @map("product_id")
+  productName       String?            @map("product_name") @db.VarChar(255)
   quantity          Int?
   unitPriceSnapshot Decimal?           @map("unit_price_snapshot") @db.Decimal(12, 2)
   invoice           Invoice?           @relation(fields: [invoiceId], references: [id])

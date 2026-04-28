@@ -6,6 +6,9 @@ export class Invoice {
   issueDate: Date;
   transactionId: string;
   details: InvoiceDetail[] = [];
+  private _subtotalSnapshot?: number;
+  private _taxTotalSnapshot?: number;
+  private _totalSnapshot?: number;
 
   constructor(clientId: number) {
     this.clientId = clientId;
@@ -18,14 +21,29 @@ export class Invoice {
   }
 
   get subtotalSnapshot(): number {
-    return this.details.reduce((sum, d) => sum + d.subtotal, 0);
+    return (
+      this._subtotalSnapshot ??
+      this.details.reduce((sum, d) => sum + d.subtotal, 0)
+    );
   }
 
   get taxTotalSnapshot(): number {
-    return this.details.reduce((sum, d) => sum + d.taxTotal, 0);
+    return (
+      this._taxTotalSnapshot ??
+      this.details.reduce((sum, d) => sum + d.taxTotal, 0)
+    );
   }
 
   get totalSnapshot(): number {
-    return this.subtotalSnapshot + this.taxTotalSnapshot;
+    return this._subtotalSnapshot !== undefined &&
+      this._taxTotalSnapshot !== undefined
+      ? this._subtotalSnapshot + this._taxTotalSnapshot
+      : this.subtotalSnapshot + this.taxTotalSnapshot;
+  }
+
+  setSnapshots(subtotal: number, taxTotal: number, total: number): void {
+    this._subtotalSnapshot = subtotal;
+    this._taxTotalSnapshot = taxTotal;
+    this._totalSnapshot = total;
   }
 }

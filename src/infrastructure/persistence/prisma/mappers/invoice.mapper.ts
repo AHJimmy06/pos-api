@@ -9,6 +9,7 @@ import {
 type PrismaInvoiceWithRelations = PrismaInvoice & {
   details: (PrismaInvoiceDetail & {
     detailTaxes: PrismaInvoiceDetailTax[];
+    product: { name: string | null } | null;
   })[];
 };
 
@@ -22,6 +23,18 @@ export class InvoiceMapper {
     (invoice as { transactionId: string }).transactionId =
       prismaInvoice.transactionId || '';
 
+    // Set stored snapshots if available
+    if (
+      prismaInvoice.subtotalSnapshot !== null &&
+      prismaInvoice.subtotalSnapshot !== undefined
+    ) {
+      invoice.setSnapshots(
+        Number(prismaInvoice.subtotalSnapshot),
+        Number(prismaInvoice.taxTotalSnapshot || 0),
+        Number(prismaInvoice.totalSnapshot || 0),
+      );
+    }
+
     prismaInvoice.details.forEach((prismaDetail) => {
       const detail = new InvoiceDetailEntity(
         prismaDetail.productId || 0,
@@ -30,6 +43,10 @@ export class InvoiceMapper {
       );
       detail.id = prismaDetail.id;
       detail.invoiceId = prismaDetail.invoiceId || undefined;
+
+      // Set product name - prefer denormalized snapshot, fallback to relation
+      detail.productName =
+        prismaDetail.productName || prismaDetail.product?.name || '';
 
       prismaDetail.detailTaxes.forEach((prismaTax) => {
         detail.addTax(
@@ -61,6 +78,7 @@ export class InvoiceMapper {
       details: {
         create: entity.details.map((detail) => ({
           productId: detail.productId,
+          productName: detail.productName || null,
           quantity: detail.quantity,
           unitPriceSnapshot: detail.unitPriceSnapshot,
           detailTaxes: {

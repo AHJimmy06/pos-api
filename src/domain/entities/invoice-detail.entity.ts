@@ -6,6 +6,7 @@ export class InvoiceDetail {
   id: number = 0;
   invoiceId?: number;
   productId: number;
+  productName: string = '';
   quantity: number;
   private _unitPriceSnapshot: Price;
   detailTaxes: InvoiceDetailTax[] = [];
