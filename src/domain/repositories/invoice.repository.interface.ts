@@ -3,5 +3,10 @@ import { Invoice } from '../entities/invoice.entity';
 export abstract class IInvoiceRepository {
   abstract create(invoice: Invoice): Promise<Invoice>;
   abstract findAll(): Promise<Invoice[]>;
+  abstract findAllPaginated(
+    page: number,
+    limit: number,
+    searchId?: number,
+  ): Promise<{ data: Invoice[]; total: number }>;
   abstract findById(id: number): Promise<Invoice | null>;
 }

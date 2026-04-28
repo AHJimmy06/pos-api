@@ -11,9 +11,11 @@ export class PrismaTaxRepository extends ITaxRepository {
     super();
   }
 
-  async findAll(): Promise<TaxEntity[]> {
-    const taxes = await this.prisma.tax.findMany();
-    return taxes.map((tax) => TaxMapper.toEntity(tax));
+async findAll(): Promise<TaxEntity[]> {
+    const taxes = await this.prisma.tax.findMany({
+      orderBy: { id: 'asc' },
+    });
+    return taxes.map(TaxMapper.toEntity);
   }
 
   async findById(id: number): Promise<TaxEntity | null> {

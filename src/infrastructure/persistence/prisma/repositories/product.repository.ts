@@ -13,6 +13,7 @@ export class PrismaProductRepository extends IProductRepository {
 
   async findAll(): Promise<ProductEntity[]> {
     const products = await this.prisma.product.findMany({
+      orderBy: { id: 'asc' },
       include: { productTaxes: { include: { tax: true } } },
     });
     return products.map((product) => ProductMapper.toEntity(product));

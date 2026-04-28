@@ -5,9 +5,10 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { CreateInvoiceDto } from '../invoices/dto/create-invoice.dto';
 import { CreateInvoiceCommand } from '../../application/invoices/commands/create-invoice.command';
 import { GetInvoicesQuery } from '../../application/invoices/queries/get-invoices.query';
@@ -49,9 +50,36 @@ export class InvoicesController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all invoices' })
-  async findAll(): Promise<Invoice[]> {
-    return this.queryBus.execute(new GetInvoicesQuery());
+  @ApiOperation({ summary: 'Get all invoices (paginated)' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'searchId',
+    required: false,
+    type: Number,
+    description: 'Filter by invoice ID',
+  })
+  async findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('searchId') searchId?: string,
+  ): Promise<{ data: Invoice[]; total: number }> {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    const searchIdNum = searchId ? parseInt(searchId, 10) : undefined;
+    return this.queryBus.execute(
+      new GetInvoicesQuery(pageNum, limitNum, searchIdNum),
+    );
   }
 
   @Get(':id')

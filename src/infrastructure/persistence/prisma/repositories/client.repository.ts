@@ -12,9 +12,11 @@ export class PrismaClientRepository extends IClientRepository {
     super();
   }
 
-  async findAll(): Promise<ClientEntity[]> {
-    const clients = await this.prisma.client.findMany();
-    return clients.map((client) => ClientMapper.toEntity(client));
+async findAll(): Promise<ClientEntity[]> {
+    const clients = await this.prisma.client.findMany({
+      orderBy: { id: 'asc' },
+    });
+    return clients.map(ClientMapper.toEntity);
   }
 
   async findById(id: number): Promise<ClientEntity | null> {

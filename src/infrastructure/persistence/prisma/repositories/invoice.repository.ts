@@ -20,9 +20,40 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
           },
         },
       },
+      orderBy: { issueDate: 'desc' },
     });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return invoices.map((invoice) => InvoiceMapper.toEntity(invoice as any));
+  }
+
+  async findAllPaginated(
+    page: number,
+    limit: number,
+    searchId?: number,
+  ): Promise<{ data: InvoiceEntity[]; total: number }> {
+    const where = searchId ? { id: searchId } : {};
+    const [invoices, total] = await Promise.all([
+      this.prisma.invoice.findMany({
+        where,
+        include: {
+          details: {
+            include: {
+              detailTaxes: true,
+              product: true,
+            },
+          },
+        },
+        orderBy: { issueDate: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.invoice.count({ where }),
+    ]);
+
+    return {
+      data: invoices.map((invoice) => InvoiceMapper.toEntity(invoice as any)),
+      total,
+    };
   }
 
   async findById(id: number): Promise<InvoiceEntity | null> {
