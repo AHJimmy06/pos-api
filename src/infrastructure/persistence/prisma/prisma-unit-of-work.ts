@@ -14,6 +14,7 @@ export class PrismaUnitOfWork extends IUnitOfWork {
 
   async runInTransaction<T>(work: () => Promise<T>): Promise<T> {
     return this.prisma.$transaction(async (tx) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       return this.asyncLocalStorage.run(tx as any, work);
     });
   }

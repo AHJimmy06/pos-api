@@ -1080,7 +1080,32 @@
         }
       ],
       "trend": "stable"
+    },
+    "src\\infrastructure\\persistence\\prisma\\prisma-unit-of-work.ts": {
+      "latest": {
+        "commit": "fdc9d7e",
+        "timestamp": "2026-05-21T23:27:53.335Z",
+        "mi": 55.1,
+        "cognitive": 1,
+        "nesting": 3,
+        "lines": 21,
+        "maxCyclomatic": 2,
+        "entropy": 4.92
+      },
+      "history": [
+        {
+          "commit": "fdc9d7e",
+          "timestamp": "2026-05-21T23:27:53.335Z",
+          "mi": 55.1,
+          "cognitive": 1,
+          "nesting": 3,
+          "lines": 21,
+          "maxCyclomatic": 2,
+          "entropy": 4.92
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-05-21T23:23:39.322Z"
+  "capturedAt": "2026-05-21T23:27:58.335Z"
 }

@@ -3,13 +3,13 @@
   "issues": [
     {
       "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
     },
     {
       "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
+      "name": "scratch/read-memories.js",
+      "file": "scratch/read-memories.js"
     },
     {
       "type": "file",
@@ -135,13 +135,13 @@
   "unusedFiles": [
     {
       "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
     },
     {
       "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
+      "name": "scratch/read-memories.js",
+      "file": "scratch/read-memories.js"
     },
     {
       "type": "file",
