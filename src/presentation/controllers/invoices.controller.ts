@@ -7,19 +7,27 @@ import {
   Post,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request } from 'express';
 
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateInvoiceDto } from '../invoices/dto/create-invoice.dto';
 import { CreateInvoiceCommand } from '../../application/invoices/commands/create-invoice.command';
 import { GetInvoicesQuery } from '../../application/invoices/queries/get-invoices.query';
 import { GetInvoiceQuery } from '../../application/invoices/queries/get-invoice.query';
 import { Invoice } from '../../domain/entities/invoice.entity';
+import { JwtAuthGuard } from '../../infrastructure/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../infrastructure/auth/guards/roles.guard';
+import { Roles } from '../../infrastructure/auth/decorators/roles.decorator';
+import { UserRole } from '../../domain/enums/user-role.enum';
+
 
 @ApiTags('invoices')
+@ApiBearerAuth('JWT-auth')
 @Controller('invoices')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class InvoicesController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -27,7 +35,9 @@ export class InvoicesController {
   ) {}
 
   @Post()
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
   @ApiOperation({ summary: 'Create a new invoice' })
+
   @ApiResponse({
     status: 201,
     description: 'The invoice has been successfully created.',
