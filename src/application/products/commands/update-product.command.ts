@@ -5,6 +5,7 @@ export class UpdateProductCommand {
       name?: string;
       price?: number;
       stock?: number;
+      taxIds?: number[];
     },
   ) {}
 }

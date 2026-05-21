@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateTaxCommand } from '../commands/update-tax.command';
 import { Inject } from '@nestjs/common';
-import { ITaxRepository } from '../../../domain/taxes/repositories/tax.repository.interface';
-import { Tax } from '../../../domain/taxes/entities/tax.entity';
+import { ITaxRepository } from '../../../domain/repositories/tax.repository.interface';
+import { Tax } from '../../../domain/entities/tax.entity';
 
 @CommandHandler(UpdateTaxCommand)
 export class UpdateTaxHandler implements ICommandHandler<UpdateTaxCommand> {

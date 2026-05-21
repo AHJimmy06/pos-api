@@ -1,9 +1,209 @@
-node_modules
-dist
-.env
+# =============================================
+# Node / TypeScript
+# =============================================
+node_modules/
+dist/
 *.log
-docker-data
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =============================================
+# Environment & Secrets
+# =============================================
+.env
+.env.local
+.env.*.local
+*.pem
+
+# =============================================
+# Docker & Database
+# =============================================
+docker-data/
 prisma/*.db
 prisma/*.db-journal
+*.sqlite
+*.sqlite3
+
+# =============================================
+# OS artifacts
+# =============================================
 .DS_Store
 Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# =============================================
+# Pi / el Gentleman runtime
+# =============================================
+.atl/
+.pi/
+pi-data/
+*.pi.log
+
+# =============================================
+# Project requirements / specs (private)
+# =============================================
+Requisitos/
+requirements/
+
+# =============================================
+# AI / Agent tooling
+# =============================================
+# OpenAI / Anthropic API logs y caches
+.ai/
+.cache/
+*.ai-cache*
+
+# Cursor
+.cursor/
+.cursor/rules/
+.cursor/mcp_settings*
+.cursor/vscode-settings.json
+
+# Windsurf
+.windsurf/
+
+# Continue.dev
+.continue/
+continue/**
+
+# GitHub Copilot
+.copilot/
+
+# Aider
+.aider/
+
+# Roo / Roo Code
+.roo/
+
+# Codeium
+.codeium*
+
+# Tabnine
+.tabnine*
+
+# Replit
+.replit
+
+# Lovable
+.lovable/
+
+# Bolt (Bolt.new)
+.bolt/
+
+# Mintlify
+.mintlify/
+
+# Docusaurus
+docsaurus/
+
+# OpenCode / OpenHands
+.opencode/
+
+# Ollama local models
+.ollama/
+
+# LM Studio
+.lm-studio/
+
+# Jan (local AI)
+.jan/
+
+# =============================================
+# Editor / IDE
+# =============================================
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.vscode/settings.*
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/launch.*
+.vscode/*.code-snippets
+.vscode/argv.json
+
+# Cursor
+.cursor/
+.cursor/rules/
+.cursor/mcp_settings*
+.cursor/launch.json
+
+# JetBrains (todos los productos)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+log/
+libs/
+
+# Sublime Text
+*.sublime-*
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+*.atom.*
+
+# Emacs
+*~/
+.#*
+.\#*
+\#*\#
+.*.swp
+.*~
+
+# Vim
+.*.swp
+.*.swo
+.*.swn
+.*.vim
+
+# Nova
+nova.globalt
+*.nova/
+
+# Kate
+.*.kate-workfile*
+
+# Brackets
+*.brackets*
+.brackets*
+
+# Code Runner
+.code-runner/
+
+# =============================================
+# Testing & Coverage
+# =============================================
+coverage/
+.nyc_output/
+*.lcov
+playwright-report/
+test-results/
+*.testresults
+
+# =============================================
+# Build artifacts
+# =============================================
+build/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# =============================================
+# Misc
+# =============================================
+*.bak
+*.tmp
+*.temp
+.temp/
+tmp/

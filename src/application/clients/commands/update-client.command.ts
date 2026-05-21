@@ -1,4 +1,4 @@
-import { Client } from '../../../domain/clients/entities/client.entity';
+import { Client } from '../../../domain/entities/client.entity';
 
 export class UpdateClientCommand {
   constructor(

@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DeleteClientCommand } from '../commands/delete-client.command';
 import { Inject } from '@nestjs/common';
-import { IClientRepository } from '../../../domain/clients/repositories/client.repository.interface';
+import { IClientRepository } from '../../../domain/repositories/client.repository.interface';
+import { DeleteResult } from '../../../domain/common/delete-result.interface';
 
 @CommandHandler(DeleteClientCommand)
 export class DeleteClientHandler implements ICommandHandler<DeleteClientCommand> {
@@ -10,8 +11,8 @@ export class DeleteClientHandler implements ICommandHandler<DeleteClientCommand>
     private readonly clientRepository: IClientRepository,
   ) {}
 
-  async execute(command: DeleteClientCommand): Promise<void> {
+  async execute(command: DeleteClientCommand): Promise<DeleteResult> {
     const { id } = command;
-    await this.clientRepository.delete(id);
+    return this.clientRepository.delete(id);
   }
 }
