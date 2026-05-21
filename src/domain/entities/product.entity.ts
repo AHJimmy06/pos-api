@@ -6,6 +6,7 @@ export class Product {
   id: number = 0;
   taxIds: number[] = [];
   version: number = 0;
+  isActive: boolean = true;
   private _name: Name;
   private _price: Price;
   private _stock: Stock;

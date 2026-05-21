@@ -2,11 +2,29 @@ import { Injectable } from '@nestjs/common';
 import { IRoleRepository } from '../../../../domain/repositories/role.repository.interface';
 import { Role } from '../../../../domain/entities/role.entity';
 import { UserRole } from '../../../../domain/enums/user-role.enum';
-import { PrismaService } from '../prisma.service';
+import { PrismaUnitOfWork } from '../prisma-unit-of-work';
 
 @Injectable()
 export class PrismaRoleRepository implements IRoleRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly uow: PrismaUnitOfWork) {}
+
+  private get prisma() {
+    return this.uow.getClient();
+  }
+
+  async findById(id: number): Promise<Role | null> {
+    const role = await this.prisma.role.findUnique({
+      where: { id },
+    });
+    return role ? this.mapToDomain(role) : null;
+  }
+
+  async findByIds(ids: number[]): Promise<Role[]> {
+    const roles = await this.prisma.role.findMany({
+      where: { id: { in: ids } },
+    });
+    return roles.map((r) => this.mapToDomain(r));
+  }
 
   async findByName(name: UserRole): Promise<Role | null> {
     const role = await this.prisma.role.findUnique({

@@ -12,7 +12,6 @@ import {
 } from 'class-validator';
 import { InvoiceStatus } from '../../../domain/enums/invoice-status.enum';
 
-
 export class TaxSnapshotDto {
   @ApiProperty({ example: 1 })
   @IsInt()
@@ -89,7 +88,6 @@ export class CreateInvoiceDto {
   status?: InvoiceStatus;
 
   @ApiProperty({ example: 4500, required: false })
-
   @IsNumber()
   @IsOptional()
   subtotalSnapshot?: number;

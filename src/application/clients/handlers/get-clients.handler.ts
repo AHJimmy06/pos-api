@@ -11,7 +11,13 @@ export class GetClientsHandler implements IQueryHandler<GetClientsQuery> {
     private readonly clientRepository: IClientRepository,
   ) {}
 
-  async execute(): Promise<Client[]> {
-    return this.clientRepository.findAll();
+  async execute(
+    query: GetClientsQuery,
+  ): Promise<{ data: Client[]; total: number }> {
+    return this.clientRepository.findAllPaginated(
+      query.page,
+      query.limit,
+      query.search,
+    );
   }
 }

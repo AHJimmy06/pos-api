@@ -7,6 +7,8 @@ import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.mod
 import { ClientsModule } from '../clients/clients.module';
 import { ProductsModule } from '../products/products.module';
 import { TaxesModule } from '../taxes/taxes.module';
+import { AuthModule } from '../auth/auth.module';
+import { PdfService } from '../../infrastructure/common/services/pdf.service';
 
 @Module({
   imports: [
@@ -15,10 +17,12 @@ import { TaxesModule } from '../taxes/taxes.module';
     ClientsModule,
     ProductsModule,
     TaxesModule,
+    AuthModule,
   ],
   controllers: [InvoicesController],
   providers: [
     ...InvoiceHandlers,
+    PdfService,
     {
       provide: 'IInvoiceRepository',
       useClass: PrismaInvoiceRepository,

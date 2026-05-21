@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -15,6 +16,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { CreateClientDto } from '../clients/dto/create-client.dto';
 import { UpdateClientDto } from '../clients/dto/update-client.dto';
@@ -28,6 +30,8 @@ import { JwtAuthGuard } from '../../infrastructure/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../infrastructure/auth/guards/roles.guard';
 import { Roles } from '../../infrastructure/auth/decorators/roles.decorator';
 import { UserRole } from '../../domain/enums/user-role.enum';
+import { normalizePageSize } from '../../infrastructure/common/utils/page-size.util';
+import { DeleteResultDto } from '../common/dto/delete-result.dto';
 
 @ApiTags('clients')
 @ApiBearerAuth('JWT-auth')
@@ -65,9 +69,20 @@ export class ClientsController {
 
   @Get()
   @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
-  @ApiOperation({ summary: 'Get all clients' })
-  async findAll(): Promise<Client[]> {
-    return this.queryBus.execute(new GetClientsQuery());
+  @ApiOperation({ summary: 'Get all clients (paginated)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  async findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ): Promise<{ data: Client[]; total: number }> {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = normalizePageSize(limit);
+    return this.queryBus.execute(
+      new GetClientsQuery(pageNum, limitNum, search),
+    );
   }
 
   @Get(':id')
@@ -91,9 +106,14 @@ export class ClientsController {
 
   @Delete(':id')
   @Roles(UserRole.ADMINISTRATOR)
-  @ApiOperation({ summary: 'Delete a client' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @ApiOperation({
+    summary: 'Delete a client (physical if no invoices, soft otherwise)',
+  })
+  @ApiResponse({ status: 200, description: 'Client deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'Client not found.' })
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DeleteResultDto> {
     return this.commandBus.execute(new DeleteClientCommand(id));
   }
 }
-

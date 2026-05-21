@@ -27,5 +27,3 @@ export class CreateInvoiceCommand {
     public readonly totalSnapshot?: number,
   ) {}
 }
-
-

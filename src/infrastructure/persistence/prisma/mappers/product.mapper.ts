@@ -8,6 +8,7 @@ export class ProductMapper {
     price: Prisma.Decimal | number | null;
     stock: number | null;
     version: number;
+    isActive: boolean;
     productTaxes?: { taxId: number }[];
   }): ProductEntity {
     const priceVal = prismaProduct.price
@@ -20,6 +21,7 @@ export class ProductMapper {
     );
     entity.id = prismaProduct.id;
     entity.version = prismaProduct.version ?? 0;
+    entity.isActive = prismaProduct.isActive;
     entity.taxIds = prismaProduct.productTaxes?.map((pt) => pt.taxId) || [];
     return entity;
   }
@@ -29,6 +31,7 @@ export class ProductMapper {
       name: entity.name,
       price: new Prisma.Decimal(entity.price),
       stock: entity.stock,
+      isActive: entity.isActive,
       productTaxes:
         entity.taxIds.length > 0
           ? {

@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './controllers/auth.controller';
+import { RolesController } from '../controllers/roles.controller';
 import { PasswordService } from '../../infrastructure/auth/services/password.service';
 import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
 import { JwtStrategy } from '../../infrastructure/auth/strategies/jwt.strategy';
@@ -27,7 +28,7 @@ const AuthHandlers = [LoginHandler, RegisterUserHandler, UnlockUserHandler];
     }),
     PrismaModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, RolesController],
   providers: [
     ...AuthHandlers,
     PasswordService,

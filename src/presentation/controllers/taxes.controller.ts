@@ -90,4 +90,3 @@ export class TaxesController {
     return this.commandBus.execute(new DeleteTaxCommand(id));
   }
 }
-

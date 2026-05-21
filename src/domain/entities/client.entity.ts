@@ -8,6 +8,7 @@ export class Client {
   private _email: Email;
   phone: string = '';
   address: string = '';
+  isActive: boolean = true;
 
   constructor(firstName: string, lastName: string, email: string) {
     this._firstName = new Name(firstName);

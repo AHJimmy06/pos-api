@@ -1,12 +1,17 @@
 import { InvoiceDetail } from './invoice-detail.entity';
 import { InvoiceStatus } from '../enums/invoice-status.enum';
+import { PaymentMethod } from '../enums/payment-method.enum';
 
 export class Invoice {
   id?: number;
   clientId: number;
+  userId?: number;
   issueDate: Date;
   transactionId: string;
   status: InvoiceStatus;
+  paymentMethod: PaymentMethod = PaymentMethod.CASH;
+  isActive: boolean = true;
+  version: number = 0;
   details: InvoiceDetail[] = [];
   private _subtotalSnapshot?: number;
   private _taxTotalSnapshot?: number;
@@ -18,7 +23,6 @@ export class Invoice {
     this.transactionId = `TRX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     this.status = InvoiceStatus.CONFIRMED;
   }
-
 
   addDetail(detail: InvoiceDetail): void {
     this.details.push(detail);
@@ -49,5 +53,9 @@ export class Invoice {
     this._subtotalSnapshot = subtotal;
     this._taxTotalSnapshot = taxTotal;
     this._totalSnapshot = total;
+  }
+
+  clearDetails(): void {
+    this.details = [];
   }
 }

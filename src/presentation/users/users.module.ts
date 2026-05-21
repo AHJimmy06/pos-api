@@ -5,10 +5,27 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersController } from './controllers/users.controller';
 import { AuthModule } from '../auth/auth.module';
 import { UnlockUserHandler } from '../../application/auth/handlers/unlock-user.handler';
+import {
+  GetUsersHandler,
+  GetUserHandler,
+  UpdateUserHandler,
+  DeleteUserHandler,
+  GetErrorLogsHandler,
+  AssignRolesHandler,
+} from '../../application/users';
 import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
 import { PrismaUserRepository } from '../../infrastructure/persistence/prisma/repositories/user.repository';
+import { PrismaRoleRepository } from '../../infrastructure/persistence/prisma/repositories/role.repository';
 
-const UserHandlers = [UnlockUserHandler];
+const UserHandlers = [
+  UnlockUserHandler,
+  GetUsersHandler,
+  GetUserHandler,
+  UpdateUserHandler,
+  DeleteUserHandler,
+  GetErrorLogsHandler,
+  AssignRolesHandler,
+];
 
 @Module({
   imports: [
@@ -27,6 +44,10 @@ const UserHandlers = [UnlockUserHandler];
     {
       provide: 'IUserRepository',
       useClass: PrismaUserRepository,
+    },
+    {
+      provide: 'IRoleRepository',
+      useClass: PrismaRoleRepository,
     },
   ],
 })

@@ -69,4 +69,3 @@ export class AuthController {
     return { message: 'User created successfully', userId: user.id };
   }
 }
-

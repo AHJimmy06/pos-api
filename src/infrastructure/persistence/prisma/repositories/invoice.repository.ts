@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaUnitOfWork } from '../prisma-unit-of-work';
 import { IInvoiceRepository } from '../../../../domain/repositories/invoice.repository.interface';
 import { Invoice as InvoiceEntity } from '../../../../domain/entities/invoice.entity';
 import {
@@ -10,8 +10,12 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaInvoiceRepository extends IInvoiceRepository {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly uow: PrismaUnitOfWork) {
     super();
+  }
+
+  private get prisma() {
+    return this.uow.getClient();
   }
 
   async findAll(): Promise<InvoiceEntity[]> {
@@ -35,8 +39,12 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
     page: number,
     limit: number,
     searchId?: number,
+    userId?: number,
   ): Promise<{ data: InvoiceEntity[]; total: number }> {
-    const where = searchId ? { id: searchId } : {};
+    const where: Prisma.InvoiceWhereInput = {};
+    if (searchId) where.id = searchId;
+    if (userId) where.userId = userId;
+
     const [invoices, total] = await Promise.all([
       this.prisma.invoice.findMany({
         where,
@@ -97,5 +105,29 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
     });
 
     return InvoiceMapper.toEntity(createdInvoice);
+  }
+
+  async findByIdWithDetails(id: number): Promise<InvoiceEntity | null> {
+    // Alias for findById with full relations
+    return this.findById(id);
+  }
+
+  async update(id: number, invoice: InvoiceEntity): Promise<InvoiceEntity> {
+    const persistenceData = InvoiceMapper.toPersistenceUpdate(invoice);
+
+    const updatedInvoice = await this.prisma.invoice.update({
+      where: { id },
+      data: persistenceData,
+      include: {
+        details: {
+          include: {
+            detailTaxes: true,
+            product: true,
+          },
+        },
+      },
+    });
+
+    return InvoiceMapper.toEntity(updatedInvoice);
   }
 }

@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaUnitOfWork } from '../prisma-unit-of-work';
 import { IStockMovementRepository } from '../../../../domain/repositories/stock-movement.repository.interface';
 import { StockMovement as StockMovementEntity } from '../../../../domain/entities/stock-movement.entity';
 import { StockMovementMapper } from '../mappers/stock-movement.mapper';
 
 @Injectable()
 export class PrismaStockMovementRepository extends IStockMovementRepository {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly uow: PrismaUnitOfWork) {
     super();
+  }
+
+  private get prisma() {
+    return this.uow.getClient();
   }
 
   async create(movement: StockMovementEntity): Promise<StockMovementEntity> {

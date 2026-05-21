@@ -1,18 +1,56 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaUnitOfWork } from '../prisma-unit-of-work';
 import { IUserRepository } from '../../../../domain/repositories/user.repository.interface';
 import { User } from '../../../../domain/entities/user.entity';
 import { UserRole } from '../../../../domain/enums/user-role.enum';
-import { PrismaService } from '../prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly uow: PrismaUnitOfWork) {}
+
+  private get prisma() {
+    return this.uow.getClient();
+  }
 
   async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany({
       include: { roles: { include: { role: true } } },
     });
     return users.map((u) => this.mapToDomain(u));
+  }
+
+  async findAllPaginated(
+    page: number,
+    limit: number,
+    search?: string,
+  ): Promise<{ data: User[]; total: number }> {
+    const where: Prisma.UserWhereInput = {};
+    if (search) {
+      where.OR = [
+        { username: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { cedula: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        include: { roles: { include: { role: true } } },
+        orderBy: { id: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      data: users.map((u) => this.mapToDomain(u)),
+      total,
+    };
   }
 
   async findById(id: number): Promise<User | null> {
@@ -77,6 +115,31 @@ export class PrismaUserRepository implements IUserRepository {
       include: { roles: { include: { role: true } } },
     });
     return this.mapToDomain(updated);
+  }
+
+  async updateRoles(id: number, roleIds: number[]): Promise<User> {
+    // Delete existing roles
+    await this.prisma.userRole.deleteMany({
+      where: { userId: id },
+    });
+
+    // Create new roles
+    await this.prisma.userRole.createMany({
+      data: roleIds.map((roleId) => ({
+        userId: id,
+        roleId,
+      })),
+    });
+
+    // Return updated user
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { roles: { include: { role: true } } },
+    });
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    return this.mapToDomain(user);
   }
 
   async softDelete(id: number): Promise<void> {

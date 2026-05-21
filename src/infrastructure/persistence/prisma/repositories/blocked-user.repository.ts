@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { IBlockedUserRepository } from '../../../../domain/repositories/blocked-user.repository.interface';
 import { BlockedUser } from '../../../../domain/entities/blocked-user.entity';
-import { PrismaService } from '../prisma.service';
+import { PrismaUnitOfWork } from '../prisma-unit-of-work';
 
 @Injectable()
 export class PrismaBlockedUserRepository implements IBlockedUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly uow: PrismaUnitOfWork) {}
+
+  private get prisma() {
+    return this.uow.getClient();
+  }
 
   async findByUserId(userId: number): Promise<BlockedUser | null> {
     const blocked = await this.prisma.blockedUser.findUnique({
