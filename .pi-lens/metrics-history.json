@@ -1005,7 +1005,82 @@
         }
       ],
       "trend": "stable"
+    },
+    "src\\domain\\interfaces\\change-invoice-status-result.interface.ts": {
+      "latest": {
+        "commit": "9c11cc3",
+        "timestamp": "2026-05-21T23:20:12.650Z",
+        "mi": 73.1,
+        "cognitive": 0,
+        "nesting": 0,
+        "lines": 6,
+        "maxCyclomatic": 1,
+        "entropy": 3.24
+      },
+      "history": [
+        {
+          "commit": "9c11cc3",
+          "timestamp": "2026-05-21T23:20:12.650Z",
+          "mi": 73.1,
+          "cognitive": 0,
+          "nesting": 0,
+          "lines": 6,
+          "maxCyclomatic": 1,
+          "entropy": 3.24
+        }
+      ],
+      "trend": "stable"
+    },
+    "src\\application\\users\\queries\\get-user.query.ts": {
+      "latest": {
+        "commit": "9c11cc3",
+        "timestamp": "2026-05-21T23:21:48.492Z",
+        "mi": 87.3,
+        "cognitive": 0,
+        "nesting": 1,
+        "lines": 3,
+        "maxCyclomatic": 1,
+        "entropy": 3
+      },
+      "history": [
+        {
+          "commit": "9c11cc3",
+          "timestamp": "2026-05-21T23:21:48.492Z",
+          "mi": 87.3,
+          "cognitive": 0,
+          "nesting": 1,
+          "lines": 3,
+          "maxCyclomatic": 1,
+          "entropy": 3
+        }
+      ],
+      "trend": "stable"
+    },
+    "eslint.config.mjs": {
+      "latest": {
+        "commit": "9c11cc3",
+        "timestamp": "2026-05-21T23:23:34.314Z",
+        "mi": 51.8,
+        "cognitive": 0,
+        "nesting": 0,
+        "lines": 33,
+        "maxCyclomatic": 1,
+        "entropy": 3.81
+      },
+      "history": [
+        {
+          "commit": "9c11cc3",
+          "timestamp": "2026-05-21T23:23:34.314Z",
+          "mi": 51.8,
+          "cognitive": 0,
+          "nesting": 0,
+          "lines": 33,
+          "maxCyclomatic": 1,
+          "entropy": 3.81
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-05-21T23:15:18.246Z"
+  "capturedAt": "2026-05-21T23:23:39.322Z"
 }

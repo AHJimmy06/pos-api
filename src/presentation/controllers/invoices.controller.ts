@@ -140,7 +140,7 @@ export class InvoicesController {
     @Body() changeStatusDto: ChangeInvoiceStatusDto,
     @Req() req: Request & { user?: { id: number; roles?: string[] } },
   ) {
-    const result = await this.commandBus.execute(
+    return this.commandBus.execute(
       new ChangeInvoiceStatusCommand(
         id,
         changeStatusDto.status,
@@ -148,8 +148,6 @@ export class InvoicesController {
         req.user?.roles?.[0],
       ),
     );
-
-    return result;
   }
 
   @Get()

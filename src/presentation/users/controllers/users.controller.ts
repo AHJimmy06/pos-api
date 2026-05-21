@@ -146,7 +146,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Get user roles (admin only)' })
   @ApiResponse({ status: 200, description: 'User roles' })
   async getUserRoles(@Param('id', ParseIntPipe) id: number): Promise<Role[]> {
-    const user = await this.queryBus.execute(new GetUserQuery(id));
+    const user: any = await this.queryBus.execute(new GetUserQuery(id));
+
     return user.roles as Role[];
   }
 

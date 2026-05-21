@@ -88,9 +88,7 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
   }
 
   async create(invoice: InvoiceEntity): Promise<InvoiceEntity> {
-    const persistenceData = InvoiceMapper.toPersistence(
-      invoice,
-    ) as unknown as Prisma.InvoiceCreateInput;
+    const persistenceData: any = InvoiceMapper.toPersistence(invoice);
 
     const createdInvoice = await this.prisma.invoice.create({
       data: persistenceData,
@@ -113,7 +111,7 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
   }
 
   async update(id: number, invoice: InvoiceEntity): Promise<InvoiceEntity> {
-    const persistenceData = InvoiceMapper.toPersistenceUpdate(invoice);
+    const persistenceData: any = InvoiceMapper.toPersistenceUpdate(invoice);
 
     const updatedInvoice = await this.prisma.invoice.update({
       where: { id },

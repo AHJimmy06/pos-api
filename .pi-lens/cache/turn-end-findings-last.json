@@ -1,4 +1,4 @@
 {
-  "signature": "src/infrastructure/persistence/prisma/mappers/invoice.mapper.ts::Unresolved from this turn — src/infrastructure/persistence/prisma/mappers/invoice.mapper.ts:\n🔴 STOP — 2 issue(s) must be fixed:\n  L76: Object literal may only specify known properties, but 'clientId' does not exist in type 'InvoiceCreateInput'. Did you mean to write 'client'?\n  L84: Namespace '\"c:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/node_modules/.prisma/client/index\".Prisma' has no exported member 'PaymentMethod'.",
+  "signature": "src/presentation/controllers/invoices.controller.ts::Unresolved from this turn — src/presentation/controllers/invoices.controller.ts:\n🔴 STOP — 125 issue(s) must be fixed:\n  L167: Expression expected.\n  L167: ',' expected.\n  L168: Expression expected.\n  L168: ',' expected.\n  L168: Expression expected.\n  L169: Expression expected.\n  L169: ',' expected.\n  L169: Expression expected.\n  L170: Expression expected.\n  L170: ',' expected.\n  ... and 115 more",
   "sessionId": "lens-mpfr5jv5-df94f4aa"
 }

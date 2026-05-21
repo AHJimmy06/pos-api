@@ -12,7 +12,7 @@ export class PdfService {
     seller: User | null,
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const doc: PDFKit.PDFDocument = new (PDFDocument as any)({ margin: 50 });
       const chunks: Buffer[] = [];
 

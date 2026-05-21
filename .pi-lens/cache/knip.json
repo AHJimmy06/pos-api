@@ -3,13 +3,13 @@
   "issues": [
     {
       "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
+      "name": "scratch/read-memories.js",
+      "file": "scratch/read-memories.js"
     },
     {
       "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
     },
     {
       "type": "file",
@@ -23,13 +23,13 @@
     },
     {
       "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
+      "name": "src/application/clients/commands/index.ts",
+      "file": "src/application/clients/commands/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
+      "name": "src/application/clients/queries/index.ts",
+      "file": "src/application/clients/queries/index.ts"
     },
     {
       "type": "file",
@@ -135,13 +135,13 @@
   "unusedFiles": [
     {
       "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
+      "name": "scratch/read-memories.js",
+      "file": "scratch/read-memories.js"
     },
     {
       "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
     },
     {
       "type": "file",
@@ -155,13 +155,13 @@
     },
     {
       "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
+      "name": "src/application/clients/commands/index.ts",
+      "file": "src/application/clients/commands/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
+      "name": "src/application/clients/queries/index.ts",
+      "file": "src/application/clients/queries/index.ts"
     },
     {
       "type": "file",
