@@ -7,9 +7,15 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CreateProductDto } from '../products/dto/create-product.dto';
 import { UpdateProductDto } from '../products/dto/update-product.dto';
 import { CreateProductCommand } from '../../application/products/commands/create-product.command';
@@ -18,8 +24,14 @@ import { DeleteProductCommand } from '../../application/products/commands/delete
 import { GetProductsQuery } from '../../application/products/queries/get-products.query';
 import { GetProductQuery } from '../../application/products/queries/get-product.query';
 import { Product } from '../../domain/entities/product.entity';
+import { JwtAuthGuard } from '../../infrastructure/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../infrastructure/auth/guards/roles.guard';
+import { Roles } from '../../infrastructure/auth/decorators/roles.decorator';
+import { UserRole } from '../../domain/enums/user-role.enum';
 
 @ApiTags('products')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
 export class ProductsController {
   constructor(
@@ -28,6 +40,7 @@ export class ProductsController {
   ) {}
 
   @Post()
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiResponse({
     status: 201,
@@ -46,12 +59,14 @@ export class ProductsController {
   }
 
   @Get()
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
   @ApiOperation({ summary: 'Get all products' })
   async findAll(): Promise<Product[]> {
     return this.queryBus.execute(new GetProductsQuery());
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
@@ -59,6 +74,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({ status: 200, description: 'Product updated successfully.' })
   @ApiResponse({ status: 400, description: 'Business rule violation.' })
@@ -73,6 +89,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Delete a product' })
   @ApiResponse({ status: 204, description: 'Product deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
@@ -80,3 +97,4 @@ export class ProductsController {
     return this.commandBus.execute(new DeleteProductCommand(id));
   }
 }
+

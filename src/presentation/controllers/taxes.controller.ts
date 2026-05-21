@@ -7,9 +7,15 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CreateTaxDto } from '../taxes/dto/create-tax.dto';
 import { UpdateTaxDto } from '../taxes/dto/update-tax.dto';
 import { CreateTaxCommand } from '../../application/taxes/commands/create-tax.command';
@@ -18,8 +24,14 @@ import { DeleteTaxCommand } from '../../application/taxes/commands/delete-tax.co
 import { GetTaxesQuery } from '../../application/taxes/queries/get-taxes.query';
 import { GetTaxQuery } from '../../application/taxes/queries/get-tax.query';
 import { Tax } from '../../domain/entities/tax.entity';
+import { JwtAuthGuard } from '../../infrastructure/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../infrastructure/auth/guards/roles.guard';
+import { Roles } from '../../infrastructure/auth/decorators/roles.decorator';
+import { UserRole } from '../../domain/enums/user-role.enum';
 
 @ApiTags('taxes')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('taxes')
 export class TaxesController {
   constructor(
@@ -28,6 +40,7 @@ export class TaxesController {
   ) {}
 
   @Post()
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Create a new tax' })
   @ApiResponse({
     status: 201,
@@ -41,12 +54,14 @@ export class TaxesController {
   }
 
   @Get()
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
   @ApiOperation({ summary: 'Get all taxes' })
   async findAll(): Promise<Tax[]> {
     return this.queryBus.execute(new GetTaxesQuery());
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
   @ApiOperation({ summary: 'Get a tax by id' })
   @ApiResponse({ status: 404, description: 'Tax not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Tax> {
@@ -54,6 +69,7 @@ export class TaxesController {
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Update a tax' })
   @ApiResponse({ status: 200, description: 'Tax updated successfully.' })
   @ApiResponse({ status: 400, description: 'Business rule violation.' })
@@ -66,6 +82,7 @@ export class TaxesController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Delete a tax' })
   @ApiResponse({ status: 204, description: 'Tax deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Tax not found.' })
@@ -73,3 +90,4 @@ export class TaxesController {
     return this.commandBus.execute(new DeleteTaxCommand(id));
   }
 }
+

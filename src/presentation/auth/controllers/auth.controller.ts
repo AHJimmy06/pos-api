@@ -1,11 +1,27 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
 import { LoginDto } from '../dto/login.dto';
 import { RegisterUserDto } from '../dto/register-user.dto';
 import { LoginCommand } from '../../../application/auth/commands/login.command';
 import { RegisterUserCommand } from '../../../application/auth/commands/register-user.command';
 import { User } from '../../../domain/entities/user.entity';
+import { JwtAuthGuard } from '../../../infrastructure/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../infrastructure/auth/guards/roles.guard';
+import { Roles } from '../../../infrastructure/auth/decorators/roles.decorator';
+import { UserRole } from '../../../domain/enums/user-role.enum';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -27,9 +43,14 @@ export class AuthController {
   }
 
   @Post('register')
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMINISTRATOR)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register new user (admin only)' })
   @ApiResponse({ status: 201, description: 'User created' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 400, description: 'Validation error' })
   @ApiResponse({ status: 409, description: 'Email or username already exists' })
   async register(
@@ -48,3 +69,4 @@ export class AuthController {
     return { message: 'User created successfully', userId: user.id };
   }
 }
+
