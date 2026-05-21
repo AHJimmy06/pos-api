@@ -6,8 +6,11 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Request } from 'express';
+
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { CreateInvoiceDto } from '../invoices/dto/create-invoice.dto';
 import { CreateInvoiceCommand } from '../../application/invoices/commands/create-invoice.command';
@@ -37,17 +40,23 @@ export class InvoicesController {
     status: 404,
     description: 'Dependency not found (Client, Product or Tax).',
   })
-  async create(@Body() createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
+  async create(
+    @Body() createInvoiceDto: CreateInvoiceDto,
+    @Req() req: Request & { user?: { id: number } },
+  ): Promise<Invoice> {
     return this.commandBus.execute(
       new CreateInvoiceCommand(
         createInvoiceDto.clientId,
         createInvoiceDto.items,
+        createInvoiceDto.status,
+        req.user?.id,
         createInvoiceDto.subtotalSnapshot,
         createInvoiceDto.taxTotalSnapshot,
         createInvoiceDto.totalSnapshot,
       ),
     );
   }
+
 
   @Get()
   @ApiOperation({ summary: 'Get all invoices (paginated)' })

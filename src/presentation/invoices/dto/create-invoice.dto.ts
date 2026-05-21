@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
@@ -9,6 +10,8 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { InvoiceStatus } from '../../../domain/enums/invoice-status.enum';
+
 
 export class TaxSnapshotDto {
   @ApiProperty({ example: 1 })
@@ -76,7 +79,17 @@ export class CreateInvoiceDto {
   @Type(() => CreateInvoiceItemDto)
   items: CreateInvoiceItemDto[];
 
+  @ApiProperty({
+    example: InvoiceStatus.CONFIRMED,
+    enum: InvoiceStatus,
+    required: false,
+  })
+  @IsEnum(InvoiceStatus)
+  @IsOptional()
+  status?: InvoiceStatus;
+
   @ApiProperty({ example: 4500, required: false })
+
   @IsNumber()
   @IsOptional()
   subtotalSnapshot?: number;
