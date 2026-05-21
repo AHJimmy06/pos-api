@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { IPasswordService } from '../../../domain/interfaces/password-service.interface';
 
 @Injectable()
-export class PasswordService {
+export class PasswordService implements IPasswordService {
   private readonly BCRYPT_ROUNDS = parseInt(
     process.env.BCRYPT_ROUNDS || '12',
     10,

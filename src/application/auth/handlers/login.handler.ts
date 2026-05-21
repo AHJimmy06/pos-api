@@ -7,7 +7,7 @@ import {
 import { LoginCommand } from '../commands/login.command';
 import { IUserRepository } from '../../../domain/repositories/user.repository.interface';
 import { IBlockedUserRepository } from '../../../domain/repositories/blocked-user.repository.interface';
-import { PasswordService } from '../../../infrastructure/auth/services/password.service';
+import type { IPasswordService } from '../../../domain/interfaces/password-service.interface';
 import { JwtService } from '@nestjs/jwt';
 
 @CommandHandler(LoginCommand)
@@ -17,7 +17,8 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     private readonly userRepository: IUserRepository,
     @Inject('IBlockedUserRepository')
     private readonly blockedUserRepository: IBlockedUserRepository,
-    private readonly passwordService: PasswordService,
+    @Inject('IPasswordService')
+    private readonly passwordService: IPasswordService,
     private readonly jwtService: JwtService,
   ) {}
 

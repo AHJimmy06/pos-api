@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsInt, IsOptional, ValidateNested } from 'class-validator';
 import { CreateInvoiceItemDto } from './create-invoice.dto';

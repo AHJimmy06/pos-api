@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject, ConflictException, BadRequestException } from '@nestjs/common';
 import { RegisterUserCommand } from '../commands/register-user.command';
 import { IUserRepository } from '../../../domain/repositories/user.repository.interface';
-import { PasswordService } from '../../../infrastructure/auth/services/password.service';
+import type { IPasswordService } from '../../../domain/interfaces/password-service.interface';
 import { User } from '../../../domain/entities/user.entity';
 
 @CommandHandler(RegisterUserCommand)
@@ -10,7 +10,8 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
   constructor(
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
-    private readonly passwordService: PasswordService,
+    @Inject('IPasswordService')
+    private readonly passwordService: IPasswordService,
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<User> {

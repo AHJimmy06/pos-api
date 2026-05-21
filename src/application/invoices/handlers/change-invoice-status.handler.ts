@@ -9,6 +9,7 @@ import { StockMovement } from '../../../domain/entities/stock-movement.entity';
 import { BusinessException } from '../../../domain/exceptions/business.exception';
 import { InvoiceStatus } from '../../../domain/enums/invoice-status.enum';
 import { MovementType } from '../../../domain/enums/movement-type.enum';
+import type { ChangeInvoiceStatusResult } from '../../../domain/interfaces/change-invoice-status-result.interface';
 
 @CommandHandler(ChangeInvoiceStatusCommand)
 export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoiceStatusCommand> {
@@ -23,7 +24,9 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
     private readonly uow: IUnitOfWork,
   ) {}
 
-  async execute(command: ChangeInvoiceStatusCommand): Promise<any> {
+  async execute(
+    command: ChangeInvoiceStatusCommand,
+  ): Promise<ChangeInvoiceStatusResult> {
     return this.uow.runInTransaction(async () => {
       const { id, status, userId } = command;
 
@@ -57,6 +60,16 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
           'Only CONFIRMED invoices can be cancelled',
           'INVALID_STATUS_TRANSITION',
         );
+      }
+
+      // Admin-only authorization for cancellation
+      if (status === InvoiceStatus.CANCELLED) {
+        if (command.userRole !== 'ADMINISTRATOR') {
+          throw new BusinessException(
+            'Only administrators can cancel invoices',
+            'UNAUTHORIZED_ACTION',
+          );
+        }
       }
 
       const stockMovements: StockMovement[] = [];

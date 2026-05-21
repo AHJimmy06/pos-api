@@ -1,4 +1,4 @@
 {
-  "signature": "src/presentation/auth/auth.module.ts::Unresolved from this turn — src/presentation/auth/auth.module.ts:\n🔴 STOP — 1 issue(s) must be fixed:\n  L53: Cannot find name 'RolesGuard'.\n    💡 Fix: LSP quick fixes: Add import from \"src/infrastructure/auth/guards/roles.guard\"",
-  "sessionId": "lens-mpe2aecl-5e6844bf"
+  "signature": "src/presentation/controllers/invoices.controller.ts::Unresolved from this turn — src/presentation/controllers/invoices.controller.ts:\n🔴 STOP — 125 issue(s) must be fixed:\n  L167: Expression expected.\n  L167: ',' expected.\n  L168: Expression expected.\n  L168: ',' expected.\n  L168: Expression expected.\n  L169: Expression expected.\n  L169: ',' expected.\n  L169: Expression expected.\n  L170: Expression expected.\n  L170: ',' expected.\n  ... and 115 more",
+  "sessionId": "lens-mpfr5jv5-df94f4aa"
 }

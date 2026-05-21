@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -141,18 +140,14 @@ export class InvoicesController {
     @Body() changeStatusDto: ChangeInvoiceStatusDto,
     @Req() req: Request & { user?: { id: number; roles?: string[] } },
   ) {
-    // Admin-only check for cancellation
-    if (changeStatusDto.status === 'CANCELLED') {
-      if (!req.user?.roles?.includes(UserRole.ADMINISTRATOR)) {
-        throw new ForbiddenException('Only administrators can cancel invoices');
-      }
-    }
-
-    const result = await this.commandBus.execute(
-      new ChangeInvoiceStatusCommand(id, changeStatusDto.status, req.user?.id),
+    return this.commandBus.execute(
+      new ChangeInvoiceStatusCommand(
+        id,
+        changeStatusDto.status,
+        req.user?.id,
+        req.user?.roles?.[0],
+      ),
     );
-
-    return result;
   }
 
   @Get()
