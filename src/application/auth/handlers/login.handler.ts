@@ -1,11 +1,14 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Inject,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { LoginCommand } from '../commands/login.command';
 import { IUserRepository } from '../../../domain/repositories/user.repository.interface';
 import { IBlockedUserRepository } from '../../../domain/repositories/blocked-user.repository.interface';
 import { PasswordService } from '../../../infrastructure/auth/services/password.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../../../domain/entities/user.entity';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -18,7 +21,9 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     private readonly jwtService: JwtService,
   ) {}
 
-  async execute(command: LoginCommand): Promise<{ accessToken: string; expiresIn: number }> {
+  async execute(
+    command: LoginCommand,
+  ): Promise<{ accessToken: string; expiresIn: number }> {
     const { email, password } = command;
 
     const user = await this.userRepository.findByEmail(email);
@@ -30,20 +35,37 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       throw new UnauthorizedException('User account is inactive');
     }
 
-    let blockedUser = await this.blockedUserRepository.findByUserId(user.id);
-    blockedUser = blockedUser ?? await this.blockedUserRepository.upsert(user.id);
+    // Buscar blocked user - si no existe, no está bloqueado
+    const blockedUser = await this.blockedUserRepository.findByUserId(user.id);
 
-    if (blockedUser.isBlocked()) {
-      throw new BadRequestException('Account is blocked due to multiple failed login attempts');
+    if (blockedUser?.isBlocked()) {
+      throw new BadRequestException(
+        'Account is blocked due to multiple failed login attempts',
+      );
     }
 
-    const isPasswordValid = await this.passwordService.compare(password, user.passwordHash);
+    const isPasswordValid = await this.passwordService.compare(
+      password,
+      user.passwordHash,
+    );
+
     if (!isPasswordValid) {
-      await this.blockedUserRepository.incrementFailedAttempts(user.id);
+      // Crear o actualizar blocked user usando upsert
+      const updated = await this.blockedUserRepository.incrementFailedAttempts(
+        user.id,
+      );
+
+      if (updated.isBlocked()) {
+        throw new BadRequestException(
+          'Account is now blocked due to multiple failed attempts',
+        );
+      }
+
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (blockedUser.failedAttempts > 0) {
+    // Login exitoso - resetear intentos fallidos si existían
+    if (blockedUser && blockedUser.failedAttempts > 0) {
       await this.blockedUserRepository.reset(user.id);
     }
 

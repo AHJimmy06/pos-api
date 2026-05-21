@@ -12,11 +12,11 @@ export class PrismaClientRepository extends IClientRepository {
     super();
   }
 
-async findAll(): Promise<ClientEntity[]> {
+  async findAll(): Promise<ClientEntity[]> {
     const clients = await this.prisma.client.findMany({
       orderBy: { id: 'asc' },
     });
-    return clients.map(ClientMapper.toEntity);
+    return clients.map((c) => ClientMapper.toEntity(c));
   }
 
   async findById(id: number): Promise<ClientEntity | null> {

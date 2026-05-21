@@ -36,11 +36,6 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
     const user = new User(username, name, lastName, email, passwordHash);
     user.cedula = cedula ?? null;
 
-    const createdUser = await this.userRepository.create(user, ['SELLER']);
-
-    const { passwordHash: _, ...userWithoutPassword } = createdUser as User & { passwordHash: string };
-    void _;
-
-    return createdUser;
+    return this.userRepository.create(user, ['SELLER']);
   }
 }

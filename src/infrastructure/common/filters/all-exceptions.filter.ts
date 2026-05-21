@@ -4,12 +4,20 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { BusinessException } from '../../../domain/exceptions/business.exception';
+import { IErrorLogRepository } from '../../../domain/repositories/error-log.repository.interface';
+import { ErrorLog } from '../../../domain/entities/error-log.entity';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  constructor(
+    @Inject('IErrorLogRepository')
+    private readonly errorLogRepository: IErrorLogRepository,
+  ) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -27,6 +35,28 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = exception.message;
       code = exception.code;
     }
+
+    const errorDetail =
+      message instanceof Object ? JSON.stringify(message) : message;
+
+    // Persist error asynchronously (Fire and Forget)
+    const userId = (request as Request & { user?: { id: number } }).user?.id;
+
+    this.errorLogRepository
+      .create(
+        new ErrorLog({
+          message: errorDetail,
+          path: request.url,
+          stackTrace: exception instanceof Error ? exception.stack : undefined,
+          exceptionType:
+            exception instanceof Error ? exception.constructor.name : undefined,
+          userId: userId,
+        }),
+      )
+
+      .catch((err) => {
+        console.error('Failed to save ErrorLog:', err);
+      });
 
     console.error(`[${new Date().toISOString()}] Exception caught:`, exception);
 

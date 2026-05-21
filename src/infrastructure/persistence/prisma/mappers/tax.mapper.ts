@@ -12,7 +12,7 @@ export class TaxMapper {
     return entity;
   }
 
-  static toPersistence(entity: TaxEntity): any {
+  static toPersistence(entity: TaxEntity) {
     return {
       name: entity.name,
       currentRate: new Prisma.Decimal(entity.currentRate),

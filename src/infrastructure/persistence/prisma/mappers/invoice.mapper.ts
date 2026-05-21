@@ -6,7 +6,7 @@ import {
   InvoiceDetailTax as PrismaInvoiceDetailTax,
 } from '@prisma/client';
 
-type PrismaInvoiceWithRelations = PrismaInvoice & {
+export type PrismaInvoiceWithRelations = PrismaInvoice & {
   details: (PrismaInvoiceDetail & {
     detailTaxes: PrismaInvoiceDetailTax[];
     product: { name: string | null } | null;
@@ -67,7 +67,7 @@ export class InvoiceMapper {
     return invoice;
   }
 
-  static toPersistence(entity: InvoiceEntity): any {
+  static toPersistence(entity: InvoiceEntity) {
     return {
       clientId: entity.clientId,
       subtotalSnapshot: entity.subtotalSnapshot,

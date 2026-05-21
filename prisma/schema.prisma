@@ -136,3 +136,16 @@ model InvoiceDetailTax {
 
   @@map("invoice_detail_taxes")
 }
+
+model ErrorLog {
+  id            Int      @id @default(autoincrement())
+  message       String   @db.Text
+  stackTrace    String?  @map("stack_trace") @db.Text
+  exceptionType String?  @map("exception_type") @db.VarChar(255)
+  userId        Int?     @map("user_id")
+  path          String   @db.VarChar(255)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("error_logs")
+}
+

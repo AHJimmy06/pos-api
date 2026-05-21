@@ -3,7 +3,10 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PasswordService {
-  private readonly BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '12', 10);
+  private readonly BCRYPT_ROUNDS = parseInt(
+    process.env.BCRYPT_ROUNDS || '12',
+    10,
+  );
 
   async hash(password: string): Promise<string> {
     return bcrypt.hash(password, this.BCRYPT_ROUNDS);
@@ -29,7 +32,9 @@ export class PasswordService {
       errors.push('Password must contain at least 1 number');
     }
     if (!/[@$!%*?&]/.test(password)) {
-      errors.push('Password must contain at least 1 special character (@$!%*?&)');
+      errors.push(
+        'Password must contain at least 1 special character (@$!%*?&)',
+      );
     }
 
     return { valid: errors.length === 0, errors };

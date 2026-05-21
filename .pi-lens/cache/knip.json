@@ -1,9 +1,176 @@
 {
-  "success": false,
-  "issues": [],
+  "success": true,
+  "issues": [
+    {
+      "type": "file",
+      "name": "test/app.e2e-spec.ts",
+      "file": "test/app.e2e-spec.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/domain/enums/invoice-status.enum.ts",
+      "file": "src/domain/enums/invoice-status.enum.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/invoices/queries/index.ts",
+      "file": "src/application/invoices/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/taxes/commands/index.ts",
+      "file": "src/application/taxes/commands/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/taxes/queries/index.ts",
+      "file": "src/application/taxes/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/commands/index.ts",
+      "file": "src/application/clients/commands/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/queries/index.ts",
+      "file": "src/application/clients/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/commands/index.ts",
+      "file": "src/application/products/commands/index.ts"
+    },
+    {
+      "type": "dependency",
+      "name": "swagger-ui-express",
+      "file": "package.json",
+      "line": 43
+    },
+    {
+      "type": "devDependency",
+      "name": "@eslint/eslintrc",
+      "file": "package.json",
+      "line": 46
+    },
+    {
+      "type": "devDependency",
+      "name": "@types/supertest",
+      "file": "package.json",
+      "line": 56
+    },
+    {
+      "type": "devDependency",
+      "name": "source-map-support",
+      "file": "package.json",
+      "line": 64
+    },
+    {
+      "type": "devDependency",
+      "name": "supertest",
+      "file": "package.json",
+      "line": 65
+    },
+    {
+      "type": "devDependency",
+      "name": "ts-loader",
+      "file": "package.json",
+      "line": 67
+    },
+    {
+      "type": "devDependency",
+      "name": "tsx",
+      "file": "package.json",
+      "line": 70
+    }
+  ],
   "unusedExports": [],
-  "unusedFiles": [],
-  "unusedDeps": [],
+  "unusedFiles": [
+    {
+      "type": "file",
+      "name": "test/app.e2e-spec.ts",
+      "file": "test/app.e2e-spec.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/domain/enums/invoice-status.enum.ts",
+      "file": "src/domain/enums/invoice-status.enum.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/invoices/queries/index.ts",
+      "file": "src/application/invoices/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/taxes/commands/index.ts",
+      "file": "src/application/taxes/commands/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/taxes/queries/index.ts",
+      "file": "src/application/taxes/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/commands/index.ts",
+      "file": "src/application/clients/commands/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/queries/index.ts",
+      "file": "src/application/clients/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/commands/index.ts",
+      "file": "src/application/products/commands/index.ts"
+    }
+  ],
+  "unusedDeps": [
+    {
+      "type": "dependency",
+      "name": "swagger-ui-express",
+      "file": "package.json",
+      "line": 43
+    },
+    {
+      "type": "devDependency",
+      "name": "@eslint/eslintrc",
+      "file": "package.json",
+      "line": 46
+    },
+    {
+      "type": "devDependency",
+      "name": "@types/supertest",
+      "file": "package.json",
+      "line": 56
+    },
+    {
+      "type": "devDependency",
+      "name": "source-map-support",
+      "file": "package.json",
+      "line": 64
+    },
+    {
+      "type": "devDependency",
+      "name": "supertest",
+      "file": "package.json",
+      "line": 65
+    },
+    {
+      "type": "devDependency",
+      "name": "ts-loader",
+      "file": "package.json",
+      "line": 67
+    },
+    {
+      "type": "devDependency",
+      "name": "tsx",
+      "file": "package.json",
+      "line": 70
+    }
+  ],
   "unlistedDeps": [],
-  "summary": "Error: Process timed out after 30000ms (killed with SIGTERM)"
+  "summary": "Found 15 issues"
 }

@@ -1,7 +1,7 @@
 {
-  "success": false,
+  "success": true,
   "clones": [],
   "duplicatedLines": 0,
-  "totalLines": 0,
+  "totalLines": 3713,
   "percentage": 0
 }

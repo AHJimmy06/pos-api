@@ -14,7 +14,7 @@ export class ClientMapper {
     return entity;
   }
 
-  static toPersistence(entity: ClientEntity): any {
+  static toPersistence(entity: ClientEntity) {
     return {
       firstName: entity.firstName,
       lastName: entity.lastName,

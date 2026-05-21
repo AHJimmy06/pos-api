@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { IInvoiceRepository } from '../../../../domain/repositories/invoice.repository.interface';
 import { Invoice as InvoiceEntity } from '../../../../domain/entities/invoice.entity';
-import { InvoiceMapper } from '../mappers/invoice.mapper';
+import {
+  InvoiceMapper,
+  PrismaInvoiceWithRelations,
+} from '../mappers/invoice.mapper';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PrismaInvoiceRepository extends IInvoiceRepository {
@@ -22,8 +26,9 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
       },
       orderBy: { issueDate: 'desc' },
     });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    return invoices.map((invoice) => InvoiceMapper.toEntity(invoice as any));
+    return invoices.map((invoice) =>
+      InvoiceMapper.toEntity(invoice as PrismaInvoiceWithRelations),
+    );
   }
 
   async findAllPaginated(
@@ -51,7 +56,9 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
     ]);
 
     return {
-      data: invoices.map((invoice) => InvoiceMapper.toEntity(invoice as any)),
+      data: invoices.map((invoice) =>
+        InvoiceMapper.toEntity(invoice as PrismaInvoiceWithRelations),
+      ),
       total,
     };
   }
@@ -73,10 +80,9 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
   }
 
   async create(invoice: InvoiceEntity): Promise<InvoiceEntity> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const persistenceData: any = InvoiceMapper.toPersistence(invoice);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    delete persistenceData.id;
+    const persistenceData = InvoiceMapper.toPersistence(
+      invoice,
+    ) as unknown as Prisma.InvoiceCreateInput;
 
     const createdInvoice = await this.prisma.invoice.create({
       data: persistenceData,

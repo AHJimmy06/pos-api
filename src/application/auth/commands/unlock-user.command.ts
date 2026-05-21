@@ -1,5 +1,3 @@
 export class UnlockUserCommand {
-  constructor(
-    public readonly userId: number,
-  ) {}
+  constructor(public readonly userId: number) {}
 }

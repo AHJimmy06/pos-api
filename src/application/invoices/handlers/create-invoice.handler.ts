@@ -60,7 +60,9 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
       });
 
       if (!success) {
-        const current = await this.productRepository.findById(item.productId).catch(() => null);
+        const current = await this.productRepository
+          .findById(item.productId)
+          .catch(() => null);
         if (!current) {
           throw new BusinessException(
             `Error de concurrencia con producto ${item.productId}. Reintente la operación.`,

@@ -2,20 +2,29 @@ import { Product as ProductEntity } from '../../../../domain/entities/product.en
 import { Prisma } from '@prisma/client';
 
 export class ProductMapper {
-  static toEntity(prismaProduct: any): ProductEntity {
+  static toEntity(prismaProduct: {
+    id: number;
+    name: string | null;
+    price: Prisma.Decimal | number | null;
+    stock: number | null;
+    version: number;
+    productTaxes?: { taxId: number }[];
+  }): ProductEntity {
+    const priceVal = prismaProduct.price
+      ? Number(prismaProduct.price.toString())
+      : 0;
     const entity = new ProductEntity(
       prismaProduct.name || '',
-      Number(prismaProduct.price || 0),
+      priceVal,
       prismaProduct.stock || 0,
     );
     entity.id = prismaProduct.id;
     entity.version = prismaProduct.version ?? 0;
-    entity.taxIds =
-      prismaProduct.productTaxes?.map((pt: any) => pt.taxId) || [];
+    entity.taxIds = prismaProduct.productTaxes?.map((pt) => pt.taxId) || [];
     return entity;
   }
 
-  static toPersistence(entity: ProductEntity): any {
+  static toPersistence(entity: ProductEntity) {
     return {
       name: entity.name,
       price: new Prisma.Decimal(entity.price),
