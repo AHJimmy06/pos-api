@@ -4,7 +4,9 @@ import {
   Invoice as PrismaInvoice,
   InvoiceDetail as PrismaInvoiceDetail,
   InvoiceDetailTax as PrismaInvoiceDetailTax,
+  InvoiceStatus as PrismaInvoiceStatus,
 } from '@prisma/client';
+import { InvoiceStatus } from '../../../../domain/enums/invoice-status.enum';
 
 export type PrismaInvoiceWithRelations = PrismaInvoice & {
   details: (PrismaInvoiceDetail & {
@@ -22,6 +24,8 @@ export class InvoiceMapper {
       prismaInvoice.issueDate || new Date();
     (invoice as { transactionId: string }).transactionId =
       prismaInvoice.transactionId || '';
+    invoice.status = prismaInvoice.status as unknown as InvoiceStatus;
+
 
     // Set stored snapshots if available
     if (
@@ -75,7 +79,9 @@ export class InvoiceMapper {
       totalSnapshot: entity.totalSnapshot,
       transactionId: entity.transactionId,
       issueDate: entity.issueDate,
+      status: entity.status as unknown as PrismaInvoiceStatus,
       details: {
+
         create: entity.details.map((detail) => ({
           productId: detail.productId,
           productName: detail.productName || null,

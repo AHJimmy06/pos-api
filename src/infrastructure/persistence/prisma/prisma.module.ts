@@ -3,6 +3,7 @@ import { PrismaService } from './prisma.service';
 import { PrismaClientRepository } from './repositories/client.repository';
 import { PrismaTaxRepository } from './repositories/tax.repository';
 import { PrismaErrorLogRepository } from './repositories/error-log.repository';
+import { PrismaStockMovementRepository } from './repositories/stock-movement.repository';
 
 @Module({
   providers: [
@@ -19,12 +20,18 @@ import { PrismaErrorLogRepository } from './repositories/error-log.repository';
       provide: 'IErrorLogRepository',
       useClass: PrismaErrorLogRepository,
     },
+    {
+      provide: 'IStockMovementRepository',
+      useClass: PrismaStockMovementRepository,
+    },
   ],
   exports: [
     PrismaService,
     'IClientRepository',
     'ITaxRepository',
     'IErrorLogRepository',
+    'IStockMovementRepository',
   ],
 })
+
 export class PrismaModule {}

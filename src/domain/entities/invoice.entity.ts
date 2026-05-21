@@ -1,10 +1,12 @@
 import { InvoiceDetail } from './invoice-detail.entity';
+import { InvoiceStatus } from '../enums/invoice-status.enum';
 
 export class Invoice {
   id?: number;
   clientId: number;
   issueDate: Date;
   transactionId: string;
+  status: InvoiceStatus;
   details: InvoiceDetail[] = [];
   private _subtotalSnapshot?: number;
   private _taxTotalSnapshot?: number;
@@ -14,7 +16,9 @@ export class Invoice {
     this.clientId = clientId;
     this.issueDate = new Date();
     this.transactionId = `TRX-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    this.status = InvoiceStatus.CONFIRMED;
   }
+
 
   addDetail(detail: InvoiceDetail): void {
     this.details.push(detail);
