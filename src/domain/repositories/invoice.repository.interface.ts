@@ -7,6 +7,9 @@ export abstract class IInvoiceRepository {
     page: number,
     limit: number,
     searchId?: number,
+    userId?: number,
   ): Promise<{ data: Invoice[]; total: number }>;
   abstract findById(id: number): Promise<Invoice | null>;
+  abstract findByIdWithDetails(id: number): Promise<Invoice | null>;
+  abstract update(id: number, invoice: Invoice): Promise<Invoice>;
 }

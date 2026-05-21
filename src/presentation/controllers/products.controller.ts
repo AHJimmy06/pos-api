@@ -7,9 +7,17 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { CreateProductDto } from '../products/dto/create-product.dto';
 import { UpdateProductDto } from '../products/dto/update-product.dto';
 import { CreateProductCommand } from '../../application/products/commands/create-product.command';
@@ -17,9 +25,18 @@ import { UpdateProductCommand } from '../../application/products/commands/update
 import { DeleteProductCommand } from '../../application/products/commands/delete-product.command';
 import { GetProductsQuery } from '../../application/products/queries/get-products.query';
 import { GetProductQuery } from '../../application/products/queries/get-product.query';
+import { GetProductsForSaleQuery } from '../../application/products/queries/get-products-for-sale.query';
 import { Product } from '../../domain/entities/product.entity';
+import { JwtAuthGuard } from '../../infrastructure/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../infrastructure/auth/guards/roles.guard';
+import { Roles } from '../../infrastructure/auth/decorators/roles.decorator';
+import { UserRole } from '../../domain/enums/user-role.enum';
+import { normalizePageSize } from '../../infrastructure/common/utils/page-size.util';
+import { DeleteResultDto } from '../common/dto/delete-result.dto';
 
 @ApiTags('products')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
 export class ProductsController {
   constructor(
@@ -28,6 +45,7 @@ export class ProductsController {
   ) {}
 
   @Post()
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Create a new product' })
   @ApiResponse({
     status: 201,
@@ -46,12 +64,55 @@ export class ProductsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all products' })
-  async findAll(): Promise<Product[]> {
-    return this.queryBus.execute(new GetProductsQuery());
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
+  @ApiOperation({ summary: 'Get all products (paginated)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Page size: 10, 15, 20, or 30',
+  })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  async findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ): Promise<{ data: Product[]; total: number }> {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = normalizePageSize(limit);
+    return this.queryBus.execute(
+      new GetProductsQuery(pageNum, limitNum, search),
+    );
+  }
+
+  @Get('for-sale')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
+  @ApiOperation({
+    summary: 'Get products available for sale (active + stock > 0)',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Page size: 10, 15, 20, or 30',
+  })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  async findForSale(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ): Promise<{ data: Product[]; total: number }> {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = normalizePageSize(limit);
+    return this.queryBus.execute(
+      new GetProductsForSaleQuery(pageNum, limitNum, search),
+    );
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
@@ -59,6 +120,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({ status: 200, description: 'Product updated successfully.' })
   @ApiResponse({ status: 400, description: 'Business rule violation.' })
@@ -73,10 +135,15 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a product' })
-  @ApiResponse({ status: 204, description: 'Product deleted successfully.' })
+  @Roles(UserRole.ADMINISTRATOR)
+  @ApiOperation({
+    summary: 'Delete a product (physical if no history, soft otherwise)',
+  })
+  @ApiResponse({ status: 200, description: 'Product deleted successfully.' })
   @ApiResponse({ status: 404, description: 'Product not found.' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DeleteResultDto> {
     return this.commandBus.execute(new DeleteProductCommand(id));
   }
 }

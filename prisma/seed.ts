@@ -1,9 +1,52 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('--- Starting Seed ---');
+
+  console.log('Seeding Roles...');
+  const adminRole = await prisma.role.upsert({
+    where: { name: 'ADMINISTRATOR' },
+    update: { name: 'ADMINISTRATOR' },
+    create: { name: 'ADMINISTRATOR' },
+  });
+  const sellerRole = await prisma.role.upsert({
+    where: { name: 'SELLER' },
+    update: { name: 'SELLER' },
+    create: { name: 'SELLER' },
+  });
+
+  console.log('Seeding Admin User...');
+  const adminPassword = await bcrypt.hash('Admin123@', 12);
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@pos.com' },
+    update: { username: 'admin', name: 'Admin', lastName: 'User' },
+    create: {
+      username: 'admin',
+      name: 'Admin',
+      lastName: 'User',
+      email: 'admin@pos.com',
+      password: adminPassword,
+      isActive: true,
+    },
+  });
+
+  // Assign admin role to admin user
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: {
+        userId: adminUser.id,
+        roleId: adminRole.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: adminUser.id,
+      roleId: adminRole.id,
+    },
+  });
 
   console.log('Seeding Taxes...');
   const taxDefinitions = [

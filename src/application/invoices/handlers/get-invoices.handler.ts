@@ -17,6 +17,7 @@ export class GetInvoicesHandler implements IQueryHandler<GetInvoicesQuery> {
       query.page,
       query.limit,
       query.searchId,
+      query.userId,
     );
   }
 }

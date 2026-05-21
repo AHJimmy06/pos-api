@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './infrastructure/common/filters/all-exceptions.filter';
 import { ResponseInterceptor } from './infrastructure/common/interceptors/response.interceptor';
 
 async function bootstrap() {
@@ -12,8 +11,6 @@ async function bootstrap() {
   app.enableCors();
 
   app.setGlobalPrefix('api');
-
-  app.useGlobalFilters(new AllExceptionsFilter());
 
   app.useGlobalInterceptors(new ResponseInterceptor());
 
@@ -29,6 +26,17 @@ async function bootstrap() {
     .setTitle('POS API')
     .setDescription('API de Facturación con Clean Architecture y CQRS')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Ingresa tu token JWT',
+      },
+      'JWT-auth',
+    )
+    .addTag('auth')
+    .addTag('users')
     .addTag('clients')
     .addTag('products')
     .addTag('taxes')

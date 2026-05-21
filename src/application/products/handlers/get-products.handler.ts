@@ -11,7 +11,13 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
     private readonly productRepository: IProductRepository,
   ) {}
 
-  async execute(): Promise<Product[]> {
-    return this.productRepository.findAll();
+  async execute(
+    query: GetProductsQuery,
+  ): Promise<{ data: Product[]; total: number }> {
+    return this.productRepository.findAllPaginated(
+      query.page,
+      query.limit,
+      query.search,
+    );
   }
 }

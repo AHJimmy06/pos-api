@@ -5,9 +5,14 @@ import { IInvoiceRepository } from '../../../domain/repositories/invoice.reposit
 import { IClientRepository } from '../../../domain/repositories/client.repository.interface';
 import { IProductRepository } from '../../../domain/repositories/product.repository.interface';
 import { ITaxRepository } from '../../../domain/repositories/tax.repository.interface';
+import { IStockMovementRepository } from '../../../domain/repositories/stock-movement.repository.interface';
+import { IUnitOfWork } from '../../../domain/repositories/unit-of-work.interface';
 import { Invoice } from '../../../domain/entities/invoice.entity';
 import { InvoiceDetail } from '../../../domain/entities/invoice-detail.entity';
+import { StockMovement } from '../../../domain/entities/stock-movement.entity';
 import { BusinessException } from '../../../domain/exceptions/business.exception';
+import { InvoiceStatus } from '../../../domain/enums/invoice-status.enum';
+import { MovementType } from '../../../domain/enums/movement-type.enum';
 
 @CommandHandler(CreateInvoiceCommand)
 export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceCommand> {
@@ -20,127 +25,122 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
     private readonly productRepository: IProductRepository,
     @Inject('ITaxRepository')
     private readonly taxRepository: ITaxRepository,
+    @Inject('IStockMovementRepository')
+    private readonly stockMovementRepository: IStockMovementRepository,
+    @Inject('IUnitOfWork')
+    private readonly uow: IUnitOfWork,
   ) {}
 
   async execute(command: CreateInvoiceCommand): Promise<Invoice> {
-    const {
-      clientId,
-      items,
-      subtotalSnapshot,
-      taxTotalSnapshot,
-      totalSnapshot,
-    } = command;
+    return this.uow.runInTransaction(async () => {
+      const {
+        clientId,
+        items,
+        status,
+        userId,
+        subtotalSnapshot,
+        taxTotalSnapshot,
+        totalSnapshot,
+      } = command;
 
-    const client = await this.clientRepository.findById(clientId);
-    if (!client) {
-      throw new NotFoundException(`Client with ID ${clientId} not found`);
-    }
-
-    const invoice = new Invoice(clientId);
-
-    for (const item of items) {
-      // Fresh stock check before reduce (Opción C)
-      const productData = await this.productRepository.findById(item.productId);
-      if (!productData) {
-        throw new NotFoundException(
-          `Product with ID ${item.productId} not found`,
-        );
+      const client = await this.clientRepository.findById(clientId);
+      if (!client) {
+        throw new NotFoundException(`Client with ID ${clientId} not found`);
       }
 
-      if (productData.stock < item.quantity) {
+      // Validar productos duplicados en el detalle
+      const productIds = items.map((i) => i.productId);
+      const uniqueProductIds = new Set(productIds);
+      if (uniqueProductIds.size !== productIds.length) {
         throw new BusinessException(
-          `Stock insuficiente para producto ${item.productId}. Disponible: ${productData.stock}, solicitado: ${item.quantity}`,
+          'Duplicate products found in invoice details',
+          'DUPLICATE_PRODUCTS',
         );
       }
 
-      const success = await this.productRepository.reduceStock({
-        productId: item.productId,
-        quantity: item.quantity,
-        expectedVersion: productData.version,
-      });
+      const invoice = new Invoice(clientId);
+      invoice.userId = userId;
+      invoice.status = status || InvoiceStatus.CONFIRMED;
 
-      if (!success) {
-        const current = await this.productRepository.findById(item.productId).catch(() => null);
-        if (!current) {
-          throw new BusinessException(
-            `Error de concurrencia con producto ${item.productId}. Reintente la operación.`,
+      for (const item of items) {
+        const productData = await this.productRepository.findById(
+          item.productId,
+        );
+        if (!productData) {
+          throw new NotFoundException(
+            `Product with ID ${item.productId} not found`,
           );
         }
-        throw new BusinessException(
-          current.stock < item.quantity
-            ? `Stock insuficiente para producto ${item.productId}. Disponible: ${current.stock}, solicitado: ${item.quantity}`
-            : `El stock del producto ${item.productId} fue modificado por otro proceso. Reintente.`,
-        );
-      }
 
-      // Use provided snapshot data, fallback to product data
-      const productName = item.productName || productData.name;
-      const unitPrice = item.unitPrice ?? Number(productData.price);
-
-      const detail = new InvoiceDetail(
-        productData.id,
-        item.quantity,
-        unitPrice,
-      );
-      detail.productName = productName;
-
-      // Handle taxes: snapshot array takes precedence, fallback to impuestoIds
-      if (item.taxes && item.taxes.length > 0) {
-        for (const t of item.taxes) {
-          detail.addTax(t.taxId, t.rate);
-          // Override calculated amount with provided value
-          const lastTax = detail.detailTaxes[detail.detailTaxes.length - 1];
-          lastTax.calculatedAmountSnapshot = t.calculatedAmount;
-        }
-      } else if (item.impuestoIds && item.impuestoIds.length > 0) {
-        for (const taxId of item.impuestoIds) {
-          const tax = await this.taxRepository.findById(taxId);
-          if (!tax) {
-            throw new NotFoundException(`Tax with ID ${taxId} not found`);
+        // Regla de Negocio: El stock solo se descuenta si la factura se CONFIRMA
+        if (invoice.status === InvoiceStatus.CONFIRMED) {
+          if (productData.stock < item.quantity) {
+            throw new BusinessException(
+              `Stock insuficiente para producto ${item.productId}. Disponible: ${productData.stock}, solicitado: ${item.quantity}`,
+            );
           }
-          detail.addTax(tax.id, Number(tax.currentRate));
+
+          const success = await this.productRepository.reduceStock({
+            productId: item.productId,
+            quantity: item.quantity,
+            expectedVersion: productData.version,
+          });
+
+          if (!success) {
+            throw new BusinessException(
+              `Error de concurrencia o stock insuficiente para producto ${item.productId}. Reintente.`,
+            );
+          }
+
+          // AuditorÃ­a: Registrar Movimiento de Stock
+          await this.stockMovementRepository.create(
+            new StockMovement({
+              productId: item.productId,
+              type: MovementType.EXIT,
+              quantity: item.quantity,
+              previousStock: productData.stock,
+              newStock: productData.stock - item.quantity,
+              userId: userId,
+              reference: `Venta - TransacciÃ³n ${invoice.transactionId}`,
+            }),
+          );
         }
+
+        const unitPrice = item.unitPrice ?? Number(productData.price);
+        const detail = new InvoiceDetail(
+          productData.id,
+          item.quantity,
+          unitPrice,
+        );
+        detail.productName = item.productName || productData.name;
+
+        if (item.taxes && item.taxes.length > 0) {
+          for (const t of item.taxes) {
+            detail.addTax(t.taxId, t.rate);
+            const lastTax = detail.detailTaxes[detail.detailTaxes.length - 1];
+            lastTax.calculatedAmountSnapshot = t.calculatedAmount;
+          }
+        } else if (item.impuestoIds && item.impuestoIds.length > 0) {
+          for (const taxId of item.impuestoIds) {
+            const tax = await this.taxRepository.findById(taxId);
+            if (tax) {
+              detail.addTax(tax.id, Number(tax.currentRate));
+            }
+          }
+        }
+
+        invoice.addDetail(detail);
       }
 
-      invoice.addDetail(detail);
-    }
-
-    // Set snapshots from provided totals or calculate from details
-    if (totalSnapshot !== undefined) {
-      invoice.setSnapshots(
-        subtotalSnapshot ?? invoice.subtotalSnapshot,
-        taxTotalSnapshot ?? invoice.taxTotalSnapshot,
-        totalSnapshot,
-      );
-    }
-
-    // Validate totals if provided (with ±0.01 tolerance)
-    if (totalSnapshot !== undefined) {
-      const serverSubtotal = invoice.subtotalSnapshot;
-      const serverTaxTotal = invoice.taxTotalSnapshot;
-      const serverTotal = invoice.totalSnapshot;
-
-      if (
-        Math.abs(serverSubtotal - (subtotalSnapshot ?? serverSubtotal)) > 0.01
-      ) {
-        throw new BusinessException(
-          `Subtotal mismatch: provided ${subtotalSnapshot}, calculated ${serverSubtotal}`,
+      if (totalSnapshot !== undefined) {
+        invoice.setSnapshots(
+          subtotalSnapshot ?? invoice.subtotalSnapshot,
+          taxTotalSnapshot ?? invoice.taxTotalSnapshot,
+          totalSnapshot,
         );
       }
-      if (
-        Math.abs(serverTaxTotal - (taxTotalSnapshot ?? serverTaxTotal)) > 0.01
-      ) {
-        throw new BusinessException(
-          `Tax total mismatch: provided ${taxTotalSnapshot}, calculated ${serverTaxTotal}`,
-        );
-      }
-      if (Math.abs(serverTotal - totalSnapshot) > 0.01) {
-        throw new BusinessException(
-          `Total mismatch: provided ${totalSnapshot}, calculated ${serverTotal}`,
-        );
-      }
-    }
 
-    return this.invoiceRepository.create(invoice);
+      return this.invoiceRepository.create(invoice);
+    });
   }
 }

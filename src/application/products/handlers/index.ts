@@ -3,6 +3,7 @@ import { UpdateProductHandler } from './update-product.handler';
 import { DeleteProductHandler } from './delete-product.handler';
 import { GetProductHandler } from './get-product.handler';
 import { GetProductsHandler } from './get-products.handler';
+import { GetProductsForSaleHandler } from './get-products-for-sale.handler';
 
 export const ProductHandlers = [
   CreateProductHandler,
@@ -10,4 +11,5 @@ export const ProductHandlers = [
   DeleteProductHandler,
   GetProductHandler,
   GetProductsHandler,
+  GetProductsForSaleHandler,
 ];

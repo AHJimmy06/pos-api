@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaUnitOfWork } from '../prisma-unit-of-work';
 import { ITaxRepository } from '../../../../domain/repositories/tax.repository.interface';
 import { Tax as TaxEntity } from '../../../../domain/entities/tax.entity';
 import { Prisma } from '@prisma/client';
@@ -7,15 +7,19 @@ import { TaxMapper } from '../mappers/tax.mapper';
 
 @Injectable()
 export class PrismaTaxRepository extends ITaxRepository {
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly uow: PrismaUnitOfWork) {
     super();
   }
 
-async findAll(): Promise<TaxEntity[]> {
+  private get prisma() {
+    return this.uow.getClient();
+  }
+
+  async findAll(): Promise<TaxEntity[]> {
     const taxes = await this.prisma.tax.findMany({
       orderBy: { id: 'asc' },
     });
-    return taxes.map(TaxMapper.toEntity);
+    return taxes.map((t) => TaxMapper.toEntity(t));
   }
 
   async findById(id: number): Promise<TaxEntity | null> {

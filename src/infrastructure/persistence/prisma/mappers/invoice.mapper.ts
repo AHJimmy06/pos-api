@@ -4,9 +4,13 @@ import {
   Invoice as PrismaInvoice,
   InvoiceDetail as PrismaInvoiceDetail,
   InvoiceDetailTax as PrismaInvoiceDetailTax,
+  InvoiceStatus as PrismaInvoiceStatus,
+  PaymentMethod as PrismaPaymentMethod,
 } from '@prisma/client';
+import { InvoiceStatus } from '../../../../domain/enums/invoice-status.enum';
+import { PaymentMethod } from '../../../../domain/enums/payment-method.enum';
 
-type PrismaInvoiceWithRelations = PrismaInvoice & {
+export type PrismaInvoiceWithRelations = PrismaInvoice & {
   details: (PrismaInvoiceDetail & {
     detailTaxes: PrismaInvoiceDetailTax[];
     product: { name: string | null } | null;
@@ -17,11 +21,16 @@ export class InvoiceMapper {
   static toEntity(prismaInvoice: PrismaInvoiceWithRelations): InvoiceEntity {
     const invoice = new InvoiceEntity(prismaInvoice.clientId || 0);
     invoice.id = prismaInvoice.id;
+    invoice.userId = prismaInvoice.userId || undefined;
     // Sobrescribimos los valores generados por el constructor con los de la base de datos
     (invoice as { issueDate: Date }).issueDate =
       prismaInvoice.issueDate || new Date();
     (invoice as { transactionId: string }).transactionId =
       prismaInvoice.transactionId || '';
+    invoice.status = prismaInvoice.status as InvoiceStatus;
+    invoice.paymentMethod = prismaInvoice.paymentMethod as PaymentMethod;
+    invoice.isActive = prismaInvoice.isActive ?? true;
+    invoice.version = prismaInvoice.version ?? 0;
 
     // Set stored snapshots if available
     if (
@@ -67,14 +76,19 @@ export class InvoiceMapper {
     return invoice;
   }
 
-  static toPersistence(entity: InvoiceEntity): any {
-    return {
+  static toPersistence(entity: InvoiceEntity) {
+    const data: any = {
       clientId: entity.clientId,
+      userId: entity.userId || null,
       subtotalSnapshot: entity.subtotalSnapshot,
       taxTotalSnapshot: entity.taxTotalSnapshot,
       totalSnapshot: entity.totalSnapshot,
       transactionId: entity.transactionId,
       issueDate: entity.issueDate,
+      status: entity.status as unknown as PrismaInvoiceStatus,
+      paymentMethod: entity.paymentMethod as any,
+      isActive: entity.isActive,
+      version: entity.version,
       details: {
         create: entity.details.map((detail) => ({
           productId: detail.productId,
@@ -91,5 +105,38 @@ export class InvoiceMapper {
         })),
       },
     };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return data;
+  }
+
+  static toPersistenceUpdate(entity: InvoiceEntity) {
+    const data: any = {
+      clientId: entity.clientId,
+      subtotalSnapshot: entity.subtotalSnapshot,
+      taxTotalSnapshot: entity.taxTotalSnapshot,
+      totalSnapshot: entity.totalSnapshot,
+      status: entity.status as unknown as PrismaInvoiceStatus,
+      isActive: entity.isActive,
+      version: { increment: 1 },
+      // Delete existing details and recreate
+      details: {
+        deleteMany: { invoiceId: entity.id },
+        create: entity.details.map((detail) => ({
+          productId: detail.productId,
+          productName: detail.productName || null,
+          quantity: detail.quantity,
+          unitPriceSnapshot: detail.unitPriceSnapshot,
+          detailTaxes: {
+            create: detail.detailTaxes.map((tax) => ({
+              taxId: tax.taxId,
+              rateSnapshot: tax.rateSnapshot,
+              calculatedAmountSnapshot: tax.calculatedAmountSnapshot,
+            })),
+          },
+        })),
+      },
+    };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return data;
   }
 }
