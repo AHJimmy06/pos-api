@@ -5,5 +5,6 @@ export class ChangeInvoiceStatusCommand {
     public readonly id: number,
     public readonly status: InvoiceStatus,
     public readonly userId?: number,
+    public readonly userRole?: string,
   ) {}
 }

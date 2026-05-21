@@ -1,4 +1,4 @@
 {
-  "signature": "src/presentation/auth/auth.module.ts::Unresolved from this turn — src/presentation/auth/auth.module.ts:\n🔴 STOP — 1 issue(s) must be fixed:\n  L53: Cannot find name 'RolesGuard'.\n    💡 Fix: LSP quick fixes: Add import from \"src/infrastructure/auth/guards/roles.guard\"",
-  "sessionId": "lens-mpe2aecl-5e6844bf"
+  "signature": "src/infrastructure/persistence/prisma/mappers/invoice.mapper.ts::Unresolved from this turn — src/infrastructure/persistence/prisma/mappers/invoice.mapper.ts:\n🔴 STOP — 2 issue(s) must be fixed:\n  L76: Object literal may only specify known properties, but 'clientId' does not exist in type 'InvoiceCreateInput'. Did you mean to write 'client'?\n  L84: Namespace '\"c:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/node_modules/.prisma/client/index\".Prisma' has no exported member 'PaymentMethod'.",
+  "sessionId": "lens-mpfr5jv5-df94f4aa"
 }

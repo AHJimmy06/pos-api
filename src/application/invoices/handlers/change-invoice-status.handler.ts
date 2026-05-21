@@ -59,6 +59,16 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
         );
       }
 
+      // Admin-only authorization for cancellation
+      if (status === InvoiceStatus.CANCELLED) {
+        if (command.userRole !== 'ADMINISTRATOR') {
+          throw new BusinessException(
+            'Only administrators can cancel invoices',
+            'UNAUTHORIZED_ACTION',
+          );
+        }
+      }
+
       const stockMovements: StockMovement[] = [];
 
       // Manejar transición DRAFT -> CONFIRMED

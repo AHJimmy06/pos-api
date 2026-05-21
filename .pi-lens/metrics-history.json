@@ -348,14 +348,14 @@
     },
     "src\\application\\auth\\handlers\\register-user.handler.ts": {
       "latest": {
-        "commit": "3e2adc5",
-        "timestamp": "2026-05-20T03:22:53.777Z",
-        "mi": 46.6,
+        "commit": "8f9497b",
+        "timestamp": "2026-05-21T23:12:37.716Z",
+        "mi": 47.8,
         "cognitive": 9,
         "nesting": 3,
-        "lines": 36,
+        "lines": 33,
         "maxCyclomatic": 5,
-        "entropy": 5.5
+        "entropy": 5.37
       },
       "history": [
         {
@@ -367,6 +367,16 @@
           "lines": 36,
           "maxCyclomatic": 5,
           "entropy": 5.5
+        },
+        {
+          "commit": "8f9497b",
+          "timestamp": "2026-05-21T23:12:37.716Z",
+          "mi": 47.8,
+          "cognitive": 9,
+          "nesting": 3,
+          "lines": 33,
+          "maxCyclomatic": 5,
+          "entropy": 5.37
         }
       ],
       "trend": "stable"
@@ -845,7 +855,157 @@
         }
       ],
       "trend": "stable"
+    },
+    "src\\domain\\entities\\product.entity.ts": {
+      "latest": {
+        "commit": "8f9497b",
+        "timestamp": "2026-05-21T23:10:25.368Z",
+        "mi": 46.7,
+        "cognitive": 0,
+        "nesting": 2,
+        "lines": 41,
+        "maxCyclomatic": 3,
+        "entropy": 5.15
+      },
+      "history": [
+        {
+          "commit": "8f9497b",
+          "timestamp": "2026-05-21T23:10:25.368Z",
+          "mi": 46.7,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 41,
+          "maxCyclomatic": 3,
+          "entropy": 5.15
+        }
+      ],
+      "trend": "stable"
+    },
+    "src\\domain\\entities\\invoice.entity.ts": {
+      "latest": {
+        "commit": "8f9497b",
+        "timestamp": "2026-05-21T23:10:25.427Z",
+        "mi": 42.4,
+        "cognitive": 3,
+        "nesting": 2,
+        "lines": 53,
+        "maxCyclomatic": 7,
+        "entropy": 5.58
+      },
+      "history": [
+        {
+          "commit": "8f9497b",
+          "timestamp": "2026-05-21T23:10:25.427Z",
+          "mi": 42.4,
+          "cognitive": 3,
+          "nesting": 2,
+          "lines": 53,
+          "maxCyclomatic": 7,
+          "entropy": 5.58
+        }
+      ],
+      "trend": "stable"
+    },
+    "src\\domain\\entities\\client.entity.ts": {
+      "latest": {
+        "commit": "8f9497b",
+        "timestamp": "2026-05-21T23:10:25.473Z",
+        "mi": 50,
+        "cognitive": 0,
+        "nesting": 2,
+        "lines": 32,
+        "maxCyclomatic": 3,
+        "entropy": 4.75
+      },
+      "history": [
+        {
+          "commit": "8f9497b",
+          "timestamp": "2026-05-21T23:10:25.473Z",
+          "mi": 50,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 32,
+          "maxCyclomatic": 3,
+          "entropy": 4.75
+        }
+      ],
+      "trend": "stable"
+    },
+    "src\\application\\invoices\\commands\\change-invoice-status.command.ts": {
+      "latest": {
+        "commit": "8f9497b",
+        "timestamp": "2026-05-21T23:11:56.666Z",
+        "mi": 70.7,
+        "cognitive": 0,
+        "nesting": 1,
+        "lines": 8,
+        "maxCyclomatic": 1,
+        "entropy": 3.65
+      },
+      "history": [
+        {
+          "commit": "8f9497b",
+          "timestamp": "2026-05-21T23:11:56.666Z",
+          "mi": 70.7,
+          "cognitive": 0,
+          "nesting": 1,
+          "lines": 8,
+          "maxCyclomatic": 1,
+          "entropy": 3.65
+        }
+      ],
+      "trend": "stable"
+    },
+    "src\\infrastructure\\persistence\\prisma\\repositories\\invoice.repository.ts": {
+      "latest": {
+        "commit": "8f9497b",
+        "timestamp": "2026-05-21T23:14:03.488Z",
+        "mi": 33.6,
+        "cognitive": 9,
+        "nesting": 3,
+        "lines": 117,
+        "maxCyclomatic": 6,
+        "entropy": 5.79
+      },
+      "history": [
+        {
+          "commit": "8f9497b",
+          "timestamp": "2026-05-21T23:14:03.488Z",
+          "mi": 33.6,
+          "cognitive": 9,
+          "nesting": 3,
+          "lines": 117,
+          "maxCyclomatic": 6,
+          "entropy": 5.79
+        }
+      ],
+      "trend": "stable"
+    },
+    "src\\presentation\\invoices\\dto\\update-invoice.dto.ts": {
+      "latest": {
+        "commit": "8f9497b",
+        "timestamp": "2026-05-21T23:15:13.219Z",
+        "mi": 57.9,
+        "cognitive": 0,
+        "nesting": 2,
+        "lines": 16,
+        "maxCyclomatic": 1,
+        "entropy": 4.65
+      },
+      "history": [
+        {
+          "commit": "8f9497b",
+          "timestamp": "2026-05-21T23:15:13.219Z",
+          "mi": 57.9,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 16,
+          "maxCyclomatic": 1,
+          "entropy": 4.65
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-05-20T13:14:33.873Z"
+  "capturedAt": "2026-05-21T23:15:18.246Z"
 }

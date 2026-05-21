@@ -3,18 +3,43 @@
   "issues": [
     {
       "type": "file",
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
+    },
+    {
+      "type": "file",
+      "name": "scratch/read-memories.js",
+      "file": "scratch/read-memories.js"
+    },
+    {
+      "type": "file",
       "name": "test/app.e2e-spec.ts",
       "file": "test/app.e2e-spec.ts"
     },
     {
       "type": "file",
-      "name": "src/domain/enums/invoice-status.enum.ts",
-      "file": "src/domain/enums/invoice-status.enum.ts"
+      "name": "test/auth.e2e-spec.ts",
+      "file": "test/auth.e2e-spec.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/queries/index.ts",
+      "file": "src/application/clients/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/commands/index.ts",
+      "file": "src/application/clients/commands/index.ts"
     },
     {
       "type": "file",
       "name": "src/application/invoices/queries/index.ts",
       "file": "src/application/invoices/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/commands/index.ts",
+      "file": "src/application/products/commands/index.ts"
     },
     {
       "type": "file",
@@ -25,67 +50,99 @@
       "type": "file",
       "name": "src/application/taxes/queries/index.ts",
       "file": "src/application/taxes/queries/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/application/products/commands/index.ts",
-      "file": "src/application/products/commands/index.ts"
     },
     {
       "type": "dependency",
       "name": "swagger-ui-express",
       "file": "package.json",
-      "line": 43
+      "line": 44
     },
     {
       "type": "devDependency",
       "name": "@eslint/eslintrc",
       "file": "package.json",
-      "line": 46
+      "line": 47
     },
     {
       "type": "devDependency",
       "name": "@types/supertest",
       "file": "package.json",
-      "line": 56
+      "line": 58
     },
     {
       "type": "devDependency",
       "name": "source-map-support",
       "file": "package.json",
-      "line": 64
+      "line": 66
     },
     {
       "type": "devDependency",
       "name": "supertest",
       "file": "package.json",
-      "line": 65
+      "line": 67
     },
     {
       "type": "devDependency",
       "name": "ts-loader",
       "file": "package.json",
-      "line": 67
+      "line": 69
     },
     {
       "type": "devDependency",
       "name": "tsx",
       "file": "package.json",
-      "line": 70
+      "line": 72
+    },
+    {
+      "type": "export",
+      "name": "isValidPageSize",
+      "file": "src/infrastructure/common/utils/page-size.util.ts",
+      "line": 27
+    },
+    {
+      "type": "export",
+      "name": "GetProductsForSaleHandler",
+      "file": "src/application/products/queries/get-products-for-sale.query.ts",
+      "line": 15
+    },
+    {
+      "type": "export",
+      "name": "PasswordValidationResult",
+      "file": "src/domain/interfaces/password-service.interface.ts",
+      "line": 10
     }
   ],
-  "unusedExports": [],
+  "unusedExports": [
+    {
+      "type": "export",
+      "name": "isValidPageSize",
+      "file": "src/infrastructure/common/utils/page-size.util.ts",
+      "line": 27
+    },
+    {
+      "type": "export",
+      "name": "GetProductsForSaleHandler",
+      "file": "src/application/products/queries/get-products-for-sale.query.ts",
+      "line": 15
+    },
+    {
+      "type": "export",
+      "name": "PasswordValidationResult",
+      "file": "src/domain/interfaces/password-service.interface.ts",
+      "line": 10
+    }
+  ],
   "unusedFiles": [
+    {
+      "type": "file",
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
+    },
+    {
+      "type": "file",
+      "name": "scratch/read-memories.js",
+      "file": "scratch/read-memories.js"
+    },
     {
       "type": "file",
       "name": "test/app.e2e-spec.ts",
@@ -93,13 +150,28 @@
     },
     {
       "type": "file",
-      "name": "src/domain/enums/invoice-status.enum.ts",
-      "file": "src/domain/enums/invoice-status.enum.ts"
+      "name": "test/auth.e2e-spec.ts",
+      "file": "test/auth.e2e-spec.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/queries/index.ts",
+      "file": "src/application/clients/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/clients/commands/index.ts",
+      "file": "src/application/clients/commands/index.ts"
     },
     {
       "type": "file",
       "name": "src/application/invoices/queries/index.ts",
       "file": "src/application/invoices/queries/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/commands/index.ts",
+      "file": "src/application/products/commands/index.ts"
     },
     {
       "type": "file",
@@ -110,21 +182,6 @@
       "type": "file",
       "name": "src/application/taxes/queries/index.ts",
       "file": "src/application/taxes/queries/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/application/products/commands/index.ts",
-      "file": "src/application/products/commands/index.ts"
     }
   ],
   "unusedDeps": [
@@ -132,45 +189,45 @@
       "type": "dependency",
       "name": "swagger-ui-express",
       "file": "package.json",
-      "line": 43
+      "line": 44
     },
     {
       "type": "devDependency",
       "name": "@eslint/eslintrc",
       "file": "package.json",
-      "line": 46
+      "line": 47
     },
     {
       "type": "devDependency",
       "name": "@types/supertest",
       "file": "package.json",
-      "line": 56
+      "line": 58
     },
     {
       "type": "devDependency",
       "name": "source-map-support",
       "file": "package.json",
-      "line": 64
+      "line": 66
     },
     {
       "type": "devDependency",
       "name": "supertest",
       "file": "package.json",
-      "line": 65
+      "line": 67
     },
     {
       "type": "devDependency",
       "name": "ts-loader",
       "file": "package.json",
-      "line": 67
+      "line": 69
     },
     {
       "type": "devDependency",
       "name": "tsx",
       "file": "package.json",
-      "line": 70
+      "line": 72
     }
   ],
   "unlistedDeps": [],
-  "summary": "Found 15 issues"
+  "summary": "Found 20 issues"
 }

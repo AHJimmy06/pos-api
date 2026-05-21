@@ -47,9 +47,13 @@ const AuthHandlers = [LoginHandler, RegisterUserHandler, UnlockUserHandler];
       provide: 'IBlockedUserRepository',
       useClass: PrismaBlockedUserRepository,
     },
+    {
+      provide: 'IPasswordService',
+      useExisting: PasswordService,
+    },
   ],
   exports: [
-    PasswordService,
+    'IPasswordService',
     JwtModule,
     JwtStrategy,
     JwtAuthGuard,
