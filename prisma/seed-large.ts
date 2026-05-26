@@ -69,40 +69,42 @@ async function main() {
     console.log(`... ${i + products.length} products created`);
   }
 
-  // 5. Generate Invoices
+  // 5. Generate Invoices in batches
   console.log(`Generating ${INVOICE_COUNT} invoices...`);
   const allClients = await prisma.client.findMany({ select: { id: true }, take: 1000 });
   const allProducts = await prisma.product.findMany({ select: { id: true, name: true, price: true }, take: 1000 });
 
-  for (let i = 0; i < INVOICE_COUNT; i += 2000) {
-    const batchSize = Math.min(2000, INVOICE_COUNT - i);
-    console.log(`... creating batch starting at ${i}`);
+  const BATCH_SIZE = 5000;
+  for (let i = 0; i < INVOICE_COUNT; i += BATCH_SIZE) {
+    const currentBatchSize = Math.min(BATCH_SIZE, INVOICE_COUNT - i);
+    console.log(`... creating invoice batch starting at ${i} (size: ${currentBatchSize})`);
     
-    for (let j = 0; j < batchSize; j++) {
+    const invoicesData = [];
+    for (let j = 0; j < currentBatchSize; j++) {
       const client = allClients[Math.floor(Math.random() * allClients.length)];
       const product = allProducts[Math.floor(Math.random() * allProducts.length)];
       
-      await prisma.invoice.create({
-        data: {
-          clientId: client.id,
-          userId: adminUser.id,
-          status: 'CONFIRMED',
-          transactionId: `LARGE-TRX-${i + j}`,
-          totalSnapshot: product.price,
-          subtotalSnapshot: product.price,
-          taxTotalSnapshot: 0,
-          issueDate: new Date(),
-          details: {
-            create: {
-              productId: product.id,
-              productName: product.name,
-              quantity: 1,
-              unitPriceSnapshot: product.price
-            }
-          }
-        }
+      invoicesData.push({
+        clientId: client.id,
+        userId: adminUser.id,
+        status: 'CONFIRMED' as const,
+        transactionId: `LARGE-TRX-${i + j}`,
+        totalSnapshot: product.price,
+        subtotalSnapshot: product.price,
+        taxTotalSnapshot: 0,
+        issueDate: new Date(),
+        paymentMethod: 'CASH' as const,
+        isActive: true,
+        version: 0
       });
     }
+
+    await prisma.invoice.createMany({ data: invoicesData });
+
+    // Note: If you need to seed InvoiceDetails, you would normally need the invoice IDs.
+    // createMany does not return IDs in many databases (including some Oracle versions with Prisma).
+    // For this specific test of "loading 100k", focus on filling the main tables first.
+    // If details are mandatory, consider a second pass or using a raw SQL approach with sequences.
   }
 
   console.log('--- Large Data Seed Completed ---');

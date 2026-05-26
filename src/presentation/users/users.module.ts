@@ -2,20 +2,19 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersController } from './controllers/users.controller';
+import { UsersController } from '../web/controllers/users.controller';
 import { AuthModule } from '../auth/auth.module';
-import { UnlockUserHandler } from '../../application/auth/handlers/unlock-user.handler';
-import {
-  GetUsersHandler,
-  GetUserHandler,
-  UpdateUserHandler,
-  DeleteUserHandler,
-  GetErrorLogsHandler,
-  AssignRolesHandler,
-} from '../../application/users';
+import { UnlockUserHandler } from '../../application/auth/unlock-user.handler';
+import { GetUsersHandler } from '../../application/users/get-users.handler';
+import { GetUserHandler } from '../../application/users/get-user.handler';
+import { UpdateUserHandler } from '../../application/users/update-user.handler';
+import { DeleteUserHandler } from '../../application/users/delete-user.handler';
+import { GetErrorLogsHandler } from '../../application/users/get-error-logs.handler';
+import { AssignRolesHandler } from '../../application/users/assign-roles.handler';
 import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
 import { PrismaUserRepository } from '../../infrastructure/persistence/prisma/repositories/user.repository';
 import { PrismaRoleRepository } from '../../infrastructure/persistence/prisma/repositories/role.repository';
+import { TOKENS } from '../../application/common/tokens/tokens';
 
 const UserHandlers = [
   UnlockUserHandler,
@@ -42,11 +41,11 @@ const UserHandlers = [
   providers: [
     ...UserHandlers,
     {
-      provide: 'IUserRepository',
+      provide: TOKENS.USER_REPOSITORY,
       useClass: PrismaUserRepository,
     },
     {
-      provide: 'IRoleRepository',
+      provide: TOKENS.ROLE_REPOSITORY,
       useClass: PrismaRoleRepository,
     },
   ],

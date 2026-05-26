@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
-import { IProductRepository } from '../../../../domain/repositories/product.repository.interface';
+import { IProductRepository } from '../../../../application/common/interfaces/product.repository.interface';
 import { Product as ProductEntity } from '../../../../domain/entities/product.entity';
 import { Prisma } from '@prisma/client';
 import { ProductMapper } from '../mappers/product.mapper';

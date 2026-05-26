@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
-import { IStockMovementRepository } from '../../../../domain/repositories/stock-movement.repository.interface';
+import { IStockMovementRepository } from '../../../../application/common/interfaces/stock-movement.repository.interface';
 import { StockMovement as StockMovementEntity } from '../../../../domain/entities/stock-movement.entity';
 import { StockMovementMapper } from '../mappers/stock-movement.mapper';
 

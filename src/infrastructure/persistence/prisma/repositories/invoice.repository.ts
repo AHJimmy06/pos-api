@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
-import { IInvoiceRepository } from '../../../../domain/repositories/invoice.repository.interface';
+import { IInvoiceRepository } from '../../../../application/common/interfaces/invoice.repository.interface';
 import { Invoice as InvoiceEntity } from '../../../../domain/entities/invoice.entity';
 import {
   InvoiceMapper,

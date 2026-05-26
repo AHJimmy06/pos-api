@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
-import { ITaxRepository } from '../../../../domain/repositories/tax.repository.interface';
+import { ITaxRepository } from '../../../../application/common/interfaces/tax.repository.interface';
 import { Tax as TaxEntity } from '../../../../domain/entities/tax.entity';
 import { Prisma } from '@prisma/client';
 import { TaxMapper } from '../mappers/tax.mapper';
