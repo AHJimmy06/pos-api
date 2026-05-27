@@ -9,7 +9,7 @@ import { StockMovement } from '../../domain/entities/stock-movement.entity';
 import { BusinessException } from '../../domain/exceptions/business.exception';
 import { InvoiceStatus } from '../../domain/enums/invoice-status.enum';
 import { MovementType } from '../../domain/enums/movement-type.enum';
-import type { ChangeInvoiceStatusResult } from '../../domain/interfaces/change-invoice-status-result.interface';
+import type { ChangeInvoiceStatusResult } from '../common/interfaces/change-invoice-status-result.interface';
 import { TOKENS } from '../common/tokens/tokens';
 
 @CommandHandler(ChangeInvoiceStatusCommand)

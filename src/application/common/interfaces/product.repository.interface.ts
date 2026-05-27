@@ -14,6 +14,7 @@ export abstract class IProductRepository {
     search?: string,
   ): Promise<{ data: Product[]; total: number }>;
   abstract findById(id: number): Promise<Product | null>;
+  abstract findByIds(ids: number[]): Promise<Product[]>;
   abstract create(product: Product): Promise<Product>;
   abstract update(id: number, product: Partial<Product>): Promise<Product>;
   abstract delete(id: number): Promise<DeleteResult>;

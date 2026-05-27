@@ -29,6 +29,16 @@ export class PrismaTaxRepository extends ITaxRepository {
     return tax ? TaxMapper.toEntity(tax) : null;
   }
 
+  async findByIds(ids: number[]): Promise<TaxEntity[]> {
+    if (ids.length === 0) return [];
+    const taxes = await this.prisma.tax.findMany({
+      where: {
+        id: { in: ids },
+      },
+    });
+    return taxes.map((tax) => TaxMapper.toEntity(tax));
+  }
+
   async create(tax: TaxEntity): Promise<TaxEntity> {
     const newTax = await this.prisma.tax.create({
       data: TaxMapper.toPersistence(tax),

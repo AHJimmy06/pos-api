@@ -78,6 +78,7 @@ model Product {
   invoiceDetails InvoiceDetail[]
   StockMovement  StockMovement[]
 
+  @@index([isActive, stock])
   @@map("products")
 }
 
@@ -88,6 +89,8 @@ model ProductTax {
   product   Product @relation(fields: [productId], references: [id])
   tax       Tax     @relation(fields: [taxId], references: [id])
 
+  @@index([productId])
+  @@index([taxId])
   @@map("product_taxes")
 }
 
@@ -133,6 +136,9 @@ model Invoice {
   user             User?           @relation(fields: [userId], references: [id])
   details          InvoiceDetail[]
 
+  @@index([clientId])
+  @@index([userId])
+  @@index([issueDate])
   @@map("invoices")
 }
 
@@ -148,6 +154,8 @@ model StockMovement {
   createdAt     DateTime     @default(now()) @map("created_at")
   product       Product      @relation(fields: [productId], references: [id])
 
+  @@index([productId])
+  @@index([createdAt])
   @@map("stock_movements")
 }
 
@@ -162,6 +170,8 @@ model InvoiceDetail {
   product           Product?           @relation(fields: [productId], references: [id])
   detailTaxes       InvoiceDetailTax[]
 
+  @@index([invoiceId])
+  @@index([productId])
   @@map("invoice_details")
 }
 
@@ -174,6 +184,8 @@ model InvoiceDetailTax {
   invoiceDetail            InvoiceDetail? @relation(fields: [detailId], references: [id])
   tax                      Tax?           @relation(fields: [taxId], references: [id])
 
+  @@index([detailId])
+  @@index([taxId])
   @@map("invoice_detail_taxes")
 }
 

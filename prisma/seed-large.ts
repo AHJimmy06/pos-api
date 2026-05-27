@@ -79,7 +79,7 @@ async function main() {
     const currentBatchSize = Math.min(BATCH_SIZE, INVOICE_COUNT - i);
     console.log(`... creating invoice batch starting at ${i} (size: ${currentBatchSize})`);
     
-    const invoicesData = [];
+    const invoicesData: any[] = [];
     for (let j = 0; j < currentBatchSize; j++) {
       const client = allClients[Math.floor(Math.random() * allClients.length)];
       const product = allProducts[Math.floor(Math.random() * allProducts.length)];

@@ -91,6 +91,18 @@ export class PrismaProductRepository extends IProductRepository {
     return product ? ProductMapper.toEntity(product) : null;
   }
 
+  async findByIds(ids: number[]): Promise<ProductEntity[]> {
+    if (ids.length === 0) return [];
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: { in: ids },
+        isActive: true,
+      },
+      include: { productTaxes: { include: { tax: true } } },
+    });
+    return products.map((product) => ProductMapper.toEntity(product));
+  }
+
   async create(product: ProductEntity): Promise<ProductEntity> {
     const data: Prisma.ProductCreateInput = {
       name: product.name,

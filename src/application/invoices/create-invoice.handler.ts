@@ -59,14 +59,27 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
         );
       }
 
+      // 1. Batch fetching de Productos e Impuestos
+      const productsData = await this.productRepository.findByIds([
+        ...uniqueProductIds,
+      ]);
+      const productMap = new Map(productsData.map((p) => [p.id, p]));
+
+      const allTaxIds = new Set<number>();
+      items.forEach((item) => {
+        if (item.taxes) item.taxes.forEach((t) => allTaxIds.add(t.taxId));
+        if (item.impuestoIds)
+          item.impuestoIds.forEach((id) => allTaxIds.add(id));
+      });
+      const taxesData = await this.taxRepository.findByIds([...allTaxIds]);
+      const taxMap = new Map(taxesData.map((t) => [t.id, t]));
+
       const invoice = new Invoice(clientId);
       invoice.userId = userId;
       invoice.status = status || InvoiceStatus.CONFIRMED;
 
       for (const item of items) {
-        const productData = await this.productRepository.findById(
-          item.productId,
-        );
+        const productData = productMap.get(item.productId);
         if (!productData) {
           throw new NotFoundException(
             `Product with ID ${item.productId} not found`,
@@ -123,7 +136,7 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
           }
         } else if (item.impuestoIds && item.impuestoIds.length > 0) {
           for (const taxId of item.impuestoIds) {
-            const tax = await this.taxRepository.findById(taxId);
+            const tax = taxMap.get(taxId);
             if (tax) {
               detail.addTax(tax.id, Number(tax.currentRate));
             }
