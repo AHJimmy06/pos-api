@@ -18,6 +18,7 @@ export class GetProductsForSaleHandler implements IQueryHandler<GetProductsForSa
       query.page,
       query.limit,
       query.search,
+      query.searchField,
     );
   }
 }

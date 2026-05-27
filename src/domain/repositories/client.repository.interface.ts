@@ -7,6 +7,7 @@ export abstract class IClientRepository {
     page: number,
     limit: number,
     search?: string,
+    searchField?: string,
   ): Promise<{ data: Client[]; total: number }>;
   abstract findById(id: number): Promise<Client | null>;
   abstract create(client: Client): Promise<Client>;

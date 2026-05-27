@@ -73,15 +73,17 @@ export class ClientsController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'searchField', required: false, type: String })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('search') search?: string,
+    @Query('searchField') searchField?: string,
   ): Promise<{ data: Client[]; total: number }> {
     const pageNum = page ? parseInt(page, 10) : 1;
     const limitNum = normalizePageSize(limit);
     return this.queryBus.execute(
-      new GetClientsQuery(pageNum, limitNum, search),
+      new GetClientsQuery(pageNum, limitNum, search, searchField),
     );
   }
 

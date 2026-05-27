@@ -11,7 +11,16 @@ export class GetTaxesHandler implements IQueryHandler<GetTaxesQuery> {
     private readonly taxRepository: ITaxRepository,
   ) {}
 
-  async execute(): Promise<Tax[]> {
+  async execute(
+    query: GetTaxesQuery,
+  ): Promise<{ data: Tax[]; total: number } | Tax[]> {
+    if (query.page && query.limit) {
+      return this.taxRepository.findAllPaginated(
+        query.page,
+        query.limit,
+        query.search,
+      );
+    }
     return this.taxRepository.findAll();
   }
 }

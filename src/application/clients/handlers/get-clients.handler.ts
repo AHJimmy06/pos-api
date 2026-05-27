@@ -18,6 +18,7 @@ export class GetClientsHandler implements IQueryHandler<GetClientsQuery> {
       query.page,
       query.limit,
       query.search,
+      query.searchField,
     );
   }
 }

@@ -29,16 +29,33 @@ export class PrismaClientRepository extends IClientRepository {
     page: number,
     limit: number,
     search?: string,
+    searchField: string = 'all',
   ): Promise<{ data: ClientEntity[]; total: number }> {
     const where: Prisma.ClientWhereInput = { isActive: true };
     if (search) {
-      where.OR = [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { phone: { contains: search, mode: 'insensitive' } },
-        { address: { contains: search, mode: 'insensitive' } },
-      ];
+      if (searchField === 'id') {
+        const idNum = parseInt(search, 10);
+        if (!isNaN(idNum)) {
+          where.id = idNum;
+        }
+      } else if (searchField === 'name') {
+        where.OR = [
+          { firstName: { contains: search, mode: 'insensitive' } },
+          { lastName: { contains: search, mode: 'insensitive' } },
+        ];
+      } else if (searchField === 'email') {
+        where.email = { contains: search, mode: 'insensitive' };
+      } else if (searchField === 'phone') {
+        where.phone = { contains: search, mode: 'insensitive' };
+      } else {
+        where.OR = [
+          { firstName: { contains: search, mode: 'insensitive' } },
+          { lastName: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { phone: { contains: search, mode: 'insensitive' } },
+          { address: { contains: search, mode: 'insensitive' } },
+        ];
+      }
     }
 
     const [clients, total] = await Promise.all([
