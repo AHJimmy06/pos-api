@@ -1,4 +1,6 @@
-export class GetClientsQuery {
+import { IProductRepository } from '../../common/interfaces/product.repository.interface';
+
+export class GetProductsForSaleQuery {
   constructor(
     public readonly page: number = 1,
     public readonly limit: number = 10,

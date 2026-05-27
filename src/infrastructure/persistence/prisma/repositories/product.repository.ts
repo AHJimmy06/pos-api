@@ -29,6 +29,7 @@ export class PrismaProductRepository extends IProductRepository {
     page: number,
     limit: number,
     search?: string,
+    searchField: string = 'all',
   ): Promise<{ data: ProductEntity[]; total: number }> {
     // Only products that are active AND have stock > 0
     const where: Prisma.ProductWhereInput = {
@@ -36,7 +37,16 @@ export class PrismaProductRepository extends IProductRepository {
       stock: { gt: 0 },
     };
     if (search) {
-      where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+      if (searchField === 'id') {
+        const idNum = parseInt(search, 10);
+        if (!isNaN(idNum)) {
+          where.id = idNum;
+        }
+      } else if (searchField === 'name') {
+        where.name = { contains: search, mode: 'insensitive' };
+      } else {
+        where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+      }
     }
 
     const [products, total] = await Promise.all([
@@ -60,10 +70,20 @@ export class PrismaProductRepository extends IProductRepository {
     page: number,
     limit: number,
     search?: string,
+    searchField: string = 'all',
   ): Promise<{ data: ProductEntity[]; total: number }> {
     const where: Prisma.ProductWhereInput = { isActive: true };
     if (search) {
-      where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+      if (searchField === 'id') {
+        const idNum = parseInt(search, 10);
+        if (!isNaN(idNum)) {
+          where.id = idNum;
+        }
+      } else if (searchField === 'name') {
+        where.name = { contains: search, mode: 'insensitive' };
+      } else {
+        where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+      }
     }
 
     const [products, total] = await Promise.all([

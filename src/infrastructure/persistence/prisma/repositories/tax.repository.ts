@@ -22,6 +22,42 @@ export class PrismaTaxRepository extends ITaxRepository {
     return taxes.map((t) => TaxMapper.toEntity(t));
   }
 
+  async findAllPaginated(
+    page: number,
+    limit: number,
+    search?: string,
+    searchField: string = 'all',
+  ): Promise<{ data: TaxEntity[]; total: number }> {
+    const where: Prisma.TaxWhereInput = {};
+    if (search) {
+      if (searchField === 'id') {
+        const idNum = parseInt(search, 10);
+        if (!isNaN(idNum)) {
+          where.id = idNum;
+        }
+      } else if (searchField === 'name') {
+        where.name = { contains: search, mode: 'insensitive' };
+      } else {
+        where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+      }
+    }
+
+    const [taxes, total] = await Promise.all([
+      this.prisma.tax.findMany({
+        where,
+        orderBy: { id: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.tax.count({ where }),
+    ]);
+
+    return {
+      data: taxes.map((t) => TaxMapper.toEntity(t)),
+      total,
+    };
+  }
+
   async findById(id: number): Promise<TaxEntity | null> {
     const tax = await this.prisma.tax.findUnique({
       where: { id },

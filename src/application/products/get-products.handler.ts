@@ -19,6 +19,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
       query.page,
       query.limit,
       query.search,
+      query.searchField,
     );
   }
 }

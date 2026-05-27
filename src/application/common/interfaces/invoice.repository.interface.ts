@@ -8,6 +8,7 @@ export abstract class IInvoiceRepository {
     limit: number,
     searchId?: number,
     userId?: number,
+    searchField?: string,
   ): Promise<{ data: Invoice[]; total: number }>;
   abstract findById(id: number): Promise<Invoice | null>;
   abstract findByIdWithDetails(id: number): Promise<Invoice | null>;

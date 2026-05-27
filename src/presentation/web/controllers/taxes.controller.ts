@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -15,6 +16,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { CreateTaxDto } from '../../taxes/dto/create-tax.dto';
 import { UpdateTaxDto } from '../../taxes/dto/update-tax.dto';
@@ -28,6 +30,7 @@ import { JwtAuthGuard } from '../../../infrastructure/security/guards/jwt-auth.g
 import { RolesGuard } from '../../../infrastructure/security/guards/roles.guard';
 import { Roles } from '../../../infrastructure/security/decorators/roles.decorator';
 import { UserRole } from '../../../domain/enums/user-role.enum';
+import { normalizePageSize } from '../../../infrastructure/web-common/utils/page-size.util';
 
 @ApiTags('taxes')
 @ApiBearerAuth('JWT-auth')
@@ -55,9 +58,22 @@ export class TaxesController {
 
   @Get()
   @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
-  @ApiOperation({ summary: 'Get all taxes' })
-  async findAll(): Promise<Tax[]> {
-    return this.queryBus.execute(new GetTaxesQuery());
+  @ApiOperation({ summary: 'Get all taxes (paginated)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'searchField', required: false, type: String })
+  async findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('searchField') searchField?: string,
+  ): Promise<{ data: Tax[]; total: number }> {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = normalizePageSize(limit);
+    return this.queryBus.execute(
+      new GetTaxesQuery(pageNum, limitNum, search, searchField),
+    );
   }
 
   @Get(':id')

@@ -7,11 +7,13 @@ export abstract class IProductRepository {
     page: number,
     limit: number,
     search?: string,
+    searchField?: string,
   ): Promise<{ data: Product[]; total: number }>;
   abstract findAllPaginated(
     page: number,
     limit: number,
     search?: string,
+    searchField?: string,
   ): Promise<{ data: Product[]; total: number }>;
   abstract findById(id: number): Promise<Product | null>;
   abstract findByIds(ids: number[]): Promise<Product[]>;
