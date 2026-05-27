@@ -4,7 +4,6 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersController } from '../web/controllers/users.controller';
 import { AuthModule } from '../auth/auth.module';
-import { UnlockUserHandler } from '../../application/auth/unlock-user.handler';
 import { GetUsersHandler } from '../../application/users/get-users.handler';
 import { GetUserHandler } from '../../application/users/get-user.handler';
 import { UpdateUserHandler } from '../../application/users/update-user.handler';
@@ -17,7 +16,6 @@ import { PrismaRoleRepository } from '../../infrastructure/persistence/prisma/re
 import { TOKENS } from '../../application/common/tokens/tokens';
 
 const UserHandlers = [
-  UnlockUserHandler,
   GetUsersHandler,
   GetUserHandler,
   UpdateUserHandler,
