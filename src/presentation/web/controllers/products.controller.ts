@@ -74,15 +74,17 @@ export class ProductsController {
     description: 'Page size: 10, 15, 20, or 30',
   })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'searchField', required: false, type: String })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('search') search?: string,
+    @Query('searchField') searchField?: string,
   ): Promise<{ data: Product[]; total: number }> {
     const pageNum = page ? parseInt(page, 10) : 1;
     const limitNum = normalizePageSize(limit);
     return this.queryBus.execute(
-      new GetProductsQuery(pageNum, limitNum, search),
+      new GetProductsQuery(pageNum, limitNum, search, searchField),
     );
   }
 

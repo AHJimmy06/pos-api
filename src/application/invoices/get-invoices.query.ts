@@ -4,5 +4,6 @@ export class GetInvoicesQuery {
     public readonly limit: number = 10,
     public readonly searchId?: number,
     public readonly userId?: number,
+    public readonly searchField?: string,
   ) {}
 }

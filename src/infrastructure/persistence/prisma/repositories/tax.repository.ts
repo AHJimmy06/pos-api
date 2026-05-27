@@ -26,12 +26,20 @@ export class PrismaTaxRepository extends ITaxRepository {
     page: number,
     limit: number,
     search?: string,
+    searchField: string = 'all',
   ): Promise<{ data: TaxEntity[]; total: number }> {
     const where: Prisma.TaxWhereInput = {};
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-      ];
+      if (searchField === 'id') {
+        const idNum = parseInt(search, 10);
+        if (!isNaN(idNum)) {
+          where.id = idNum;
+        }
+      } else if (searchField === 'name') {
+        where.name = { contains: search, mode: 'insensitive' };
+      } else {
+        where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+      }
     }
 
     const [taxes, total] = await Promise.all([

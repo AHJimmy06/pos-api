@@ -20,6 +20,7 @@ export class GetTaxesHandler implements IQueryHandler<GetTaxesQuery> {
         query.page,
         query.limit,
         query.search,
+        query.searchField,
       );
     }
     return this.taxRepository.findAll();
