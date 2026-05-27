@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { PrismaClient } from '@prisma/client';
-import { IUnitOfWork } from '../../../domain/repositories/unit-of-work.interface';
+import { IUnitOfWork } from '../../../application/common/interfaces/unit-of-work.interface';
 import { PrismaService } from './prisma.service';
 
 @Injectable()

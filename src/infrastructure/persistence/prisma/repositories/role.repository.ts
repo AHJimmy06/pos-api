@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IRoleRepository } from '../../../../domain/repositories/role.repository.interface';
+import { IRoleRepository } from '../../../../application/common/interfaces/role.repository.interface';
 import { Role } from '../../../../domain/entities/role.entity';
 import { UserRole } from '../../../../domain/enums/user-role.enum';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';

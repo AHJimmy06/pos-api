@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
-import { ITaxRepository } from '../../../../domain/repositories/tax.repository.interface';
+import { ITaxRepository } from '../../../../application/common/interfaces/tax.repository.interface';
 import { Tax as TaxEntity } from '../../../../domain/entities/tax.entity';
 import { Prisma } from '@prisma/client';
 import { TaxMapper } from '../mappers/tax.mapper';
@@ -55,6 +55,16 @@ export class PrismaTaxRepository extends ITaxRepository {
       where: { id },
     });
     return tax ? TaxMapper.toEntity(tax) : null;
+  }
+
+  async findByIds(ids: number[]): Promise<TaxEntity[]> {
+    if (ids.length === 0) return [];
+    const taxes = await this.prisma.tax.findMany({
+      where: {
+        id: { in: ids },
+      },
+    });
+    return taxes.map((tax) => TaxMapper.toEntity(tax));
   }
 
   async create(tax: TaxEntity): Promise<TaxEntity> {

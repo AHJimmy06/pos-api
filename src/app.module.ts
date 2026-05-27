@@ -9,7 +9,7 @@ import { ProductsModule } from './presentation/products/products.module';
 import { InvoicesModule } from './presentation/invoices/invoices.module';
 import { AuthModule } from './presentation/auth/auth.module';
 import { UsersModule } from './presentation/users/users.module';
-import { AllExceptionsFilter } from './infrastructure/common/filters/all-exceptions.filter';
+import { AllExceptionsFilter } from './infrastructure/web-common/filters/all-exceptions.filter';
 
 @Module({
   imports: [

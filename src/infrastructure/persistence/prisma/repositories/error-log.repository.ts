@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
-import { IErrorLogRepository } from '../../../../domain/repositories/error-log.repository.interface';
+import { IErrorLogRepository } from '../../../../application/common/interfaces/error-log.repository.interface';
 import { ErrorLog as ErrorLogEntity } from '../../../../domain/entities/error-log.entity';
 import { ErrorLogMapper } from '../mappers/error-log.mapper';
 

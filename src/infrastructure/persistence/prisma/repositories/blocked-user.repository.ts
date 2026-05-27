@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IBlockedUserRepository } from '../../../../domain/repositories/blocked-user.repository.interface';
+import { IBlockedUserRepository } from '../../../../application/common/interfaces/blocked-user.repository.interface';
 import { BlockedUser } from '../../../../domain/entities/blocked-user.entity';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
 

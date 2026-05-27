@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaUnitOfWork } from '../prisma-unit-of-work';
-import { IProductRepository } from '../../../../domain/repositories/product.repository.interface';
+import { IProductRepository } from '../../../../application/common/interfaces/product.repository.interface';
 import { Product as ProductEntity } from '../../../../domain/entities/product.entity';
 import { Prisma } from '@prisma/client';
 import { ProductMapper } from '../mappers/product.mapper';
@@ -99,6 +99,18 @@ export class PrismaProductRepository extends IProductRepository {
       include: { productTaxes: { include: { tax: true } } },
     });
     return product ? ProductMapper.toEntity(product) : null;
+  }
+
+  async findByIds(ids: number[]): Promise<ProductEntity[]> {
+    if (ids.length === 0) return [];
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: { in: ids },
+        isActive: true,
+      },
+      include: { productTaxes: { include: { tax: true } } },
+    });
+    return products.map((product) => ProductMapper.toEntity(product));
   }
 
   async create(product: ProductEntity): Promise<ProductEntity> {
