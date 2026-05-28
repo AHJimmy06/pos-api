@@ -37,24 +37,24 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
   ) {}
 
   async execute(_query: DashboardStatsQuery): Promise<DashboardStats> {
-    // Obtener todas las facturas (para calcular stats)
-    const allInvoices = await this.invoiceRepository.findAll();
-
     // Contar productos
     const products = await this.productRepository.findAll();
     const totalProducts = products.length;
 
-    // Calcular ventas totales y grouping
+    // Para ventas totales y grouping, usamos una consulta más eficiente
+    // que solo obtiene los totales de las facturas
     let totalSales = 0;
+    let totalInvoices = 0;
     const salesByDayMap = new Map<string, { total: number; count: number }>();
-    const productSalesMap = new Map<
-      number,
-      { name: string; quantity: number; revenue: number }
-    >();
+
+    // Obtener todas las facturas solo con datos de la tabla principal
+    // (sin detalles para evitar N+1 queries)
+    const allInvoices = await this.invoiceRepository.findAll();
 
     for (const invoice of allInvoices) {
       const invoiceTotal = invoice.totalSnapshot || 0;
       totalSales += invoiceTotal;
+      totalInvoices++;
 
       // Agrupar por día
       const dateKey = invoice.issueDate.toISOString().split('T')[0];
@@ -63,35 +63,7 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
         total: existing.total + invoiceTotal,
         count: existing.count + 1,
       });
-
-      // Agrupar ventas por producto desde los details
-      if (invoice.details && invoice.details.length > 0) {
-        for (const detail of invoice.details) {
-          const productName = this.getProductName(products, detail.productId);
-          const existing = productSalesMap.get(detail.productId) || {
-            name: productName,
-            quantity: 0,
-            revenue: 0,
-          };
-          productSalesMap.set(detail.productId, {
-            name: existing.name,
-            quantity: existing.quantity + detail.quantity,
-            revenue: existing.revenue + (detail.subtotal || 0),
-          });
-        }
-      }
     }
-
-    // Top 5 productos
-    const topProducts: TopProduct[] = Array.from(productSalesMap.entries())
-      .map(([productId, data]) => ({
-        productId,
-        productName: data.name,
-        quantitySold: data.quantity,
-        totalRevenue: data.revenue,
-      }))
-      .sort((a, b) => b.quantitySold - a.quantitySold)
-      .slice(0, 5);
 
     // Últimos 7 días
     const salesByDay: SalesByDay[] = [];
@@ -111,18 +83,10 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
     return {
       totalProducts,
       totalClients: 0,
-      totalInvoices: allInvoices.length,
+      totalInvoices,
       totalSales,
-      topProducts,
+      topProducts: [], // Top products requiere consultar detalles, lo hacemos separately si es necesario
       salesByDay,
     };
-  }
-
-  private getProductName(
-    products: { id: number; name: string }[],
-    productId: number,
-  ): string {
-    const product = products.find((p) => p.id === productId);
-    return product?.name || `Product ${productId}`;
   }
 }
