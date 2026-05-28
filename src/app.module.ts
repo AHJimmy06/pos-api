@@ -9,6 +9,7 @@ import { ProductsModule } from './presentation/products/products.module';
 import { InvoicesModule } from './presentation/invoices/invoices.module';
 import { AuthModule } from './presentation/auth/auth.module';
 import { UsersModule } from './presentation/users/users.module';
+import { DashboardModule } from './presentation/dashboard/dashboard.module';
 import { AllExceptionsFilter } from './infrastructure/web-common/filters/all-exceptions.filter';
 
 @Module({
@@ -20,6 +21,7 @@ import { AllExceptionsFilter } from './infrastructure/web-common/filters/all-exc
     InvoicesModule,
     AuthModule,
     UsersModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
