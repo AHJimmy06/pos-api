@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './infrastructure/persistence/prisma/prisma.module';
+import { TypeOrmModule } from './infrastructure/persistence/typeorm/typeorm-module';
 import { ClientsModule } from './presentation/clients/clients.module';
 import { TaxesModule } from './presentation/taxes/taxes.module';
 import { ProductsModule } from './presentation/products/products.module';
@@ -13,7 +13,7 @@ import { AllExceptionsFilter } from './infrastructure/web-common/filters/all-exc
 
 @Module({
   imports: [
-    PrismaModule,
+    TypeOrmModule,
     ClientsModule,
     TaxesModule,
     ProductsModule,

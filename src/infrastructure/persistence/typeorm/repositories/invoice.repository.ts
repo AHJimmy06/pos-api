@@ -212,7 +212,7 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
     limit: number,
     searchId?: number,
     userId?: number,
-    _searchField?: string,
+    _searchField?: string, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<{ data: Invoice[]; total: number }> {
     const offset = (page - 1) * limit;
     const whereConditions: string[] = ['i.IS_ACTIVE = 1'];

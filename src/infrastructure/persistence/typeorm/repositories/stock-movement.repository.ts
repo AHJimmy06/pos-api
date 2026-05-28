@@ -1,6 +1,5 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
 import { Inject } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
 import { IStockMovementRepository } from '../../../../application/common/interfaces/stock-movement.repository.interface';
 import { StockMovement } from '../../../../domain/entities/stock-movement.entity';
 import { TypeOrmUnitOfWork } from '../typeorm-unit-of-work';

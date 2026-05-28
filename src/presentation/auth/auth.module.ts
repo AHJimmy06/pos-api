@@ -5,16 +5,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from '../web/controllers/auth.controller';
 import { RolesController } from '../web/controllers/roles.controller';
 import { PasswordService } from '../../infrastructure/security/services/password.service';
-import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
+import { TypeOrmModule } from '../../infrastructure/persistence/typeorm/typeorm-module';
 import { JwtStrategy } from '../../infrastructure/security/strategies/jwt.strategy';
 import { JwtAuthGuard } from '../../infrastructure/security/guards/jwt-auth.guard';
 import { RolesGuard } from '../../infrastructure/security/guards/roles.guard';
 import { LoginHandler } from '../../application/auth/login.handler';
 import { RegisterUserHandler } from '../../application/auth/register-user.handler';
 import { UnlockUserHandler } from '../../application/auth/unlock-user.handler';
-import { PrismaUserRepository } from '../../infrastructure/persistence/prisma/repositories/user.repository';
-import { PrismaRoleRepository } from '../../infrastructure/persistence/prisma/repositories/role.repository';
-import { PrismaBlockedUserRepository } from '../../infrastructure/persistence/prisma/repositories/blocked-user.repository';
+import { TypeOrmUserRepository } from '../../infrastructure/persistence/typeorm/repositories/user.repository';
+import { TypeOrmRoleRepository } from '../../infrastructure/persistence/typeorm/repositories/role.repository';
+import { TypeOrmBlockedUserRepository } from '../../infrastructure/persistence/typeorm/repositories/blocked-user.repository';
 import { TOKENS } from '../../application/common/tokens/tokens';
 
 const AuthHandlers = [LoginHandler, RegisterUserHandler, UnlockUserHandler];
@@ -27,7 +27,7 @@ const AuthHandlers = [LoginHandler, RegisterUserHandler, UnlockUserHandler];
       secret: process.env.JWT_SECRET || 'default-secret-change-in-production',
       signOptions: { expiresIn: 3600 },
     }),
-    PrismaModule,
+    TypeOrmModule,
   ],
   controllers: [AuthController, RolesController],
   providers: [
@@ -38,15 +38,15 @@ const AuthHandlers = [LoginHandler, RegisterUserHandler, UnlockUserHandler];
     RolesGuard,
     {
       provide: TOKENS.USER_REPOSITORY,
-      useClass: PrismaUserRepository,
+      useClass: TypeOrmUserRepository,
     },
     {
       provide: TOKENS.ROLE_REPOSITORY,
-      useClass: PrismaRoleRepository,
+      useClass: TypeOrmRoleRepository,
     },
     {
       provide: TOKENS.BLOCKED_USER_REPOSITORY,
-      useClass: PrismaBlockedUserRepository,
+      useClass: TypeOrmBlockedUserRepository,
     },
     {
       provide: TOKENS.PASSWORD_SERVICE,

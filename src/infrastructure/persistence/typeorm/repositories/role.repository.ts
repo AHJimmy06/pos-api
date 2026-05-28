@@ -1,6 +1,5 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
 import { Inject } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
 import { IRoleRepository } from '../../../../application/common/interfaces/role.repository.interface';
 import { Role } from '../../../../domain/entities/role.entity';
 import { UserRole } from '../../../../domain/enums/user-role.enum';

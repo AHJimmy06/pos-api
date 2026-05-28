@@ -1,6 +1,5 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
 import { Inject } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
 import { IErrorLogRepository } from '../../../../application/common/interfaces/error-log.repository.interface';
 import { ErrorLog } from '../../../../domain/entities/error-log.entity';
 import { TypeOrmUnitOfWork } from '../typeorm-unit-of-work';

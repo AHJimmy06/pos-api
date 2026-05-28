@@ -6,8 +6,8 @@ import { DeleteClientHandler } from '../../application/clients/delete-client.han
 import { GetClientHandler } from '../../application/clients/get-client.handler';
 import { GetClientsHandler } from '../../application/clients/get-clients.handler';
 import { UpdateClientHandler } from '../../application/clients/update-client.handler';
-import { PrismaClientRepository } from '../../infrastructure/persistence/prisma/repositories/client.repository';
-import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
+import { TypeOrmClientRepository } from '../../infrastructure/persistence/typeorm/repositories/client.repository';
+import { TypeOrmModule } from '../../infrastructure/persistence/typeorm/typeorm-module';
 import { TOKENS } from '../../application/common/tokens/tokens';
 
 const ClientHandlers = [
@@ -19,13 +19,13 @@ const ClientHandlers = [
 ];
 
 @Module({
-  imports: [CqrsModule, PrismaModule],
+  imports: [CqrsModule, TypeOrmModule],
   controllers: [ClientsController],
   providers: [
     ...ClientHandlers,
     {
       provide: TOKENS.CLIENT_REPOSITORY,
-      useClass: PrismaClientRepository,
+      useClass: TypeOrmClientRepository,
     },
   ],
   exports: [TOKENS.CLIENT_REPOSITORY],

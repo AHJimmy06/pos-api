@@ -6,8 +6,8 @@ import { DeleteTaxHandler } from '../../application/taxes/delete-tax.handler';
 import { GetTaxHandler } from '../../application/taxes/get-tax.handler';
 import { GetTaxesHandler } from '../../application/taxes/get-taxes.handler';
 import { UpdateTaxHandler } from '../../application/taxes/update-tax.handler';
-import { PrismaTaxRepository } from '../../infrastructure/persistence/prisma/repositories/tax.repository';
-import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
+import { TypeOrmTaxRepository } from '../../infrastructure/persistence/typeorm/repositories/tax.repository';
+import { TypeOrmModule } from '../../infrastructure/persistence/typeorm/typeorm-module';
 import { TOKENS } from '../../application/common/tokens/tokens';
 
 const TaxHandlers = [
@@ -19,13 +19,13 @@ const TaxHandlers = [
 ];
 
 @Module({
-  imports: [CqrsModule, PrismaModule],
+  imports: [CqrsModule, TypeOrmModule],
   controllers: [TaxesController],
   providers: [
     ...TaxHandlers,
     {
       provide: TOKENS.TAX_REPOSITORY,
-      useClass: PrismaTaxRepository,
+      useClass: TypeOrmTaxRepository,
     },
   ],
   exports: [TOKENS.TAX_REPOSITORY],

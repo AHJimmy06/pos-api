@@ -6,8 +6,6 @@ import { TypeOrmUnitOfWork } from '../typeorm-unit-of-work';
 import { ProductMapper } from '../mappers/product.mapper';
 import { DeleteResult } from '../../../../domain/common/delete-result.interface';
 
-type AnyRow = any;
-
 export class TypeOrmProductRepository implements IProductRepository {
   constructor(
     @Inject(TOKENS.UNIT_OF_WORK) private readonly uow: TypeOrmUnitOfWork,

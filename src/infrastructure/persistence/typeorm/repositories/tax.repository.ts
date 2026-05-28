@@ -1,6 +1,6 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
 import { Inject } from '@nestjs/common';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { ITaxRepository } from '../../../../application/common/interfaces/tax.repository.interface';
 import { Tax } from '../../../../domain/entities/tax.entity';
 import { TypeOrmUnitOfWork } from '../typeorm-unit-of-work';

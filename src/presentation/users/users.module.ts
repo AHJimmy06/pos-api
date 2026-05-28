@@ -10,9 +10,9 @@ import { UpdateUserHandler } from '../../application/users/update-user.handler';
 import { DeleteUserHandler } from '../../application/users/delete-user.handler';
 import { GetErrorLogsHandler } from '../../application/users/get-error-logs.handler';
 import { AssignRolesHandler } from '../../application/users/assign-roles.handler';
-import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
-import { PrismaUserRepository } from '../../infrastructure/persistence/prisma/repositories/user.repository';
-import { PrismaRoleRepository } from '../../infrastructure/persistence/prisma/repositories/role.repository';
+import { TypeOrmModule } from '../../infrastructure/persistence/typeorm/typeorm-module';
+import { TypeOrmUserRepository } from '../../infrastructure/persistence/typeorm/repositories/user.repository';
+import { TypeOrmRoleRepository } from '../../infrastructure/persistence/typeorm/repositories/role.repository';
 import { TOKENS } from '../../application/common/tokens/tokens';
 
 const UserHandlers = [
@@ -33,18 +33,18 @@ const UserHandlers = [
       signOptions: { expiresIn: 3600 },
     }),
     AuthModule,
-    PrismaModule,
+    TypeOrmModule,
   ],
   controllers: [UsersController],
   providers: [
     ...UserHandlers,
     {
       provide: TOKENS.USER_REPOSITORY,
-      useClass: PrismaUserRepository,
+      useClass: TypeOrmUserRepository,
     },
     {
       provide: TOKENS.ROLE_REPOSITORY,
-      useClass: PrismaRoleRepository,
+      useClass: TypeOrmRoleRepository,
     },
   ],
 })

@@ -7,8 +7,8 @@ import { GetProductHandler } from '../../application/products/get-product.handle
 import { GetProductsForSaleHandler } from '../../application/products/get-products-for-sale.handler';
 import { GetProductsHandler } from '../../application/products/get-products.handler';
 import { UpdateProductHandler } from '../../application/products/update-product.handler';
-import { PrismaProductRepository } from '../../infrastructure/persistence/prisma/repositories/product.repository';
-import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
+import { TypeOrmProductRepository } from '../../infrastructure/persistence/typeorm/repositories/product.repository';
+import { TypeOrmModule } from '../../infrastructure/persistence/typeorm/typeorm-module';
 import { TOKENS } from '../../application/common/tokens/tokens';
 
 const ProductHandlers = [
@@ -21,13 +21,13 @@ const ProductHandlers = [
 ];
 
 @Module({
-  imports: [CqrsModule, PrismaModule],
+  imports: [CqrsModule, TypeOrmModule],
   controllers: [ProductsController],
   providers: [
     ...ProductHandlers,
     {
       provide: TOKENS.PRODUCT_REPOSITORY,
-      useClass: PrismaProductRepository,
+      useClass: TypeOrmProductRepository,
     },
   ],
   exports: [TOKENS.PRODUCT_REPOSITORY],

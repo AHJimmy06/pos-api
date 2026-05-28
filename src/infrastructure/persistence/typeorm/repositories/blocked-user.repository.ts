@@ -1,6 +1,5 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
 import { Inject } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
 import { IBlockedUserRepository } from '../../../../application/common/interfaces/blocked-user.repository.interface';
 import { BlockedUser } from '../../../../domain/entities/blocked-user.entity';
 import { TypeOrmUnitOfWork } from '../typeorm-unit-of-work';
