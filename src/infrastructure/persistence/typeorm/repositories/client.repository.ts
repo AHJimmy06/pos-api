@@ -1,4 +1,6 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
+
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { Inject } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { IClientRepository } from '../../../../application/common/interfaces/client.repository.interface';

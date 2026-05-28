@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { TOKENS } from '../../../../application/common/tokens/tokens';
 import { Inject } from '@nestjs/common';
 import { IErrorLogRepository } from '../../../../application/common/interfaces/error-log.repository.interface';
@@ -20,6 +21,7 @@ export class TypeOrmErrorLogRepository implements IErrorLogRepository {
        VALUES (:1, :2, :3, :4, :5)`,
       [
         errorLog.message,
+
         errorLog.stackTrace,
         errorLog.exceptionType,
         errorLog.userId,
@@ -32,6 +34,7 @@ export class TypeOrmErrorLogRepository implements IErrorLogRepository {
     }
 
     // For Oracle, retrieve the created error log
+
     const insertedRow = await this.manager.query(
       `SELECT ID, MESSAGE, STACK_TRACE, EXCEPTION_TYPE, USER_ID, PATH, CREATED_AT
        FROM ERROR_LOGS
@@ -75,7 +78,6 @@ export class TypeOrmErrorLogRepository implements IErrorLogRepository {
     );
 
     return {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       data: rows.map((row) =>
         ErrorLogMapper.toEntity({
           id: row.ID as number,

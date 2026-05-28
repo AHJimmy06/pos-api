@@ -1,4 +1,6 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
+
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { Inject } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
 import { ITaxRepository } from '../../../../application/common/interfaces/tax.repository.interface';
@@ -20,7 +22,6 @@ export class TypeOrmTaxRepository implements ITaxRepository {
       `SELECT ID, NAME, CURRENT_RATE FROM TAXES ORDER BY NAME ASC`,
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return rows.map((row) =>
       TaxMapper.toEntity({
         id: row.ID as number,
@@ -68,7 +69,6 @@ export class TypeOrmTaxRepository implements ITaxRepository {
     );
 
     return {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       data: rows.map((row) =>
         TaxMapper.toEntity({
           id: row.ID as number,
@@ -104,7 +104,6 @@ export class TypeOrmTaxRepository implements ITaxRepository {
     const sql = `SELECT ID, NAME, CURRENT_RATE FROM TAXES WHERE ID IN (${inClause})`;
     const rows = await this.manager.query(sql, ids);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return rows.map((row) =>
       TaxMapper.toEntity({
         id: row.ID as number,

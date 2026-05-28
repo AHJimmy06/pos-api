@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
+
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { DataSource } from 'typeorm';
 import { User } from 'src/domain/entities/user.entity';
 import { UserMapper } from '../mappers/user.mapper';

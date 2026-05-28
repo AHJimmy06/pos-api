@@ -1,4 +1,6 @@
 import { TOKENS } from '../../../../application/common/tokens/tokens';
+
+/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { Inject } from '@nestjs/common';
 import { IProductRepository } from '../../../../application/common/interfaces/product.repository.interface';
 import { Product } from '../../../../domain/entities/product.entity';
