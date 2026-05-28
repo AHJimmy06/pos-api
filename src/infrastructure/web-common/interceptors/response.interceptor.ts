@@ -7,7 +7,7 @@ import {
 import { Request, Response as ExpressResponse } from 'express';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { instanceToPlain } from 'class-transformer';
+import { instanceToPlain, plainToClass } from 'class-transformer';
 
 export interface Response<T> {
   success: boolean;
@@ -30,11 +30,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
 
     return next.handle().pipe(
       map((data: T) => {
-        // Use class-transformer to serialize entities with @Expose decorators
-        const serializedData = instanceToPlain(data, {
-          excludeExtraneousValues: false,
-          enableImplicitConversion: true,
-        }) as T;
+        const serializedData = this.serializeData(data);
 
         return {
           success: true,
@@ -45,5 +41,53 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
         };
       }),
     );
+  }
+
+  private serializeData(data: any): any {
+    if (data === null || data === undefined) {
+      return data;
+    }
+
+    // Handle arrays
+    if (Array.isArray(data)) {
+      return data.map((item) => this.serializeItem(item));
+    }
+
+    return this.serializeItem(data);
+  }
+
+  private serializeItem(item: any): any {
+    // If item has toJSON method, use it (entities define their own serialization)
+    if (item && typeof item.toJSON === 'function') {
+      return item.toJSON();
+    }
+
+    // If it's a class instance with class-transformer decorators, use instanceToPlain
+    if (
+      item &&
+      typeof item === 'object' &&
+      item.constructor &&
+      item.constructor.name !== 'Object'
+    ) {
+      try {
+        return instanceToPlain(item, {
+          excludeExtraneousValues: false,
+          enableImplicitConversion: true,
+        });
+      } catch {
+        // Fallback to manual serialization
+      }
+    }
+
+    // For plain objects, serialize recursively
+    if (item && typeof item === 'object') {
+      const result: Record<string, unknown> = {};
+      for (const key of Object.keys(item)) {
+        result[key] = this.serializeData(item[key]);
+      }
+      return result;
+    }
+
+    return item;
   }
 }
