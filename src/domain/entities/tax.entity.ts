@@ -22,4 +22,13 @@ export class Tax {
   updateRate(rate: number): void {
     this._currentRate = new Percentage(rate);
   }
+
+  // Serialize to plain object
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      name: this.name,
+      currentRate: this.currentRate,
+    };
+  }
 }
