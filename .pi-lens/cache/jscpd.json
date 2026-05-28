@@ -1,7 +1,120 @@
 {
   "success": true,
-  "clones": [],
-  "duplicatedLines": 0,
-  "totalLines": 3713,
-  "percentage": 0
+  "clones": [
+    {
+      "fileA": "src\\infrastructure\\persistence\\prisma\\repositories\\product.repository.ts",
+      "startA": 38,
+      "fileB": "src\\infrastructure\\persistence\\prisma\\repositories\\tax.repository.ts",
+      "startB": 31,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\infrastructure\\persistence\\prisma\\repositories\\product.repository.ts",
+      "startA": 75,
+      "fileB": "src\\infrastructure\\persistence\\prisma\\repositories\\tax.repository.ts",
+      "startB": 31,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\infrastructure\\persistence\\prisma\\repositories\\product.repository.ts",
+      "startA": 93,
+      "fileB": "src\\infrastructure\\persistence\\prisma\\repositories\\product.repository.ts",
+      "startB": 56,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\infrastructure\\persistence\\prisma\\repositories\\product.repository.ts",
+      "startA": 265,
+      "fileB": "src\\infrastructure\\persistence\\prisma\\repositories\\product.repository.ts",
+      "startB": 245,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\infrastructure\\persistence\\prisma\\repositories\\client.repository.ts",
+      "startA": 34,
+      "fileB": "src\\infrastructure\\persistence\\prisma\\repositories\\product.repository.ts",
+      "startB": 75,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\infrastructure\\persistence\\prisma\\mappers\\invoice.mapper.ts",
+      "startA": 114,
+      "fileB": "src\\infrastructure\\persistence\\prisma\\mappers\\invoice.mapper.ts",
+      "startB": 87,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\presentation\\web\\controllers\\products.controller.ts",
+      "startA": 1,
+      "fileB": "src\\presentation\\web\\controllers\\taxes.controller.ts",
+      "startB": 1,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\presentation\\web\\controllers\\products.controller.ts",
+      "startA": 75,
+      "fileB": "src\\presentation\\web\\controllers\\taxes.controller.ts",
+      "startB": 63,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\presentation\\web\\controllers\\products.controller.ts",
+      "startA": 95,
+      "fileB": "src\\presentation\\web\\controllers\\products.controller.ts",
+      "startB": 68,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\presentation\\web\\controllers\\products.controller.ts",
+      "startA": 105,
+      "fileB": "src\\presentation\\web\\controllers\\products.controller.ts",
+      "startB": 78,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\presentation\\web\\controllers\\clients.controller.ts",
+      "startA": 1,
+      "fileB": "src\\presentation\\web\\controllers\\taxes.controller.ts",
+      "startB": 1,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\presentation\\web\\controllers\\clients.controller.ts",
+      "startA": 72,
+      "fileB": "src\\presentation\\web\\controllers\\users.controller.ts",
+      "startB": 53,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\application\\invoices\\create-invoice.handler.ts",
+      "startA": 53,
+      "fileB": "src\\application\\invoices\\update-invoice.handler.ts",
+      "startB": 55,
+      "lines": 25,
+      "tokens": 0
+    },
+    {
+      "fileA": "src\\application\\invoices\\create-invoice.handler.ts",
+      "startA": 119,
+      "fileB": "src\\application\\invoices\\update-invoice.handler.ts",
+      "startB": 84,
+      "lines": 31,
+      "tokens": 0
+    }
+  ],
+  "duplicatedLines": 209,
+  "totalLines": 6419,
+  "percentage": 3.26
 }

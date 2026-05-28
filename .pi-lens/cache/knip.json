@@ -3,16 +3,6 @@
   "issues": [
     {
       "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
-    },
-    {
-      "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
-    },
-    {
-      "type": "file",
       "name": "test/app.e2e-spec.ts",
       "file": "test/app.e2e-spec.ts"
     },
@@ -23,33 +13,43 @@
     },
     {
       "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
     },
     {
       "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
+      "name": "src/application/auth/index.ts",
+      "file": "src/application/auth/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/invoices/queries/index.ts",
-      "file": "src/application/invoices/queries/index.ts"
+      "name": "src/application/clients/index.ts",
+      "file": "src/application/clients/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/products/commands/index.ts",
-      "file": "src/application/products/commands/index.ts"
+      "name": "src/application/invoices/index.ts",
+      "file": "src/application/invoices/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/commands/index.ts",
-      "file": "src/application/taxes/commands/index.ts"
+      "name": "src/application/products/index.ts",
+      "file": "src/application/products/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/queries/index.ts",
-      "file": "src/application/taxes/queries/index.ts"
+      "name": "src/application/taxes/index.ts",
+      "file": "src/application/taxes/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/users/index.ts",
+      "file": "src/application/users/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/queries/get-products-for-sale.query.ts",
+      "file": "src/application/products/queries/get-products-for-sale.query.ts"
     },
     {
       "type": "dependency",
@@ -96,19 +96,13 @@
     {
       "type": "export",
       "name": "isValidPageSize",
-      "file": "src/infrastructure/common/utils/page-size.util.ts",
+      "file": "src/infrastructure/web-common/utils/page-size.util.ts",
       "line": 27
     },
     {
       "type": "export",
-      "name": "GetProductsForSaleHandler",
-      "file": "src/application/products/queries/get-products-for-sale.query.ts",
-      "line": 15
-    },
-    {
-      "type": "export",
       "name": "PasswordValidationResult",
-      "file": "src/domain/interfaces/password-service.interface.ts",
+      "file": "src/application/common/interfaces/password-service.interface.ts",
       "line": 10
     }
   ],
@@ -116,33 +110,17 @@
     {
       "type": "export",
       "name": "isValidPageSize",
-      "file": "src/infrastructure/common/utils/page-size.util.ts",
+      "file": "src/infrastructure/web-common/utils/page-size.util.ts",
       "line": 27
     },
     {
       "type": "export",
-      "name": "GetProductsForSaleHandler",
-      "file": "src/application/products/queries/get-products-for-sale.query.ts",
-      "line": 15
-    },
-    {
-      "type": "export",
       "name": "PasswordValidationResult",
-      "file": "src/domain/interfaces/password-service.interface.ts",
+      "file": "src/application/common/interfaces/password-service.interface.ts",
       "line": 10
     }
   ],
   "unusedFiles": [
-    {
-      "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
-    },
-    {
-      "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
-    },
     {
       "type": "file",
       "name": "test/app.e2e-spec.ts",
@@ -155,33 +133,43 @@
     },
     {
       "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
+      "name": "prisma/seed-large.ts",
+      "file": "prisma/seed-large.ts"
     },
     {
       "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
+      "name": "src/application/auth/index.ts",
+      "file": "src/application/auth/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/invoices/queries/index.ts",
-      "file": "src/application/invoices/queries/index.ts"
+      "name": "src/application/clients/index.ts",
+      "file": "src/application/clients/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/products/commands/index.ts",
-      "file": "src/application/products/commands/index.ts"
+      "name": "src/application/invoices/index.ts",
+      "file": "src/application/invoices/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/commands/index.ts",
-      "file": "src/application/taxes/commands/index.ts"
+      "name": "src/application/products/index.ts",
+      "file": "src/application/products/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/queries/index.ts",
-      "file": "src/application/taxes/queries/index.ts"
+      "name": "src/application/taxes/index.ts",
+      "file": "src/application/taxes/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/users/index.ts",
+      "file": "src/application/users/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/queries/get-products-for-sale.query.ts",
+      "file": "src/application/products/queries/get-products-for-sale.query.ts"
     }
   ],
   "unusedDeps": [
@@ -229,5 +217,5 @@
     }
   ],
   "unlistedDeps": [],
-  "summary": "Found 20 issues"
+  "summary": "Found 19 issues"
 }
