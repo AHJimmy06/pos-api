@@ -28,6 +28,19 @@ export class Client {
     return this._email.getValue();
   }
 
+  // Explicitly exclude private fields from JSON serialization
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      email: this.email,
+      phone: this.phone,
+      address: this.address,
+      isActive: this.isActive,
+    };
+  }
+
   updateName(firstName: string, lastName: string): void {
     this._firstName = new Name(firstName);
     this._lastName = new Name(lastName);

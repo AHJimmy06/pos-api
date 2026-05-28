@@ -24,6 +24,25 @@ export class Invoice {
     this.status = InvoiceStatus.CONFIRMED;
   }
 
+  // Explicitly exclude private fields from JSON serialization
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      clientId: this.clientId,
+      userId: this.userId,
+      issueDate: this.issueDate,
+      transactionId: this.transactionId,
+      status: this.status,
+      paymentMethod: this.paymentMethod,
+      isActive: this.isActive,
+      version: this.version,
+      details: this.details,
+      subtotalSnapshot: this.subtotalSnapshot,
+      taxTotalSnapshot: this.taxTotalSnapshot,
+      totalSnapshot: this.totalSnapshot,
+    };
+  }
+
   addDetail(detail: InvoiceDetail): void {
     this.details.push(detail);
   }
@@ -43,10 +62,7 @@ export class Invoice {
   }
 
   get totalSnapshot(): number {
-    return this._subtotalSnapshot !== undefined &&
-      this._taxTotalSnapshot !== undefined
-      ? this._subtotalSnapshot + this._taxTotalSnapshot
-      : this.subtotalSnapshot + this.taxTotalSnapshot;
+    return this._totalSnapshot ?? this.subtotalSnapshot + this.taxTotalSnapshot;
   }
 
   setSnapshots(subtotal: number, taxTotal: number, total: number): void {

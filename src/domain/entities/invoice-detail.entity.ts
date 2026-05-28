@@ -24,6 +24,21 @@ export class InvoiceDetail {
     return this._unitPriceSnapshot.getValue();
   }
 
+  // Explicitly exclude private fields from JSON serialization
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      invoiceId: this.invoiceId,
+      productId: this.productId,
+      productName: this.productName,
+      quantity: this.quantity,
+      unitPriceSnapshot: this.unitPriceSnapshot,
+      subtotal: this.subtotal,
+      taxTotal: this.taxTotal,
+      detailTaxes: this.detailTaxes,
+    };
+  }
+
   addTax(taxId: number, rate: number): void {
     const detailTax = new InvoiceDetailTax();
     detailTax.taxId = taxId;

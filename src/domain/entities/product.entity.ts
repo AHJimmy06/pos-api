@@ -37,6 +37,19 @@ export class Product {
     this._stock = new Stock(value);
   }
 
+  // Explicitly exclude private fields from JSON serialization
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      name: this.name,
+      price: this.price,
+      stock: this.stock,
+      taxIds: this.taxIds,
+      version: this.version,
+      isActive: this.isActive,
+    };
+  }
+
   updatePrice(newPrice: number): void {
     this._price = new Price(newPrice);
   }
