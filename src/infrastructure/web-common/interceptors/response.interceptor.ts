@@ -7,6 +7,7 @@ import {
 import { Request, Response as ExpressResponse } from 'express';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { instanceToPlain } from 'class-transformer';
 
 export interface Response<T> {
   success: boolean;
@@ -28,13 +29,21 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     const statusCode = response.statusCode;
 
     return next.handle().pipe(
-      map((data: T) => ({
-        success: true,
-        statusCode,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        data,
-      })),
+      map((data: T) => {
+        // Use class-transformer to serialize entities with @Expose decorators
+        const serializedData = instanceToPlain(data, {
+          excludeExtraneousValues: false,
+          enableImplicitConversion: true,
+        }) as T;
+
+        return {
+          success: true,
+          statusCode,
+          timestamp: new Date().toISOString(),
+          path: request.url,
+          data: serializedData,
+        };
+      }),
     );
   }
 }
