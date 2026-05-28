@@ -5,13 +5,6 @@ import { IInvoiceRepository } from '../common/interfaces/invoice.repository.inte
 import { IProductRepository } from '../common/interfaces/product.repository.interface';
 import { TOKENS } from '../common/tokens/tokens';
 
-export interface TopProduct {
-  productId: number;
-  productName: string;
-  quantitySold: number;
-  totalRevenue: number;
-}
-
 export interface SalesByDay {
   date: string;
   total: number;
@@ -23,7 +16,7 @@ export interface DashboardStats {
   totalClients: number;
   totalInvoices: number;
   totalSales: number;
-  topProducts: TopProduct[];
+  topProducts: never[];
   salesByDay: SalesByDay[];
 }
 
@@ -37,42 +30,24 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
   ) {}
 
   async execute(_query: DashboardStatsQuery): Promise<DashboardStats> {
-    // Contar productos
-    const products = await this.productRepository.findAll();
-    const totalProducts = products.length;
+    // Contar productos con contador simple
+    const totalProducts = await this.productRepository.count();
 
-    // Para ventas totales y grouping, usamos una consulta más eficiente
-    // que solo obtiene los totales de las facturas
-    let totalSales = 0;
-    let totalInvoices = 0;
-    const salesByDayMap = new Map<string, { total: number; count: number }>();
-
-    // Obtener todas las facturas solo con datos de la tabla principal
-    // (sin detalles para evitar N+1 queries)
-    const allInvoices = await this.invoiceRepository.findAll();
-
-    for (const invoice of allInvoices) {
-      const invoiceTotal = invoice.totalSnapshot || 0;
-      totalSales += invoiceTotal;
-      totalInvoices++;
-
-      // Agrupar por día
-      const dateKey = invoice.issueDate.toISOString().split('T')[0];
-      const existing = salesByDayMap.get(dateKey) || { total: 0, count: 0 };
-      salesByDayMap.set(dateKey, {
-        total: existing.total + invoiceTotal,
-        count: existing.count + 1,
-      });
-    }
+    // Obtener stats de facturas usando SQL directo (sin cargar detalles)
+    const invoiceStats = await this.invoiceRepository.getStats();
 
     // Últimos 7 días
-    const salesByDay: SalesByDay[] = [];
     const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 6);
+    startDate.setHours(0, 0, 0, 0);
+
+    const salesByDay: SalesByDay[] = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
       const dateKey = date.toISOString().split('T')[0];
-      const dayData = salesByDayMap.get(dateKey);
+      const dayData = invoiceStats.salesByDay.find((d) => d.date === dateKey);
       salesByDay.push({
         date: dateKey,
         total: dayData?.total || 0,
@@ -83,9 +58,9 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
     return {
       totalProducts,
       totalClients: 0,
-      totalInvoices,
-      totalSales,
-      topProducts: [], // Top products requiere consultar detalles, lo hacemos separately si es necesario
+      totalInvoices: invoiceStats.totalInvoices,
+      totalSales: invoiceStats.totalSales,
+      topProducts: [],
       salesByDay,
     };
   }

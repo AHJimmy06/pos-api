@@ -50,42 +50,43 @@ export class TypeOrmClientRepository implements IClientRepository {
   ): Promise<{ data: ClientEntity[]; total: number }> {
     const offset = (page - 1) * limit;
     let whereClause = 'WHERE IS_ACTIVE = 1 AND DELETED_AT IS NULL';
-    const params: (string | number)[] = [];
+    const params: Record<string, string | number> = {};
 
     if (search) {
       if (searchField === 'name') {
         whereClause += ` AND (FIRST_NAME LIKE :search OR LAST_NAME LIKE :search)`;
-        params.push(`%${search}%`);
+        params.search = `%${search}%`;
       } else if (searchField === 'email') {
         whereClause += ` AND EMAIL LIKE :search`;
-        params.push(`%${search}%`);
+        params.search = `%${search}%`;
       } else if (searchField === 'phone') {
         whereClause += ` AND PHONE LIKE :search`;
-        params.push(`%${search}%`);
+        params.search = `%${search}%`;
       } else if (searchField === 'id') {
         const idNum = parseInt(search, 10);
         if (!isNaN(idNum)) {
-          whereClause += ` AND ID = :id`;
-          params.push(idNum);
+          whereClause += ` AND ID = :searchId`;
+          params.searchId = idNum;
         }
       } else {
         whereClause += ` AND (FIRST_NAME LIKE :search OR LAST_NAME LIKE :search OR EMAIL LIKE :search OR PHONE LIKE :search OR ADDRESS LIKE :search)`;
-        params.push(`%${search}%`);
+        params.search = `%${search}%`;
       }
     }
 
     const countResult = await this.manager.query(
       `SELECT COUNT(*) as CNT FROM CLIENTS ${whereClause}`,
-      params,
+      params as unknown as any[],
     );
     const total = parseInt(countResult[0]?.CNT || '0', 10);
 
+    // Use positional parameters for OFFSET/FETCH (Oracle supports both)
     const rows = await this.manager.query(
       `SELECT ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE, ADDRESS, IS_ACTIVE, CREATED_AT, UPDATED_AT, DELETED_AT
        FROM CLIENTS ${whereClause}
        ORDER BY ID ASC
        OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY`,
-      [...params, offset, limit],
+      { ...params, offset, limit } as unknown as any[],
     );
 
     return {

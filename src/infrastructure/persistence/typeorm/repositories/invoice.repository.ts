@@ -50,6 +50,41 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
     return this.uow.getManager();
   }
 
+  async getStats(): Promise<{
+    totalInvoices: number;
+    totalSales: number;
+    salesByDay: { date: string; total: number; count: number }[];
+  }> {
+    // Total invoices y ventas
+    const statsResult = await this.manager.query(
+      `SELECT COUNT(*) as CNT, COALESCE(SUM(TOTAL_SNAPSHOT), 0) as TOTAL
+       FROM INVOICES WHERE IS_ACTIVE = 1`,
+    );
+    const totalInvoices = parseInt(statsResult[0]?.CNT || '0', 10);
+    const totalSales = parseFloat(statsResult[0]?.TOTAL || '0');
+
+    // Ventas por día (últimos 30 días para tener datos)
+    const salesResult = await this.manager.query(
+      `SELECT 
+         TRUNC(ISSUE_DATE) as DAY,
+         COUNT(*) as CNT,
+         SUM(TOTAL_SNAPSHOT) as TOTAL
+       FROM INVOICES 
+       WHERE IS_ACTIVE = 1
+         AND ISSUE_DATE >= SYSDATE - 30
+       GROUP BY TRUNC(ISSUE_DATE)
+       ORDER BY DAY`,
+    );
+
+    const salesByDay = (salesResult as any[]).map((row) => ({
+      date: (row.DAY as Date).toISOString().split('T')[0],
+      total: parseFloat(row.TOTAL || '0'),
+      count: parseInt(row.CNT || '0', 10),
+    }));
+
+    return { totalInvoices, totalSales, salesByDay };
+  }
+
   private async loadDetails(invoiceId: number): Promise<RawInvoiceDetail[]> {
     const detailRows = await this.manager.query(
       `SELECT d.ID, d.INVOICE_ID, d.PRODUCT_ID, d.PRODUCT_NAME, d.QUANTITY, d.UNIT_PRICE_SNAPSHOT

@@ -92,5 +92,15 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
+  },
+  "seed-massive": {
+    "description": "Seed masivo para testing de rendimiento Oracle",
+    "script": "tsx prisma/seed-massive.ts",
+    "targets": {
+      "users": 100000,
+      "products": 100000,
+      "clients": 100000,
+      "invoices": 100000
+    }
   }
 }

@@ -17,6 +17,13 @@ export class TypeOrmProductRepository implements IProductRepository {
     return this.uow.getManager();
   }
 
+  async count(): Promise<number> {
+    const result = await this.manager.query(
+      `SELECT COUNT(*) as CNT FROM PRODUCTS WHERE IS_ACTIVE = 1`,
+    );
+    return parseInt(result[0]?.CNT || '0', 10);
+  }
+
   private async getProductTaxIds(productId: number): Promise<number[]> {
     const rows = await this.manager.query(
       `SELECT TAX_ID FROM PRODUCT_TAXES WHERE PRODUCT_ID = :1`,

@@ -2,6 +2,7 @@ import { Product } from '../../../domain/entities/product.entity';
 import { DeleteResult } from '../../../domain/common/delete-result.interface';
 
 export abstract class IProductRepository {
+  abstract count(): Promise<number>;
   abstract findAll(): Promise<Product[]>;
   abstract findForSale(
     page: number,

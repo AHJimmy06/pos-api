@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ResponseInterceptor } from './infrastructure/web-common/interceptors/response.interceptor';
@@ -12,7 +12,10 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector)),
+    new ResponseInterceptor(),
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({

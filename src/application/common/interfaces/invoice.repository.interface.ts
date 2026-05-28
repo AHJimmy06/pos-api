@@ -1,8 +1,15 @@
 import { Invoice } from '../../../domain/entities/invoice.entity';
 
+export interface InvoiceStats {
+  totalInvoices: number;
+  totalSales: number;
+  salesByDay: { date: string; total: number; count: number }[];
+}
+
 export abstract class IInvoiceRepository {
   abstract create(invoice: Invoice): Promise<Invoice>;
   abstract findAll(): Promise<Invoice[]>;
+  abstract getStats(): Promise<InvoiceStats>;
   abstract findAllPaginated(
     page: number,
     limit: number,
