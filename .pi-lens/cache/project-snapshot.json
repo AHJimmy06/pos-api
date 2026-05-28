@@ -1,7 +1,7 @@
 {
   "version": 1,
   "projectRoot": "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api",
-  "generatedAt": "2026-05-28T23:37:14.969Z",
+  "generatedAt": "2026-05-28T23:54:50.362Z",
   "seq": 0,
   "files": {
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/eslint.config.mjs": {
@@ -2024,6 +2024,7 @@
       "mtimeMs": 1780009196183.3752,
       "size": 3673,
       "imports": [
+        "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/common/interfaces/client.repository.interface.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/common/interfaces/invoice.repository.interface.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/common/interfaces/product.repository.interface.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/common/tokens/tokens.ts",
@@ -2163,6 +2164,7 @@
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/clients/get-client.handler.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/clients/get-clients.handler.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/clients/update-client.handler.ts",
+      "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/dashboard/dashboard-stats.handler.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/invoices/create-invoice.handler.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/infrastructure/persistence/typeorm/repositories/client.repository.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/presentation/web/controllers/invoices.controller.ts"

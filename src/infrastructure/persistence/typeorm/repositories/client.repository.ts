@@ -18,6 +18,13 @@ export class TypeOrmClientRepository implements IClientRepository {
     return this.uow.getManager();
   }
 
+  async count(): Promise<number> {
+    const result = await this.manager.query(
+      `SELECT COUNT(*) as CNT FROM CLIENTS WHERE IS_ACTIVE = 1 AND DELETED_AT IS NULL`,
+    );
+    return parseInt(result[0]?.CNT || '0', 10);
+  }
+
   async findAll(): Promise<ClientEntity[]> {
     const rows = await this.manager.query(
       `SELECT ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE, ADDRESS, IS_ACTIVE, CREATED_AT, UPDATED_AT, DELETED_AT

@@ -2,6 +2,7 @@ import { Client } from '../../../domain/entities/client.entity';
 import { DeleteResult } from '../../../domain/common/delete-result.interface';
 
 export abstract class IClientRepository {
+  abstract count(): Promise<number>;
   abstract findAll(): Promise<Client[]>;
   abstract findAllPaginated(
     page: number,

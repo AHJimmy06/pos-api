@@ -3,6 +3,7 @@ import { Inject } from '@nestjs/common';
 import { DashboardStatsQuery } from './dashboard-stats.query';
 import { IInvoiceRepository } from '../common/interfaces/invoice.repository.interface';
 import { IProductRepository } from '../common/interfaces/product.repository.interface';
+import { IClientRepository } from '../common/interfaces/client.repository.interface';
 import { TOKENS } from '../common/tokens/tokens';
 
 export interface SalesByDay {
@@ -27,21 +28,19 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
     private readonly invoiceRepository: IInvoiceRepository,
     @Inject(TOKENS.PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository,
+    @Inject(TOKENS.CLIENT_REPOSITORY)
+    private readonly clientRepository: IClientRepository,
   ) {}
 
   async execute(_query: DashboardStatsQuery): Promise<DashboardStats> {
-    // Contar productos con contador simple
-    const totalProducts = await this.productRepository.count();
-
-    // Obtener stats de facturas usando SQL directo (sin cargar detalles)
-    const invoiceStats = await this.invoiceRepository.getStats();
+    const [totalProducts, totalClients, invoiceStats] = await Promise.all([
+      this.productRepository.count(),
+      this.clientRepository.count(),
+      this.invoiceRepository.getStats(),
+    ]);
 
     // Últimos 7 días
     const today = new Date();
-    const startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - 6);
-    startDate.setHours(0, 0, 0, 0);
-
     const salesByDay: SalesByDay[] = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
@@ -57,7 +56,7 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
 
     return {
       totalProducts,
-      totalClients: 0,
+      totalClients,
       totalInvoices: invoiceStats.totalInvoices,
       totalSales: invoiceStats.totalSales,
       topProducts: [],
