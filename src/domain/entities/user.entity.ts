@@ -69,4 +69,20 @@ export class User {
   activate(): void {
     this.isActive = true;
   }
+
+  // Serialize to plain object (exclude passwordHash)
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      username: this.username,
+      name: this.name,
+      lastName: this.lastName,
+      email: this.email,
+      cedula: this.cedula,
+      isActive: this.isActive,
+      roles: this.roles,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+  }
 }
