@@ -49,6 +49,11 @@ Requisitos/
 requirements/
 
 # =============================================
+# Scratch / temporary scripts
+# =============================================
+scratch/
+
+# =============================================
 # AI / Agent tooling
 # =============================================
 # OpenAI / Anthropic API logs y caches
