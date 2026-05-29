@@ -460,10 +460,12 @@ export class TypeOrmProductRepository implements IProductRepository {
         ],
       );
 
-      console.log(`[reduceStock] With version check, result:`, result);
+      // Oracle puede devolver número o rowsAffected
+      const affected =
+        typeof result === 'number' ? result : result?.rowsAffected;
 
       // Si no afectó filas (versión no coincidió), intentar sin versión
-      if (!result || result.rowsAffected === 0) {
+      if (!affected) {
         console.log(
           `[reduceStock] Version mismatch, trying without version check`,
         );
@@ -474,9 +476,12 @@ export class TypeOrmProductRepository implements IProductRepository {
           [params.quantity, params.productId, params.quantity],
         );
         console.log(`[reduceStock] Without version check, result:`, result);
+        const affected2 =
+          typeof result === 'number' ? result : result?.rowsAffected;
+        return affected2 != null && affected2 > 0;
       }
 
-      return result && result.rowsAffected > 0;
+      return affected > 0;
     } catch (error) {
       console.error(`[reduceStock] Error:`, error);
       return false;
