@@ -364,18 +364,24 @@ export class TypeOrmProductRepository implements IProductRepository {
     quantity: number,
     _expectedVersion: number, // Mantenemos el parámetro por compatibilidad, pero no se usa
   ): Promise<Product> {
-    // Restaurar stock no usa control de versión porque:
-    // 1. Es una operación de recuperación, no de consumo
-    // 2. Siempre aumenta stock, no hay riesgo de sobre-venta
-    // 3. Versión冲突 no debería bloquear la cancelación
-    await this.manager.query(
-      `UPDATE PRODUCTS SET STOCK = STOCK + :1, VERSION = VERSION + 1 WHERE ID = :2`,
-      [quantity, id],
-    );
+    console.log(`[incrementStock] Adding ${quantity} to product ${id}`);
+    
+    try {
+      const result = await this.manager.query(
+        `UPDATE PRODUCTS SET STOCK = STOCK + :1, VERSION = VERSION + 1 WHERE ID = :2`,
+        [quantity, id],
+      );
+      console.log(`[incrementStock] Update result for ${id}:`, result);
+    } catch (err) {
+      console.error(`[incrementStock] Query failed for ${id}:`, err);
+      throw err;
+    }
 
     const updated = await this.findById(id);
+    console.log(`[incrementStock] findById result for ${id}:`, updated ? `stock=${updated.stock}` : 'not found');
+    
     if (!updated) {
-      throw new Error('Failed to retrieve product after stock update');
+      throw new Error(`Product ${id} not found after increment`);
     }
     return updated;
   }
@@ -491,10 +497,11 @@ export class TypeOrmProductRepository implements IProductRepository {
     expectedVersion: number;
   }): Promise<boolean> {
     try {
-      await this.incrementStock(
-        params.productId,
-        params.quantity,
-        params.expectedVersion,
+      // Restaurar stock directamente sin control de versión
+      // (es una operación de recuperación, no de consumo)
+      await this.manager.query(
+        `UPDATE PRODUCTS SET STOCK = STOCK + :1, VERSION = VERSION + 1 WHERE ID = :2`,
+        [params.quantity, params.productId],
       );
       return true;
     } catch {
