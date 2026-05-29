@@ -50,11 +50,11 @@ export class TypeOrmStockMovementRepository implements IStockMovementRepository 
     return StockMovementMapper.toEntity({
       id: row.ID as number,
       productId: row.PRODUCT_ID as number,
-      type: row.USER_ID as string,
-      quantity: row.TYPE as number,
-      previousStock: row.QUANTITY as number,
-      newStock: row.REASON as number,
-      userId: row.CREATED_AT as number | undefined,
+      type: row.TYPE as string,
+      quantity: row.QUANTITY as number,
+      previousStock: row.PREVIOUS_STOCK as number,
+      newStock: row.NEW_STOCK as number,
+      userId: row.USER_ID as number | undefined,
       reference: row.REFERENCE as string | undefined,
       createdAt: row.CREATED_AT as Date,
     });
@@ -69,16 +69,15 @@ export class TypeOrmStockMovementRepository implements IStockMovementRepository 
       [productId],
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    return rows.map((row) =>
+    return (rows as any[]).map((row) =>
       StockMovementMapper.toEntity({
         id: row.ID as number,
         productId: row.PRODUCT_ID as number,
-        type: row.USER_ID as string,
-        quantity: row.TYPE as number,
-        previousStock: row.QUANTITY as number,
-        newStock: row.REASON as number,
-        userId: row.CREATED_AT as number | undefined,
+        type: row.TYPE as string,
+        quantity: row.QUANTITY as number,
+        previousStock: row.PREVIOUS_STOCK as number,
+        newStock: row.NEW_STOCK as number,
+        userId: row.USER_ID as number | undefined,
         reference: row.REFERENCE as string | undefined,
         createdAt: row.CREATED_AT as Date,
       }),

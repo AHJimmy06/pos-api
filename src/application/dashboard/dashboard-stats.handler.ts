@@ -32,6 +32,7 @@ export class DashboardStatsHandler implements IQueryHandler<DashboardStatsQuery>
     private readonly clientRepository: IClientRepository,
   ) {}
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async execute(_query: DashboardStatsQuery): Promise<DashboardStats> {
     const [totalProducts, totalClients, invoiceStats] = await Promise.all([
       this.productRepository.count(),

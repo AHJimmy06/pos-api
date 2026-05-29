@@ -29,7 +29,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
 
     return next.handle().pipe(
       map((data: T) => {
-        const serializedData = this.serialize(data);
+        const serializedData = this.serialize(data) as T;
 
         return {
           success: true,
@@ -42,14 +42,16 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     );
   }
 
-  private serialize(value: any): any {
+  private serialize(value: unknown): unknown {
     if (value === null || value === undefined) {
       return value;
     }
 
     // If has toJSON, use it
-    if (typeof value.toJSON === 'function') {
-      return value.toJSON();
+
+    if (typeof (value as any).toJSON === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      return (value as any).toJSON();
     }
 
     // Handle arrays
@@ -60,8 +62,9 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     // Handle objects
     if (typeof value === 'object') {
       const result: Record<string, unknown> = {};
+
       for (const key of Object.keys(value)) {
-        result[key] = this.serialize(value[key]);
+        result[key] = this.serialize((value as any)[key]);
       }
       return result;
     }

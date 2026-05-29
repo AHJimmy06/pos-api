@@ -304,8 +304,9 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
     // Get unitPriceSnapshot from getter
     const getUnitPrice = (detail: InvoiceDetail): number => {
       const d = detail as any;
+
       return typeof d.unitPriceSnapshot === 'function'
-        ? d.unitPriceSnapshot()
+        ? /* eslint-disable-line @typescript-eslint/no-unsafe-call */ d.unitPriceSnapshot()
         : d.unitPriceSnapshot;
     };
 
