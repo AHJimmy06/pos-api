@@ -362,19 +362,16 @@ export class TypeOrmProductRepository implements IProductRepository {
   async incrementStock(
     id: number,
     quantity: number,
-    expectedVersion: number,
+    _expectedVersion: number, // Mantenemos el parámetro por compatibilidad, pero no se usa
   ): Promise<Product> {
-    const result = await this.manager.query(
-      `UPDATE PRODUCTS
-       SET STOCK = STOCK + :1, VERSION = VERSION + 1
-       WHERE ID = :2 AND VERSION = :3
-       RETURNING ID INTO :4`,
-      [quantity, id, expectedVersion, { type: 'NUMBER', dir: 'OUT' }],
+    // Restaurar stock no usa control de versión porque:
+    // 1. Es una operación de recuperación, no de consumo
+    // 2. Siempre aumenta stock, no hay riesgo de sobre-venta
+    // 3. Versión冲突 no debería bloquear la cancelación
+    await this.manager.query(
+      `UPDATE PRODUCTS SET STOCK = STOCK + :1, VERSION = VERSION + 1 WHERE ID = :2`,
+      [quantity, id],
     );
-
-    if (!result || result.rowsAffected === 0) {
-      throw new Error('Failed to increment stock - version mismatch');
-    }
 
     const updated = await this.findById(id);
     if (!updated) {
