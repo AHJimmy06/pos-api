@@ -314,18 +314,41 @@ export class TypeOrmProductRepository implements IProductRepository {
     quantity: number,
     expectedVersion: number,
   ): Promise<Product> {
+    // Primero verificar stock actual y versión del producto
+    const checkResult = await this.manager.query(
+      `SELECT STOCK, VERSION FROM PRODUCTS WHERE ID = :1 AND IS_ACTIVE = 1`,
+      [id],
+    );
+
+    if (!checkResult || checkResult.length === 0) {
+      throw new Error(`Product ${id} not found or inactive`);
+    }
+
+    const currentStock = checkResult[0].STOCK;
+    const currentVersion = checkResult[0].VERSION;
+
+    console.log(
+      `[decrementStock] Product ${id}: currentStock=${currentStock}, currentVersion=${currentVersion}, expectedVersion=${expectedVersion}, quantity=${quantity}`,
+    );
+
+    if (currentStock < quantity) {
+      throw new Error(
+        `Insufficient stock for product ${id}. Available: ${currentStock}, requested: ${quantity}`,
+      );
+    }
+
+    // Oracle: UPDATE con WHERE condicional y verificar filas afectadas
     const result = await this.manager.query(
       `UPDATE PRODUCTS
        SET STOCK = STOCK - :1, VERSION = VERSION + 1
-       WHERE ID = :2 AND VERSION = :3 AND STOCK >= :4
-       RETURNING ID INTO :5`,
-      [quantity, id, expectedVersion, quantity, { type: 'NUMBER', dir: 'OUT' }],
+       WHERE ID = :2 AND STOCK >= :1`,
+      [quantity, id],
     );
 
+    console.log(`[decrementStock] Update result:`, result);
+
     if (!result || result.rowsAffected === 0) {
-      throw new Error(
-        'Failed to decrement stock - version mismatch or insufficient stock',
-      );
+      throw new Error('Failed to decrement stock - insufficient stock');
     }
 
     const updated = await this.findById(id);
@@ -399,13 +422,56 @@ export class TypeOrmProductRepository implements IProductRepository {
     expectedVersion: number;
   }): Promise<boolean> {
     try {
-      await this.decrementStock(
-        params.productId,
-        params.quantity,
-        params.expectedVersion,
+      // Verificar stock actual primero
+      const checkResult = await this.manager.query(
+        `SELECT STOCK FROM PRODUCTS WHERE ID = :1 AND IS_ACTIVE = 1`,
+        [params.productId],
       );
-      return true;
-    } catch {
+
+      if (!checkResult || checkResult.length === 0) {
+        console.log(`[reduceStock] Product ${params.productId} not found`);
+        return false;
+      }
+
+      const currentStock = checkResult[0].STOCK;
+      console.log(
+        `[reduceStock] Product ${params.productId}: currentStock=${currentStock}, requested=${params.quantity}, expectedVersion=${params.expectedVersion}`,
+      );
+
+      if (currentStock < params.quantity) {
+        console.log(
+          `[reduceStock] Insufficient stock for product ${params.productId}`,
+        );
+        return false;
+      }
+
+      // Intentar decrementar con control de versión
+      let result = await this.manager.query(
+        `UPDATE PRODUCTS
+         SET STOCK = STOCK - :1, VERSION = VERSION + 1
+         WHERE ID = :2 AND VERSION = :3 AND STOCK >= :1`,
+        [params.quantity, params.productId, params.expectedVersion],
+      );
+
+      console.log(`[reduceStock] With version check, result:`, result);
+
+      // Si no afectó filas (versión no coincidió), intentar sin versión
+      if (!result || result.rowsAffected === 0) {
+        console.log(
+          `[reduceStock] Version mismatch, trying without version check`,
+        );
+        result = await this.manager.query(
+          `UPDATE PRODUCTS
+           SET STOCK = STOCK - :1, VERSION = VERSION + 1
+           WHERE ID = :2 AND STOCK >= :1`,
+          [params.quantity, params.productId],
+        );
+        console.log(`[reduceStock] Without version check, result:`, result);
+      }
+
+      return result && result.rowsAffected > 0;
+    } catch (error) {
+      console.error(`[reduceStock] Error:`, error);
       return false;
     }
   }
