@@ -338,11 +338,12 @@ export class TypeOrmProductRepository implements IProductRepository {
     }
 
     // Oracle: UPDATE con WHERE condicional y verificar filas afectadas
+    // Usar :qty para STOCK >= :qty y :check para STOCK >= :check
     const result = await this.manager.query(
       `UPDATE PRODUCTS
-       SET STOCK = STOCK - :1, VERSION = VERSION + 1
-       WHERE ID = :2 AND STOCK >= :1`,
-      [quantity, id],
+       SET STOCK = STOCK - :qty, VERSION = VERSION + 1
+       WHERE ID = :id AND STOCK >= :check`,
+      [quantity, id, quantity],
     );
 
     console.log(`[decrementStock] Update result:`, result);
@@ -445,12 +446,18 @@ export class TypeOrmProductRepository implements IProductRepository {
         return false;
       }
 
-      // Intentar decrementar con control de versión
+      // Intentar decrementar - usar :qty para STOCK >= :qty y :amount para STOCK - :amount
+      // Oracle requiere que cada placeholder tenga un valor único
       let result = await this.manager.query(
         `UPDATE PRODUCTS
-         SET STOCK = STOCK - :1, VERSION = VERSION + 1
-         WHERE ID = :2 AND VERSION = :3 AND STOCK >= :1`,
-        [params.quantity, params.productId, params.expectedVersion],
+         SET STOCK = STOCK - :qty, VERSION = VERSION + 1
+         WHERE ID = :productId AND VERSION = :version AND STOCK >= :checkQty`,
+        [
+          params.quantity,
+          params.productId,
+          params.expectedVersion,
+          params.quantity,
+        ],
       );
 
       console.log(`[reduceStock] With version check, result:`, result);
@@ -462,9 +469,9 @@ export class TypeOrmProductRepository implements IProductRepository {
         );
         result = await this.manager.query(
           `UPDATE PRODUCTS
-           SET STOCK = STOCK - :1, VERSION = VERSION + 1
-           WHERE ID = :2 AND STOCK >= :1`,
-          [params.quantity, params.productId],
+           SET STOCK = STOCK - :qty, VERSION = VERSION + 1
+           WHERE ID = :productId AND STOCK >= :checkQty`,
+          [params.quantity, params.productId, params.quantity],
         );
         console.log(`[reduceStock] Without version check, result:`, result);
       }
