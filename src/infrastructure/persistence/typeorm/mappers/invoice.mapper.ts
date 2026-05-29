@@ -93,20 +93,25 @@ export class InvoiceMapper {
     STATUS: string;
     PAYMENT_METHOD: string;
     IS_ACTIVE: number;
-    VERSION: number;
   } {
+    const entityAny = entity as any;
+
+    // Handle Money value objects (getters return Money with .value)
+    const subtotal = entityAny.subtotal;
+    const taxTotal = entityAny.taxTotal;
+    const total = entityAny.total;
+
     return {
       CLIENT_ID: entity.clientId,
-      USER_ID: entity.userId,
-      ISSUE_DATE: entity.issueDate,
-      SUBTOTAL_SNAPSHOT: entity.subtotalSnapshot,
-      TAX_TOTAL_SNAPSHOT: entity.taxTotalSnapshot,
-      TOTAL_SNAPSHOT: entity.totalSnapshot,
-      TRANSACTION_ID: entity.transactionId,
-      STATUS: entity.status,
-      PAYMENT_METHOD: entity.paymentMethod,
-      IS_ACTIVE: entity.isActive ? 1 : 0,
-      VERSION: entity.version,
+      USER_ID: entity.userId ?? undefined,
+      ISSUE_DATE: entity.issueDate ?? new Date(),
+      SUBTOTAL_SNAPSHOT: subtotal?.value ?? 0,
+      TAX_TOTAL_SNAPSHOT: taxTotal?.value ?? 0,
+      TOTAL_SNAPSHOT: total?.value ?? 0,
+      TRANSACTION_ID: entity.transactionId ?? '',
+      STATUS: entity.status ?? 'CONFIRMED',
+      PAYMENT_METHOD: entity.paymentMethod ?? 'CASH',
+      IS_ACTIVE: 1,
     };
   }
 }

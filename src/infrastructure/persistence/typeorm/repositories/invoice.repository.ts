@@ -4,6 +4,7 @@ import { TOKENS } from '../../../../application/common/tokens/tokens';
 import { Inject } from '@nestjs/common';
 import { IInvoiceRepository } from '../../../../application/common/interfaces/invoice.repository.interface';
 import { Invoice } from '../../../../domain/entities/invoice.entity';
+import { InvoiceDetail } from '../../../../domain/entities/invoice-detail.entity';
 import { TypeOrmUnitOfWork } from '../typeorm-unit-of-work';
 import { InvoiceMapper } from '../mappers/invoice.mapper';
 import { DeleteResult } from '../../../../domain/common/delete-result.interface';
@@ -300,10 +301,18 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
   async create(invoice: Invoice): Promise<Invoice> {
     const persistence = InvoiceMapper.toPersistence(invoice);
 
+    // Get unitPriceSnapshot from getter
+    const getUnitPrice = (detail: InvoiceDetail): number => {
+      const d = detail as any;
+      return typeof d.unitPriceSnapshot === 'function'
+        ? d.unitPriceSnapshot()
+        : d.unitPriceSnapshot;
+    };
+
     const result = await this.manager.query(
       `INSERT INTO INVOICES (CLIENT_ID, USER_ID, ISSUE_DATE, SUBTOTAL_SNAPSHOT, TAX_TOTAL_SNAPSHOT,
                              TOTAL_SNAPSHOT, TRANSACTION_ID, STATUS, PAYMENT_METHOD, IS_ACTIVE)
-       VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10)`,
+       VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10) RETURNING ID INTO :11`,
       [
         persistence.CLIENT_ID,
         persistence.USER_ID,
@@ -315,33 +324,84 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
         persistence.STATUS,
         persistence.PAYMENT_METHOD,
         persistence.IS_ACTIVE,
+        { type: 'NUMBER', dir: 'out' },
       ],
     );
 
-    if (!result || !result.rowsAffected || result.rowsAffected === 0) {
-      throw new Error('Failed to create invoice');
+    console.log('[createInvoice] INSERT result:', result);
+
+    // Try to get invoice ID from result - Oracle might return it differently
+    let invoiceId: number | undefined;
+    if (result?.rowsAffected && result.rowsAffected > 0) {
+      // Option 1: check for insertId
+      invoiceId = result.insertId as number;
+      // Option 2: check for out parameter
+      if (!invoiceId && result.outBinds) {
+        invoiceId = result.outBinds[0] as number;
+      }
+      // Option 3: try to find by transactionId
+      if (!invoiceId && persistence.TRANSACTION_ID) {
+        const existing = await this.findByTransactionId(
+          persistence.TRANSACTION_ID,
+        );
+        if (existing) invoiceId = existing.id;
+      }
     }
 
-    const invoiceId = result.insertId as number;
+    if (!invoiceId) {
+      // Last resort: query for the most recent invoice
+      const rows = await this.manager.query(
+        `SELECT MAX(ID) as MAX_ID FROM INVOICES WHERE CLIENT_ID = :1`,
+        [persistence.CLIENT_ID],
+      );
+      invoiceId = rows[0]?.MAX_ID;
+    }
+
     if (!invoiceId) {
       throw new Error('Failed to retrieve created invoice ID');
     }
 
+    console.log('[createInvoice] invoiceId:', invoiceId);
+
     // Insert details
     for (const detail of invoice.details) {
+      const unitPrice = getUnitPrice(detail);
       const detailResult = await this.manager.query(
         `INSERT INTO INVOICE_DETAILS (INVOICE_ID, PRODUCT_ID, PRODUCT_NAME, QUANTITY, UNIT_PRICE_SNAPSHOT)
-         VALUES (:1, :2, :3, :4, :5)`,
+         VALUES (:1, :2, :3, :4, :5) RETURNING ID INTO :6`,
         [
           invoiceId,
           detail.productId,
           detail.productName,
           detail.quantity,
-          detail.unitPriceSnapshot,
+          unitPrice,
+          { type: 'NUMBER', dir: 'out' },
         ],
       );
 
-      const detailId = detailResult.insertId as number;
+      let detailId: number | undefined;
+      if (detailResult?.rowsAffected && detailResult.rowsAffected > 0) {
+        detailId = detailResult.insertId as number;
+        if (!detailId && detailResult.outBinds) {
+          detailId = detailResult.outBinds[0] as number;
+        }
+      }
+
+      if (!detailId) {
+        // Fallback: query for detail by product and invoice
+        const detailRows = await this.manager.query(
+          `SELECT MAX(ID) as MAX_ID FROM INVOICE_DETAILS 
+           WHERE INVOICE_ID = :1 AND PRODUCT_ID = :2`,
+          [invoiceId, detail.productId],
+        );
+        detailId = detailRows[0]?.MAX_ID;
+      }
+
+      if (!detailId) {
+        throw new Error(
+          `Failed to insert detail for product ${detail.productId}`,
+        );
+      }
 
       // Insert detail taxes
       for (const detailTax of detail.detailTaxes) {

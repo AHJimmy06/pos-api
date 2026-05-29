@@ -1,7 +1,7 @@
 {
   "version": 1,
   "projectRoot": "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api",
-  "generatedAt": "2026-05-29T13:02:32.700Z",
+  "generatedAt": "2026-05-29T13:15:04.910Z",
   "seq": 0,
   "files": {
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/eslint.config.mjs": {
@@ -1310,6 +1310,7 @@
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/common/interfaces/invoice.repository.interface.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/common/tokens/tokens.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/domain/common/delete-result.interface.ts",
+        "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/domain/entities/invoice-detail.entity.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/domain/entities/invoice.entity.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/infrastructure/persistence/typeorm/mappers/invoice.mapper.ts",
         "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/infrastructure/persistence/typeorm/typeorm-unit-of-work.ts"
@@ -2509,6 +2510,7 @@
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/application/invoices/update-invoice.handler.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/domain/entities/invoice.entity.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/infrastructure/persistence/typeorm/mappers/invoice.mapper.ts",
+      "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/infrastructure/persistence/typeorm/repositories/invoice.repository.ts",
       "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/test/domain/invoice.entity.spec.ts"
     ],
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/src/domain/entities/invoice.entity.ts": [
