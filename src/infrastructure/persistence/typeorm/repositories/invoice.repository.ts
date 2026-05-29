@@ -310,10 +310,11 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
         : d.unitPriceSnapshot;
     };
 
-    const result = await this.manager.query(
+    // Insert invoice WITHOUT RETURNING clause - Oracle DB driver doesn't support out binds well
+    await this.manager.query(
       `INSERT INTO INVOICES (CLIENT_ID, USER_ID, ISSUE_DATE, SUBTOTAL_SNAPSHOT, TAX_TOTAL_SNAPSHOT,
                              TOTAL_SNAPSHOT, TRANSACTION_ID, STATUS, PAYMENT_METHOD, IS_ACTIVE)
-       VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10) RETURNING ID INTO :11`,
+       VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10)`,
       [
         persistence.CLIENT_ID,
         persistence.USER_ID,
@@ -325,35 +326,34 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
         persistence.STATUS,
         persistence.PAYMENT_METHOD,
         persistence.IS_ACTIVE,
-        { type: 'NUMBER', dir: 'out' },
       ],
     );
 
-    console.log('[createInvoice] INSERT result:', result);
-
-    // Try to get invoice ID from result - Oracle might return it differently
+    // Oracle doesn't return insertId reliably, so get the ID via transactionId or MAX
     let invoiceId: number | undefined;
-    if (result?.rowsAffected && result.rowsAffected > 0) {
-      // Option 1: check for insertId
-      invoiceId = result.insertId as number;
-      // Option 2: check for out parameter
-      if (!invoiceId && result.outBinds) {
-        invoiceId = result.outBinds[0] as number;
-      }
-      // Option 3: try to find by transactionId
-      if (!invoiceId && persistence.TRANSACTION_ID) {
-        const existing = await this.findByTransactionId(
-          persistence.TRANSACTION_ID,
-        );
-        if (existing) invoiceId = existing.id;
-      }
+
+    // Try by transactionId first (most reliable)
+    if (persistence.TRANSACTION_ID) {
+      const existing = await this.findByTransactionId(
+        persistence.TRANSACTION_ID,
+      );
+      if (existing) invoiceId = existing.id;
     }
 
-    if (!invoiceId) {
-      // Last resort: query for the most recent invoice
+    // Fallback: get the most recent invoice for this client
+    if (!invoiceId && persistence.CLIENT_ID) {
       const rows = await this.manager.query(
         `SELECT MAX(ID) as MAX_ID FROM INVOICES WHERE CLIENT_ID = :1`,
         [persistence.CLIENT_ID],
+      );
+      invoiceId = rows[0]?.MAX_ID;
+    }
+
+    // Last resort: get the global most recent
+    if (!invoiceId) {
+      const rows = await this.manager.query(
+        `SELECT MAX(ID) as MAX_ID FROM INVOICES`,
+        [],
       );
       invoiceId = rows[0]?.MAX_ID;
     }
@@ -367,36 +367,27 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
     // Insert details
     for (const detail of invoice.details) {
       const unitPrice = getUnitPrice(detail);
-      const detailResult = await this.manager.query(
+
+      // Insert detail WITHOUT RETURNING clause
+      await this.manager.query(
         `INSERT INTO INVOICE_DETAILS (INVOICE_ID, PRODUCT_ID, PRODUCT_NAME, QUANTITY, UNIT_PRICE_SNAPSHOT)
-         VALUES (:1, :2, :3, :4, :5) RETURNING ID INTO :6`,
+         VALUES (:1, :2, :3, :4, :5)`,
         [
           invoiceId,
           detail.productId,
           detail.productName,
           detail.quantity,
           unitPrice,
-          { type: 'NUMBER', dir: 'out' },
         ],
       );
 
-      let detailId: number | undefined;
-      if (detailResult?.rowsAffected && detailResult.rowsAffected > 0) {
-        detailId = detailResult.insertId as number;
-        if (!detailId && detailResult.outBinds) {
-          detailId = detailResult.outBinds[0] as number;
-        }
-      }
-
-      if (!detailId) {
-        // Fallback: query for detail by product and invoice
-        const detailRows = await this.manager.query(
-          `SELECT MAX(ID) as MAX_ID FROM INVOICE_DETAILS 
-           WHERE INVOICE_ID = :1 AND PRODUCT_ID = :2`,
-          [invoiceId, detail.productId],
-        );
-        detailId = detailRows[0]?.MAX_ID;
-      }
+      // Get detail ID by finding the most recent detail for this invoice/product
+      const detailRows = await this.manager.query(
+        `SELECT MAX(ID) as MAX_ID FROM INVOICE_DETAILS
+         WHERE INVOICE_ID = :1 AND PRODUCT_ID = :2`,
+        [invoiceId, detail.productId],
+      );
+      const detailId = detailRows[0]?.MAX_ID;
 
       if (!detailId) {
         throw new Error(

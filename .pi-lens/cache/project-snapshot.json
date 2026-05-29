@@ -1,7 +1,7 @@
 {
   "version": 1,
   "projectRoot": "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api",
-  "generatedAt": "2026-05-29T13:30:17.962Z",
+  "generatedAt": "2026-05-29T14:43:55.395Z",
   "seq": 0,
   "files": {
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/eslint.config.mjs": {
@@ -2063,12 +2063,20 @@
       "size": 3953,
       "imports": [],
       "lastSeq": 0
+    },
+    "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/check-stock-movements.ts": {
+      "path": "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/check-stock-movements.ts",
+      "mtimeMs": 1780061678108.8872,
+      "size": 2119,
+      "imports": [],
+      "lastSeq": 0
     }
   },
   "symbols": {},
   "reverseDeps": {
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/check-roles.ts": [],
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/check-schema.ts": [],
+    "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/check-stock-movements.ts": [],
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/cleanup.ts": [],
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/debug-schema.ts": [],
     "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api/eslint.config.mjs": [],
