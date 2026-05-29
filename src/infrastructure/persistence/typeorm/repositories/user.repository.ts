@@ -256,16 +256,18 @@ export class TypeOrmUserRepository implements IUserRepository {
     let countSql = `SELECT COUNT(*) as CNT FROM USERS u WHERE u.IS_ACTIVE = 1`;
 
     if (search && searchPattern) {
-      sql += ` AND (UPPER(u.USERNAME) LIKE UPPER(:1) OR UPPER(u.NAME) LIKE UPPER(:1) OR UPPER(u.EMAIL) LIKE UPPER(:1))`;
-      countSql += ` AND (UPPER(u.USERNAME) LIKE UPPER(:1) OR UPPER(u.NAME) LIKE UPPER(:1) OR UPPER(u.EMAIL) LIKE UPPER(:1))`;
+      // Oracle requires separate bind values for each placeholder
+      sql += ` AND (UPPER(u.USERNAME) LIKE UPPER(:1) OR UPPER(u.NAME) LIKE UPPER(:2) OR UPPER(u.EMAIL) LIKE UPPER(:3))`;
+      countSql += ` AND (UPPER(u.USERNAME) LIKE UPPER(:1) OR UPPER(u.NAME) LIKE UPPER(:2) OR UPPER(u.EMAIL) LIKE UPPER(:3))`;
     }
 
-    const countResult = await this.manager.query(countSql, searchPattern ? [searchPattern] : []);
+    const bindValues = searchPattern ? [searchPattern, searchPattern, searchPattern] : [];
+    const countResult = await this.manager.query(countSql, bindValues);
     const total = parseInt(countResult[0]?.CNT || '0', 10);
 
     const rows = await this.manager.query(
       sql + ` ORDER BY u.ID OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY`,
-      searchPattern ? [searchPattern] : [],
+      bindValues,
     );
 
     const data = (rows as UserRow[]).map((row) => {
