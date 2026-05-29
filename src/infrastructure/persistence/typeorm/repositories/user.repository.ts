@@ -248,29 +248,24 @@ export class TypeOrmUserRepository implements IUserRepository {
     search?: string,
   ): Promise<{ data: User[]; total: number }> {
     const offset = (page - 1) * limit;
+    const searchPattern = search ? `%${search}%` : null;
 
     let sql = `SELECT u.ID, u.USERNAME, u.NAME, u.LAST_NAME, u.CEDULA, u.EMAIL, u.PASSWORD, u.IS_ACTIVE, u.CREATED_AT, u.UPDATED_AT
        FROM USERS u
        WHERE u.IS_ACTIVE = 1`;
-    const params: any[] = [];
+    let countSql = `SELECT COUNT(*) as CNT FROM USERS u WHERE u.IS_ACTIVE = 1`;
 
-    if (search) {
-      sql += ` AND (u.USERNAME LIKE :search OR u.NAME LIKE :search OR u.EMAIL LIKE :search)`;
-      params.push(`%${search}%`);
+    if (search && searchPattern) {
+      sql += ` AND (UPPER(u.USERNAME) LIKE UPPER(:1) OR UPPER(u.NAME) LIKE UPPER(:1) OR UPPER(u.EMAIL) LIKE UPPER(:1))`;
+      countSql += ` AND (UPPER(u.USERNAME) LIKE UPPER(:1) OR UPPER(u.NAME) LIKE UPPER(:1) OR UPPER(u.EMAIL) LIKE UPPER(:1))`;
     }
 
-    const countSql =
-      `SELECT COUNT(*) as CNT FROM USERS u WHERE u.IS_ACTIVE = 1` +
-      (search
-        ? ` AND (u.USERNAME LIKE :search OR u.NAME LIKE :search OR u.EMAIL LIKE :search)`
-        : '');
-    const countResult = await this.manager.query(countSql, params);
+    const countResult = await this.manager.query(countSql, searchPattern ? [searchPattern] : []);
     const total = parseInt(countResult[0]?.CNT || '0', 10);
 
-    const queryParams = [...params, offset, limit];
     const rows = await this.manager.query(
-      sql + ` ORDER BY u.ID OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY`,
-      queryParams,
+      sql + ` ORDER BY u.ID OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY`,
+      searchPattern ? [searchPattern] : [],
     );
 
     const data = (rows as UserRow[]).map((row) => {
