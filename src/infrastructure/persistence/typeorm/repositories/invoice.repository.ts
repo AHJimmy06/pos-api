@@ -181,6 +181,25 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
     });
   }
 
+  // Busca invoice sin filtrar por IS_ACTIVE (para cancelaciones)
+  async findByIdIncludingInactive(id: number): Promise<Invoice | null> {
+    const rows = await this.manager.query(
+      `SELECT i.ID, i.CLIENT_ID, i.USER_ID, i.ISSUE_DATE, i.SUBTOTAL_SNAPSHOT, i.TAX_TOTAL_SNAPSHOT,
+              i.TOTAL_SNAPSHOT, i.TRANSACTION_ID, i.STATUS, i.PAYMENT_METHOD, i.IS_ACTIVE, i.VERSION
+       FROM INVOICES i
+       WHERE i.ID = :1`,
+      [id],
+    );
+
+    if (rows.length === 0) return null;
+
+    const details = await this.loadDetails(rows[0].ID);
+    return InvoiceMapper.toEntity({
+      ...this.mapRowToRawInvoice(rows[0]),
+      details,
+    });
+  }
+
   async findByTransactionId(transactionId: string): Promise<Invoice | null> {
     const rows = await this.manager.query(
       `SELECT i.ID, i.CLIENT_ID, i.USER_ID, i.ISSUE_DATE, i.SUBTOTAL_SNAPSHOT, i.TAX_TOTAL_SNAPSHOT,
@@ -434,11 +453,16 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
       values.push(invoice.isActive ? 1 : 0);
     }
 
+    // Para cancelaciones, el invoice ya tiene IS_ACTIVE=0, 
+    // así que el WHERE no debe filtrar por IS_ACTIVE
+    const whereClause = invoice.isActive === false 
+      ? 'WHERE ID = :' + (values.length + 1)
+      : 'WHERE ID = :' + (values.length + 1) + ' AND IS_ACTIVE = 1';
+
     if (fields.length > 0) {
       values.push(id);
       const result = await this.manager.query(
-        `UPDATE INVOICES SET ${fields.join(', ')}, VERSION = VERSION + 1
-         WHERE ID = :${values.length} AND IS_ACTIVE = 1`,
+        `UPDATE INVOICES SET ${fields.join(', ')}, VERSION = VERSION + 1 ${whereClause}`,
         values,
       );
 
@@ -447,7 +471,11 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
       }
     }
 
-    const updated = await this.findById(id);
+    // Usar findByIdIncludingInactive si el invoice fue desactivado
+    const updated = invoice.isActive === false
+      ? await this.findByIdIncludingInactive(id)
+      : await this.findById(id);
+    
     if (!updated) {
       throw new Error('Failed to retrieve updated invoice');
     }
