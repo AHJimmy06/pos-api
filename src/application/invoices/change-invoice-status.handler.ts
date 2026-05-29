@@ -28,10 +28,14 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
   async execute(
     command: ChangeInvoiceStatusCommand,
   ): Promise<ChangeInvoiceStatusResult> {
+    console.log(`[ChangeInvoiceStatusHandler] Starting... id=${command.id}, status=${command.status}, userRole=${command.userRole}`);
+    
     return this.uow.runInTransaction(async () => {
       const { id, status, userId } = command;
 
       const invoice = await this.invoiceRepository.findByIdWithDetails(id);
+      console.log(`[ChangeInvoiceStatusHandler] Invoice found:`, invoice?.id, 'status:', invoice?.status);
+      
       if (!invoice) {
         throw new NotFoundException(`Invoice with ID ${id} not found`);
       }
@@ -75,69 +79,22 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
 
       const stockMovements: StockMovement[] = [];
 
-      // Manejar transición DRAFT -> CONFIRMED
-      if (
-        originalStatus === InvoiceStatus.DRAFT &&
-        status === InvoiceStatus.CONFIRMED
-      ) {
-        // Verificar stock para cada item
-        for (const detail of invoice.details) {
-          const product = await this.productRepository.findById(
-            detail.productId,
-          );
-          if (!product) {
-            throw new NotFoundException(
-              `Product with ID ${detail.productId} not found`,
-            );
-          }
-
-          if (product.stock < detail.quantity) {
-            throw new BusinessException(
-              `Stock insuficiente para producto ${detail.productId}. Disponible: ${product.stock}, solicitado: ${detail.quantity}`,
-              'INSUFFICIENT_STOCK',
-            );
-          }
-
-          // Reducir stock
-          const success = await this.productRepository.reduceStock({
-            productId: detail.productId,
-            quantity: detail.quantity,
-            expectedVersion: product.version,
-          });
-
-          if (!success) {
-            throw new BusinessException(
-              `Error de concurrencia para producto ${detail.productId}. Reintente.`,
-              'STOCK_CONFLICT',
-            );
-          }
-
-          // Crear movimiento de stock (EXIT)
-          const movement = new StockMovement({
-            productId: detail.productId,
-            type: MovementType.EXIT,
-            quantity: detail.quantity,
-            previousStock: product.stock,
-            newStock: product.stock - detail.quantity,
-            userId: userId,
-            reference: `Confirmación de factura #${invoice.id}`,
-          });
-
-          await this.stockMovementRepository.create(movement);
-          stockMovements.push(movement);
-        }
-      }
-
       // Manejar transición CONFIRMED -> CANCELLED
       if (
         originalStatus === InvoiceStatus.CONFIRMED &&
         status === InvoiceStatus.CANCELLED
       ) {
+        console.log(`[ChangeInvoiceStatusHandler] Processing CANCELLATION for invoice ${id}`);
+        
         // Restaurar stock para cada item
         for (const detail of invoice.details) {
+          console.log(`[ChangeInvoiceStatusHandler] Processing detail: productId=${detail.productId}, quantity=${detail.quantity}`);
+          
           const product = await this.productRepository.findById(
             detail.productId,
           );
+          console.log(`[ChangeInvoiceStatusHandler] Product found:`, product?.id, 'stock:', product?.stock);
+          
           if (!product) {
             throw new NotFoundException(
               `Product with ID ${detail.productId} not found`,
@@ -145,11 +102,13 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
           }
 
           // Restaurar stock
+          console.log(`[ChangeInvoiceStatusHandler] Calling addStock for product ${detail.productId}`);
           const success = await this.productRepository.addStock({
             productId: detail.productId,
             quantity: detail.quantity,
             expectedVersion: product.version,
           });
+          console.log(`[ChangeInvoiceStatusHandler] addStock result:`, success);
 
           if (!success) {
             throw new BusinessException(
@@ -168,6 +127,7 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
             userId: userId,
             reference: `Cancelación de factura #${invoice.id}`,
           });
+          console.log(`[ChangeInvoiceStatusHandler] StockMovement created for product ${detail.productId}`);
 
           await this.stockMovementRepository.create(movement);
           stockMovements.push(movement);
@@ -179,12 +139,17 @@ export class ChangeInvoiceStatusHandler implements ICommandHandler<ChangeInvoice
 
       // Actualizar estado de la factura
       invoice.status = status;
+      console.log(`[ChangeInvoiceStatusHandler] Updating invoice status to:`, status);
       const updatedInvoice = await this.invoiceRepository.update(id, invoice);
-
-      return {
+      console.log(`[ChangeInvoiceStatusHandler] Invoice updated successfully`);
+      
+      const result = {
         invoice: updatedInvoice,
         stockMovements,
       };
+      console.log(`[ChangeInvoiceStatusHandler] Returning result with ${stockMovements.length} movements`);
+      
+      return result;
     });
   }
 }
