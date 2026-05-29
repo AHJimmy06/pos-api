@@ -410,8 +410,11 @@ export class TypeOrmInvoiceRepository implements IInvoiceRepository {
       }
     }
 
-    const created = await this.findById(invoiceId);
-    return created!;
+    // Return the invoice directly from data we already have
+    // Don't call findById - Oracle may not see uncommitted data from this transaction
+    invoice.id = invoiceId;
+    console.log('[createInvoice] Returning invoice with id:', invoiceId);
+    return invoice;
   }
 
   async update(id: number, invoice: Partial<Invoice>): Promise<Invoice> {
