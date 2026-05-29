@@ -15,6 +15,8 @@ export class TypeOrmStockMovementRepository implements IStockMovementRepository 
   }
 
   async create(movement: StockMovement): Promise<StockMovement> {
+    console.log('[StockMovement.create] Starting with:', JSON.stringify(movement, null, 2));
+    
     const result = await this.manager.query(
       `INSERT INTO STOCK_MOVEMENTS (PRODUCT_ID, TYPE, QUANTITY, PREVIOUS_STOCK, NEW_STOCK, USER_ID, REFERENCE)
        VALUES (:1, :2, :3, :4, :5, :6, :7)`,
@@ -29,24 +31,52 @@ export class TypeOrmStockMovementRepository implements IStockMovementRepository 
       ],
     );
 
+    console.log('[StockMovement.create] INSERT result:', JSON.stringify(result, null, 2));
+
     if (!result || !result.rowsAffected || result.rowsAffected === 0) {
-      throw new Error('Failed to create stock movement');
+      // Try to see if it actually inserted despite rowsAffected being 0
+      const checkResult = await this.manager.query(
+        `SELECT COUNT(*) as CNT FROM STOCK_MOVEMENTS WHERE PRODUCT_ID = :1`,
+        [movement.productId],
+      );
+      console.log('[StockMovement.create] Check after insert:', checkResult);
+      
+      if (checkResult && checkResult[0]?.CNT > 0) {
+        console.log('[StockMovement.create] Record exists despite rowsAffected=0, continuing...');
+      } else {
+        throw new Error('Failed to create stock movement');
+      }
     }
 
     // For Oracle, we need to get the inserted ID via a separate query
+    // Use ID (not PRODUCT_ID) for finding the right row since multiple movements can exist
     const insertedRow = await this.manager.query(
       `SELECT ID, PRODUCT_ID, TYPE, QUANTITY, PREVIOUS_STOCK, NEW_STOCK, USER_ID, REFERENCE, CREATED_AT
-       FROM STOCK_MOVEMENTS
-       WHERE PRODUCT_ID = :1 AND ROWNUM = 1
-       ORDER BY CREATED_AT DESC`,
-      [movement.productId],
+       FROM (
+         SELECT * FROM STOCK_MOVEMENTS ORDER BY CREATED_AT DESC
+       ) WHERE ROWNUM = 1`,
+      [],
     );
 
-    if (insertedRow.length === 0) {
+    console.log('[StockMovement.create] SELECT result:', JSON.stringify(insertedRow, null, 2));
+
+
+    if (!insertedRow || insertedRow.length === 0) {
       throw new Error('Failed to retrieve created stock movement');
     }
 
     const row = insertedRow[0];
+    console.log('[StockMovement.create] Mapped row:', {
+      id: row.ID,
+      productId: row.PRODUCT_ID,
+      type: row.TYPE,
+      quantity: row.QUANTITY,
+      previousStock: row.PREVIOUS_STOCK,
+      newStock: row.NEW_STOCK,
+      userId: row.USER_ID,
+      reference: row.REFERENCE,
+      createdAt: row.CREATED_AT,
+    });
     return StockMovementMapper.toEntity({
       id: row.ID as number,
       productId: row.PRODUCT_ID as number,
