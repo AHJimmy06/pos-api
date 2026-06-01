@@ -37,15 +37,27 @@ export class PrismaProductRepository extends IProductRepository {
       stock: { gt: 0 },
     };
     if (search) {
-      if (searchField === 'id') {
-        const idNum = parseInt(search, 10);
-        if (!isNaN(idNum)) {
-          where.id = idNum;
-        }
+      const searchNum = parseInt(search, 10);
+      const isNumericSearch = !isNaN(searchNum);
+
+      if (searchField === 'id' && isNumericSearch) {
+        where.id = searchNum;
       } else if (searchField === 'name') {
         where.name = { contains: search, mode: 'insensitive' };
+      } else if (searchField === 'price' && isNumericSearch) {
+        where.price = { equals: new Prisma.Decimal(searchNum) };
+      } else if (searchField === 'stock' && isNumericSearch) {
+        where.stock = { equals: searchNum };
       } else {
-        where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+        // Búsqueda por todos los campos (all)
+        const orConditions: Prisma.ProductWhereInput[] = [
+          { name: { contains: search, mode: 'insensitive' } },
+        ];
+        if (isNumericSearch) {
+          orConditions.push({ id: searchNum });
+          orConditions.push({ stock: searchNum });
+        }
+        where.OR = orConditions;
       }
     }
 
@@ -74,15 +86,27 @@ export class PrismaProductRepository extends IProductRepository {
   ): Promise<{ data: ProductEntity[]; total: number }> {
     const where: Prisma.ProductWhereInput = { isActive: true };
     if (search) {
-      if (searchField === 'id') {
-        const idNum = parseInt(search, 10);
-        if (!isNaN(idNum)) {
-          where.id = idNum;
-        }
+      const searchNum = parseInt(search, 10);
+      const isNumericSearch = !isNaN(searchNum);
+
+      if (searchField === 'id' && isNumericSearch) {
+        where.id = searchNum;
       } else if (searchField === 'name') {
         where.name = { contains: search, mode: 'insensitive' };
+      } else if (searchField === 'price' && isNumericSearch) {
+        where.price = { equals: new Prisma.Decimal(searchNum) };
+      } else if (searchField === 'stock' && isNumericSearch) {
+        where.stock = { equals: searchNum };
       } else {
-        where.OR = [{ name: { contains: search, mode: 'insensitive' } }];
+        // Búsqueda por todos los campos
+        const orConditions: Prisma.ProductWhereInput[] = [];
+        if (isNumericSearch) {
+          orConditions.push({ id: searchNum });
+          orConditions.push({ stock: searchNum });
+          orConditions.push({ price: { gte: new Prisma.Decimal(searchNum * 0.9), lte: new Prisma.Decimal(searchNum * 1.1) } });
+        }
+        orConditions.push({ name: { contains: search, mode: 'insensitive' } });
+        where.OR = orConditions;
       }
     }
 
