@@ -34,8 +34,7 @@ import { UpdateUserCommand } from '../../../application/users/update-user.comman
 import { DeleteUserCommand } from '../../../application/users/delete-user.command';
 import { GetRolesQuery } from '../../../application/users/get-roles.query';
 import { GetErrorLogsQuery } from '../../../application/users/get-error-logs.query';
-import { UpdateUserDto } from '../../users/dto/update-user.dto';
-import { AssignRolesDto } from '../../users/dto/assign-roles.dto';
+import { UpdateUserDto, AssignRolesDto } from '../../../application/dto';
 import { AssignRolesCommand } from '../../../application/users/assign-roles.command';
 
 @ApiTags('users')

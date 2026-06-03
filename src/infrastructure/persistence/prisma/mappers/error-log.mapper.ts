@@ -9,6 +9,7 @@ export class ErrorLogMapper {
       stackTrace: prismaErrorLog.stackTrace || undefined,
       exceptionType: prismaErrorLog.exceptionType || undefined,
       userId: prismaErrorLog.userId || undefined,
+      source: prismaErrorLog.source || undefined,
     });
     entity.id = prismaErrorLog.id;
     entity.createdAt = prismaErrorLog.createdAt;
@@ -22,6 +23,7 @@ export class ErrorLogMapper {
       exceptionType: entity.exceptionType,
       userId: entity.userId,
       path: entity.path,
+      source: entity.source,
       createdAt: entity.createdAt,
     };
   }

@@ -18,8 +18,7 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
-import { CreateTaxDto } from '../../taxes/dto/create-tax.dto';
-import { UpdateTaxDto } from '../../taxes/dto/update-tax.dto';
+import { CreateTaxDto, UpdateTaxDto } from '../../../application/dto/taxes';
 import { CreateTaxCommand } from '../../../application/taxes/create-tax.command';
 import { UpdateTaxCommand } from '../../../application/taxes/update-tax.command';
 import { DeleteTaxCommand } from '../../../application/taxes/delete-tax.command';

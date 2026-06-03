@@ -196,6 +196,7 @@ model ErrorLog {
   exceptionType String?  @map("exception_type") @db.VarChar(255)
   userId        Int?     @map("user_id")
   path          String   @db.VarChar(255)
+  source        String?  @db.VarChar(500)
   createdAt     DateTime @default(now()) @map("created_at")
 
   @@map("error_logs")

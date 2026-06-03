@@ -18,8 +18,10 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
-import { CreateClientDto } from '../../clients/dto/create-client.dto';
-import { UpdateClientDto } from '../../clients/dto/update-client.dto';
+import {
+  CreateClientDto,
+  UpdateClientDto,
+} from '../../../application/dto/clients';
 import { CreateClientCommand } from '../../../application/clients/create-client.command';
 import { UpdateClientCommand } from '../../../application/clients/update-client.command';
 import { DeleteClientCommand } from '../../../application/clients/delete-client.command';
@@ -30,8 +32,8 @@ import { JwtAuthGuard } from '../../../infrastructure/security/guards/jwt-auth.g
 import { RolesGuard } from '../../../infrastructure/security/guards/roles.guard';
 import { Roles } from '../../../infrastructure/security/decorators/roles.decorator';
 import { UserRole } from '../../../domain/enums/user-role.enum';
+import { DeleteResultDto } from '../../../application/dto';
 import { normalizePageSize } from '../../../infrastructure/web-common/utils/page-size.util';
-import { DeleteResultDto } from '../../common/dto/delete-result.dto';
 
 @ApiTags('clients')
 @ApiBearerAuth('JWT-auth')

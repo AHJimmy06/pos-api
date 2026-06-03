@@ -52,6 +52,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
           exceptionType:
             exception instanceof Error ? exception.constructor.name : undefined,
           userId: userId,
+          source: JSON.stringify({
+            method: request.method,
+            path: request.path,
+            query: Object.keys(request.query).length > 0 ? request.query : undefined,
+            ip: request.ip || request.socket?.remoteAddress,
+          }),
         }),
       )
 

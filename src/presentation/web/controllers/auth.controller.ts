@@ -13,8 +13,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CommandBus } from '@nestjs/cqrs';
-import { LoginDto } from '../../auth/dto/login.dto';
-import { RegisterUserDto } from '../../auth/dto/register-user.dto';
+import { LoginDto, RegisterUserDto } from '../../../application/dto';
 import { LoginCommand } from '../../../application/auth/login.command';
 import { RegisterUserCommand } from '../../../application/auth/register-user.command';
 import { User } from '../../../domain/entities/user.entity';

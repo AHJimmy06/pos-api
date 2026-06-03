@@ -22,9 +22,11 @@ import {
   ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CreateInvoiceDto } from '../../invoices/dto/create-invoice.dto';
-import { UpdateInvoiceDto } from '../../invoices/dto/update-invoice.dto';
-import { ChangeInvoiceStatusDto } from '../../invoices/dto/change-invoice-status.dto';
+import {
+  CreateInvoiceDto,
+  UpdateInvoiceDto,
+  ChangeInvoiceStatusDto,
+} from '../../../application/dto/invoices';
 import { CreateInvoiceCommand } from '../../../application/invoices/create-invoice.command';
 import { UpdateInvoiceCommand } from '../../../application/invoices/update-invoice.command';
 import { ChangeInvoiceStatusCommand } from '../../../application/invoices/change-invoice-status.command';

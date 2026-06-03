@@ -18,8 +18,12 @@ import {
   ApiBearerAuth,
   ApiQuery,
 } from '@nestjs/swagger';
-import { CreateProductDto } from '../../products/dto/create-product.dto';
-import { UpdateProductDto } from '../../products/dto/update-product.dto';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from '../../../application/dto/products';
+import { DeleteResultDto } from '../../../application/dto';
+import { normalizePageSize } from '../../../infrastructure/web-common/utils/page-size.util';
 import { CreateProductCommand } from '../../../application/products/create-product.command';
 import { UpdateProductCommand } from '../../../application/products/update-product.command';
 import { DeleteProductCommand } from '../../../application/products/delete-product.command';
@@ -31,8 +35,6 @@ import { JwtAuthGuard } from '../../../infrastructure/security/guards/jwt-auth.g
 import { RolesGuard } from '../../../infrastructure/security/guards/roles.guard';
 import { Roles } from '../../../infrastructure/security/decorators/roles.decorator';
 import { UserRole } from '../../../domain/enums/user-role.enum';
-import { normalizePageSize } from '../../../infrastructure/web-common/utils/page-size.util';
-import { DeleteResultDto } from '../../common/dto/delete-result.dto';
 
 @ApiTags('products')
 @ApiBearerAuth('JWT-auth')
