@@ -6,6 +6,7 @@ import { CreateInvoiceHandler } from '../../application/invoices/create-invoice.
 import { GetInvoiceHandler } from '../../application/invoices/get-invoice.handler';
 import { GetInvoicesHandler } from '../../application/invoices/get-invoices.handler';
 import { UpdateInvoiceHandler } from '../../application/invoices/update-invoice.handler';
+import { ReconstructInvoiceHandler } from '../../application/invoices/reconstruct-invoice.handler';
 import { PrismaInvoiceRepository } from '../../infrastructure/persistence/prisma/repositories/invoice.repository';
 import { PrismaModule } from '../../infrastructure/persistence/prisma/prisma.module';
 import { ClientsModule } from '../clients/clients.module';
@@ -21,6 +22,7 @@ const InvoiceHandlers = [
   GetInvoiceHandler,
   GetInvoicesHandler,
   UpdateInvoiceHandler,
+  ReconstructInvoiceHandler,
 ];
 
 @Module({
@@ -35,7 +37,10 @@ const InvoiceHandlers = [
   controllers: [InvoicesController],
   providers: [
     ...InvoiceHandlers,
-    PdfService,
+    {
+      provide: TOKENS.PDF_SERVICE,
+      useClass: PdfService,
+    },
     {
       provide: TOKENS.INVOICE_REPOSITORY,
       useClass: PrismaInvoiceRepository,

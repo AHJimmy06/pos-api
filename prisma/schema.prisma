@@ -21,19 +21,19 @@ model Client {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  username     String        @unique @db.VarChar(50)
-  name         String        @db.VarChar(100)
-  lastName     String        @db.VarChar(100)
-  cedula       String?       @db.VarChar(20)
-  email        String        @unique @db.VarChar(255)
-  password     String        @db.VarChar(255)
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  roles        UserRole[]
-  blockedUsers BlockedUser[]
+  id           Int          @id @default(autoincrement())
+  username     String       @unique @db.VarChar(50)
+  name         String       @db.VarChar(100)
+  lastName     String       @db.VarChar(100)
+  cedula       String?      @db.VarChar(20)
+  email        String       @unique @db.VarChar(255)
+  password     String       @db.VarChar(255)
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  blockedUsers BlockedUser?
   invoices     Invoice[]
+  roles        UserRole[]
 
   @@map("users")
 }
@@ -50,8 +50,8 @@ model Role {
 model UserRole {
   userId Int  @map("user_id")
   roleId Int  @map("role_id")
-  user   User @relation(fields: [userId], references: [id])
   role   Role @relation(fields: [roleId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
   @@id([userId, roleId])
   @@map("user_roles")
@@ -74,8 +74,8 @@ model Product {
   stock          Int?
   version        Int             @default(0)
   isActive       Boolean         @default(true) @map("is_active")
-  productTaxes   ProductTax[]
   invoiceDetails InvoiceDetail[]
+  productTaxes   ProductTax[]
   StockMovement  StockMovement[]
 
   @@index([isActive, stock])
@@ -98,25 +98,10 @@ model Tax {
   id           Int                @id @default(autoincrement())
   name         String?            @unique @db.VarChar(255)
   currentRate  Decimal?           @map("current_rate") @db.Decimal(5, 2)
-  productTaxes ProductTax[]
   detailTaxes  InvoiceDetailTax[]
+  productTaxes ProductTax[]
 
   @@map("taxes")
-}
-
-enum InvoiceStatus {
-  DRAFT
-  CONFIRMED
-  CANCELLED
-}
-
-enum MovementType {
-  ENTRY
-  EXIT
-}
-
-enum PaymentMethod {
-  CASH
 }
 
 model Invoice {
@@ -132,9 +117,11 @@ model Invoice {
   paymentMethod    PaymentMethod   @default(CASH) @map("payment_method")
   isActive         Boolean         @default(true) @map("is_active")
   version          Int             @default(0)
+  clientSnapshot   Json?           @map("client_snapshot")
+  sellerSnapshot   Json?           @map("seller_snapshot")
+  details          InvoiceDetail[]
   client           Client?         @relation(fields: [clientId], references: [id])
   user             User?           @relation(fields: [userId], references: [id])
-  details          InvoiceDetail[]
 
   @@index([clientId])
   @@index([userId])
@@ -163,12 +150,12 @@ model InvoiceDetail {
   id                Int                @id @default(autoincrement())
   invoiceId         Int?               @map("invoice_id")
   productId         Int?               @map("product_id")
-  productName       String?            @map("product_name") @db.VarChar(255)
   quantity          Int?
   unitPriceSnapshot Decimal?           @map("unit_price_snapshot") @db.Decimal(12, 2)
+  productName       String?            @map("product_name") @db.VarChar(255)
+  detailTaxes       InvoiceDetailTax[]
   invoice           Invoice?           @relation(fields: [invoiceId], references: [id])
   product           Product?           @relation(fields: [productId], references: [id])
-  detailTaxes       InvoiceDetailTax[]
 
   @@index([invoiceId])
   @@index([productId])
@@ -191,13 +178,28 @@ model InvoiceDetailTax {
 
 model ErrorLog {
   id            Int      @id @default(autoincrement())
-  message       String   @db.Text
-  stackTrace    String?  @map("stack_trace") @db.Text
+  message       String
+  stackTrace    String?  @map("stack_trace")
   exceptionType String?  @map("exception_type") @db.VarChar(255)
   userId        Int?     @map("user_id")
   path          String   @db.VarChar(255)
-  source        String?  @db.VarChar(500)
   createdAt     DateTime @default(now()) @map("created_at")
+  source        String?  @db.VarChar(500)
 
   @@map("error_logs")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  CONFIRMED
+  CANCELLED
+}
+
+enum MovementType {
+  ENTRY
+  EXIT
+}
+
+enum PaymentMethod {
+  CASH
 }

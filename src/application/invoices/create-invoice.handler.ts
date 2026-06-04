@@ -3,6 +3,7 @@ import { CreateInvoiceCommand } from './create-invoice.command';
 import { Inject, NotFoundException } from '@nestjs/common';
 import { IInvoiceRepository } from '../common/interfaces/invoice.repository.interface';
 import { IClientRepository } from '../common/interfaces/client.repository.interface';
+import { IUserRepository } from '../common/interfaces/user.repository.interface';
 import { IProductRepository } from '../common/interfaces/product.repository.interface';
 import { ITaxRepository } from '../common/interfaces/tax.repository.interface';
 import { IStockMovementRepository } from '../common/interfaces/stock-movement.repository.interface';
@@ -22,6 +23,8 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
     private readonly invoiceRepository: IInvoiceRepository,
     @Inject(TOKENS.CLIENT_REPOSITORY)
     private readonly clientRepository: IClientRepository,
+    @Inject(TOKENS.USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
     @Inject(TOKENS.PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository,
     @Inject(TOKENS.TAX_REPOSITORY)
@@ -48,6 +51,29 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
       if (!client) {
         throw new NotFoundException(`Client with ID ${clientId} not found`);
       }
+
+      let sellerSnapshot: any = null;
+      if (userId) {
+        const seller = await this.userRepository.findById(userId);
+        if (seller) {
+          sellerSnapshot = {
+            id: seller.id,
+            name: seller.name,
+            lastName: seller.lastName,
+            email: seller.email,
+            cedula: seller.cedula,
+          };
+        }
+      }
+
+      const clientSnapshot = {
+        id: client.id,
+        firstName: client.firstName,
+        lastName: client.lastName,
+        email: client.email,
+        phone: client.phone,
+        address: client.address,
+      };
 
       // Validar productos duplicados en el detalle
       const productIds = items.map((i) => i.productId);
@@ -77,6 +103,8 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
       const invoice = new Invoice(clientId);
       invoice.userId = userId;
       invoice.status = status || InvoiceStatus.CONFIRMED;
+      invoice.clientSnapshot = clientSnapshot;
+      invoice.sellerSnapshot = sellerSnapshot;
 
       for (const item of items) {
         const productData = productMap.get(item.productId);

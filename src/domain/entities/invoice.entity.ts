@@ -12,6 +12,8 @@ export class Invoice {
   paymentMethod: PaymentMethod = PaymentMethod.CASH;
   isActive: boolean = true;
   version: number = 0;
+  clientSnapshot: any;
+  sellerSnapshot: any;
   details: InvoiceDetail[] = [];
   private _subtotalSnapshot?: number;
   private _taxTotalSnapshot?: number;
@@ -43,10 +45,13 @@ export class Invoice {
   }
 
   get totalSnapshot(): number {
-    return this._subtotalSnapshot !== undefined &&
+    return (
+      this._totalSnapshot ??
+      (this._subtotalSnapshot !== undefined &&
       this._taxTotalSnapshot !== undefined
-      ? this._subtotalSnapshot + this._taxTotalSnapshot
-      : this.subtotalSnapshot + this.taxTotalSnapshot;
+        ? this._subtotalSnapshot + this._taxTotalSnapshot
+        : this.subtotalSnapshot + this.taxTotalSnapshot)
+    );
   }
 
   setSnapshots(subtotal: number, taxTotal: number, total: number): void {

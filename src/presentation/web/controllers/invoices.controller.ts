@@ -32,13 +32,14 @@ import { UpdateInvoiceCommand } from '../../../application/invoices/update-invoi
 import { ChangeInvoiceStatusCommand } from '../../../application/invoices/change-invoice-status.command';
 import { GetInvoicesQuery } from '../../../application/invoices/get-invoices.query';
 import { GetInvoiceQuery } from '../../../application/invoices/get-invoice.query';
+import { ReconstructInvoiceQuery } from '../../../application/invoices/reconstruct-invoice.query';
 import { Invoice } from '../../../domain/entities/invoice.entity';
 import { JwtAuthGuard } from '../../../infrastructure/security/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../infrastructure/security/guards/roles.guard';
 import { Roles } from '../../../infrastructure/security/decorators/roles.decorator';
 import { UserRole } from '../../../domain/enums/user-role.enum';
 import { normalizePageSize } from '../../../infrastructure/web-common/utils/page-size.util';
-import { PdfService } from '../../../infrastructure/web-common/services/pdf.service';
+import { IPdfService } from '../../../application/common/interfaces/pdf-service.interface';
 import { IClientRepository } from '../../../application/common/interfaces/client.repository.interface';
 import { IUserRepository } from '../../../application/common/interfaces/user.repository.interface';
 import { TOKENS } from '../../../application/common/tokens/tokens';
@@ -51,7 +52,8 @@ export class InvoicesController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-    private readonly pdfService: PdfService,
+    @Inject(TOKENS.PDF_SERVICE)
+    private readonly pdfService: IPdfService,
     @Inject(TOKENS.CLIENT_REPOSITORY)
     private readonly clientRepository: IClientRepository,
     @Inject(TOKENS.USER_REPOSITORY)
@@ -203,6 +205,39 @@ export class InvoicesController {
     return this.queryBus.execute(new GetInvoiceQuery(id));
   }
 
+  @Get('audit/:transactionId')
+  @ApiOperation({ summary: 'Reconstruct historical invoice for audit' })
+  @ApiResponse({ status: 200, description: 'Reconstructed invoice data' })
+  @ApiResponse({ status: 404, description: 'Invoice not found.' })
+  async reconstruct(
+    @Param('transactionId') transactionId: string,
+  ): Promise<Invoice> {
+    return this.queryBus.execute(new ReconstructInvoiceQuery(transactionId));
+  }
+
+  @Get('audit/:transactionId/pdf')
+  @ApiOperation({ summary: 'Export historical invoice to PDF for audit' })
+  @ApiResponse({ status: 200, description: 'Historical PDF generated' })
+  @ApiResponse({ status: 404, description: 'Invoice not found' })
+  async exportAuditPdf(
+    @Param('transactionId') transactionId: string,
+    @Res() res: Response,
+  ) {
+    const invoice: Invoice = await this.queryBus.execute(
+      new ReconstructInvoiceQuery(transactionId),
+    );
+
+    const buffer = await this.pdfService.generateInvoicePdf(invoice);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=invoice-audit-${transactionId}.pdf`,
+      'Content-Length': buffer.length,
+    });
+
+    res.end(buffer);
+  }
+
   @Get(':id/pdf')
   @ApiOperation({ summary: 'Export invoice to PDF' })
   @ApiResponse({ status: 200, description: 'PDF generated' })
@@ -215,16 +250,7 @@ export class InvoicesController {
       return res.status(404).json({ message: 'Invoice not found' });
     }
 
-    const client = await this.clientRepository.findById(invoice.clientId);
-    const seller = invoice.userId
-      ? await this.userRepository.findById(invoice.userId)
-      : null;
-
-    const buffer = await this.pdfService.generateInvoicePdf(
-      invoice,
-      client,
-      seller,
-    );
+    const buffer = await this.pdfService.generateInvoicePdf(invoice);
 
     res.set({
       'Content-Type': 'application/pdf',

@@ -10,4 +10,5 @@ export const TOKENS = {
   ERROR_LOG_REPOSITORY: 'IErrorLogRepository',
   UNIT_OF_WORK: 'IUnitOfWork',
   PASSWORD_SERVICE: 'IPasswordService',
+  PDF_SERVICE: 'IPdfService',
 } as const;

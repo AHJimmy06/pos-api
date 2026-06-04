@@ -8,3 +8,5 @@ export * from './get-invoices.handler';
 export * from './get-invoices.query';
 export * from './update-invoice.command';
 export * from './update-invoice.handler';
+export * from './reconstruct-invoice.query';
+export * from './reconstruct-invoice.handler';

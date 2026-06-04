@@ -29,6 +29,8 @@ export class InvoiceMapper {
     invoice.paymentMethod = prismaInvoice.paymentMethod as PaymentMethod;
     invoice.isActive = prismaInvoice.isActive ?? true;
     invoice.version = prismaInvoice.version ?? 0;
+    invoice.clientSnapshot = prismaInvoice.clientSnapshot;
+    invoice.sellerSnapshot = prismaInvoice.sellerSnapshot;
 
     if (
       prismaInvoice.subtotalSnapshot !== null &&
@@ -83,6 +85,8 @@ export class InvoiceMapper {
       paymentMethod: entity.paymentMethod,
       isActive: entity.isActive,
       version: entity.version,
+      clientSnapshot: entity.clientSnapshot,
+      sellerSnapshot: entity.sellerSnapshot,
       details: {
         create: entity.details.map((detail) => ({
           productId: detail.productId,
