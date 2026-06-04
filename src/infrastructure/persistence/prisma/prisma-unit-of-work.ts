@@ -13,7 +13,7 @@ export class PrismaUnitOfWork extends IUnitOfWork {
   }
 
   async runInTransaction<T>(work: () => Promise<T>): Promise<T> {
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: PrismaClient) => {
       return this.asyncLocalStorage.run(tx, work);
     });
   }
