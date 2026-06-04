@@ -127,6 +127,7 @@ model Invoice {
   taxTotalSnapshot Decimal?        @map("tax_total_snapshot") @db.Decimal(12, 2)
   totalSnapshot    Decimal?        @map("total_snapshot") @db.Decimal(12, 2)
   transactionId    String?         @map("transaction_id") @db.VarChar(255)
+  invoiceNumber    String?         @unique @map("invoice_number") @db.VarChar(20)
   status           InvoiceStatus   @default(CONFIRMED)
   userId           Int?            @map("user_id")
   paymentMethod    PaymentMethod   @default(CASH) @map("payment_method")
@@ -139,6 +140,7 @@ model Invoice {
   @@index([clientId])
   @@index([userId])
   @@index([issueDate])
+  @@index([invoiceNumber])
   @@map("invoices")
 }
 

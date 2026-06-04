@@ -4,6 +4,7 @@ import { InvoicesController } from '../web/controllers/invoices.controller';
 import { ChangeInvoiceStatusHandler } from '../../application/invoices/change-invoice-status.handler';
 import { CreateInvoiceHandler } from '../../application/invoices/create-invoice.handler';
 import { GetInvoiceHandler } from '../../application/invoices/get-invoice.handler';
+import { GetInvoiceByNumberHandler } from '../../application/invoices/get-invoice-by-number.handler';
 import { GetInvoicesHandler } from '../../application/invoices/get-invoices.handler';
 import { UpdateInvoiceHandler } from '../../application/invoices/update-invoice.handler';
 import { PrismaInvoiceRepository } from '../../infrastructure/persistence/prisma/repositories/invoice.repository';
@@ -19,6 +20,7 @@ const InvoiceHandlers = [
   ChangeInvoiceStatusHandler,
   CreateInvoiceHandler,
   GetInvoiceHandler,
+  GetInvoiceByNumberHandler,
   GetInvoicesHandler,
   UpdateInvoiceHandler,
 ];

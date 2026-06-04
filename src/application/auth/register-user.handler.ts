@@ -16,7 +16,7 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<User> {
-    const { username, name, lastName, email, password, cedula } = command;
+    const { username, name, lastName, email, password, cedula, roles } = command;
 
     const passwordValidation = this.passwordService.validateStrength(password);
     if (!passwordValidation.valid) {
@@ -38,6 +38,9 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
     const user = new User(username, name, lastName, email, passwordHash);
     user.cedula = cedula ?? null;
 
-    return this.userRepository.create(user, ['SELLER']);
+    // Use provided roles or default to SELLER
+    const userRoles = roles && roles.length > 0 ? roles : ['SELLER'];
+
+    return this.userRepository.create(user, userRoles);
   }
 }

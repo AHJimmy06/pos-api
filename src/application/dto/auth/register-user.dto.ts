@@ -3,10 +3,12 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsArray,
   Length,
   Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRole } from '../../../domain/enums/user-role.enum';
 
 export class RegisterUserDto {
   @ApiProperty({ example: 'johndoe' })
@@ -51,4 +53,16 @@ export class RegisterUserDto {
     },
   )
   password: string;
+
+  @ApiProperty({
+    example: ['SELLER'],
+    description: 'User roles array',
+    required: false,
+    enum: UserRole,
+    isArray: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  roles?: string[];
 }

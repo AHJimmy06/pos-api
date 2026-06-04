@@ -32,6 +32,7 @@ import { UpdateInvoiceCommand } from '../../../application/invoices/update-invoi
 import { ChangeInvoiceStatusCommand } from '../../../application/invoices/change-invoice-status.command';
 import { GetInvoicesQuery } from '../../../application/invoices/get-invoices.query';
 import { GetInvoiceQuery } from '../../../application/invoices/get-invoice.query';
+import { GetInvoiceByNumberQuery } from '../../../application/invoices/get-invoice-by-number.query';
 import { Invoice } from '../../../domain/entities/invoice.entity';
 import { JwtAuthGuard } from '../../../infrastructure/security/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../infrastructure/security/guards/roles.guard';
@@ -201,6 +202,60 @@ export class InvoicesController {
   @ApiResponse({ status: 404, description: 'Invoice not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Invoice> {
     return this.queryBus.execute(new GetInvoiceQuery(id));
+  }
+
+  @Get('by-number/:invoiceNumber')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.AUDITOR)
+  @ApiOperation({ summary: 'Reconstruct an invoice by its invoice number (for audit)' })
+  @ApiResponse({ status: 404, description: 'Invoice not found.' })
+  async findByInvoiceNumber(
+    @Param('invoiceNumber') invoiceNumber: string,
+  ): Promise<any> {
+    return this.queryBus.execute(new GetInvoiceByNumberQuery(invoiceNumber));
+  }
+
+  @Get('by-number/:invoiceNumber/pdf')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.AUDITOR)
+  @ApiOperation({ summary: 'Export invoice PDF by invoice number (for audit)' })
+  @ApiResponse({ status: 200, description: 'PDF generated' })
+  @ApiResponse({ status: 404, description: 'Invoice not found' })
+  async exportPdfByNumber(
+    @Param('invoiceNumber') invoiceNumber: string,
+    @Res() res: Response,
+  ) {
+    const invoiceData = await this.queryBus.execute(
+      new GetInvoiceByNumberQuery(invoiceNumber),
+    );
+    if (!invoiceData) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+
+    // Reconstruct minimal Invoice entity for PDF service
+    const invoice: Invoice = new Invoice(invoiceData.client?.id || 0);
+    invoice.id = invoiceData.id;
+    invoice.issueDate = new Date(invoiceData.issueDate);
+    invoice.status = invoiceData.status;
+    invoice.paymentMethod = invoiceData.paymentMethod;
+    invoice.transactionId = invoiceData.transactionId;
+    invoice.setSnapshots(
+      invoiceData.subtotalSnapshot,
+      invoiceData.taxTotalSnapshot,
+      invoiceData.totalSnapshot,
+    );
+
+    const buffer = await this.pdfService.generateInvoicePdf(
+      invoice,
+      invoiceData.client,
+      invoiceData.seller,
+    );
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=invoice-${invoiceNumber}.pdf`,
+      'Content-Length': buffer.length,
+    });
+
+    res.end(buffer);
   }
 
   @Get(':id/pdf')

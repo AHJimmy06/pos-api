@@ -111,6 +111,27 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
     return this.findById(id);
   }
 
+  async findByInvoiceNumber(invoiceNumber: string): Promise<any> {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { invoiceNumber: invoiceNumber } as any,
+      include: {
+        details: {
+          include: {
+            detailTaxes: {
+              include: {
+                tax: true,
+              },
+            },
+            product: true,
+          },
+        },
+        client: true,
+        user: true,
+      },
+    });
+    return invoice;
+  }
+
   async update(id: number, invoice: InvoiceEntity): Promise<InvoiceEntity> {
     const persistenceData: any = InvoiceMapper.toPersistenceUpdate(invoice);
 

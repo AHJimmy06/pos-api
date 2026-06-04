@@ -12,5 +12,6 @@ export abstract class IInvoiceRepository {
   ): Promise<{ data: Invoice[]; total: number }>;
   abstract findById(id: number): Promise<Invoice | null>;
   abstract findByIdWithDetails(id: number): Promise<Invoice | null>;
+  abstract findByInvoiceNumber(invoiceNumber: string): Promise<any>;
   abstract update(id: number, invoice: Invoice): Promise<Invoice>;
 }

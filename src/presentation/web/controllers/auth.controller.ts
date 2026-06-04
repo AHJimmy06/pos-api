@@ -63,6 +63,7 @@ export class AuthController {
         dto.email,
         dto.password,
         dto.cedula,
+        dto.roles,
       ),
     );
     return { message: 'User created successfully', userId: user.id };
