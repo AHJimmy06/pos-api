@@ -72,7 +72,7 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
     };
   }
 
-  async findById(id: number): Promise<InvoiceEntity | null> {
+  async findById(id: number): Promise<any> {
     const invoice = await this.prisma.invoice.findUnique({
       where: { id },
       include: {
@@ -82,10 +82,12 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
             product: true,
           },
         },
+        client: true,
+        user: true,
       },
     });
 
-    return invoice ? InvoiceMapper.toEntity(invoice) : null;
+    return invoice;
   }
 
   async create(invoice: InvoiceEntity): Promise<InvoiceEntity> {

@@ -198,10 +198,40 @@ export class InvoicesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get an invoice by id' })
+  @ApiOperation({ summary: 'Get an invoice by id with client and seller' })
   @ApiResponse({ status: 404, description: 'Invoice not found.' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Invoice> {
-    return this.queryBus.execute(new GetInvoiceQuery(id));
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<any> {
+    const invoice = await this.queryBus.execute(new GetInvoiceQuery(id));
+    if (!invoice) {
+      return null;
+    }
+    
+    // Get client and seller info
+    const client = invoice.clientId 
+      ? await this.clientRepository.findById(invoice.clientId)
+      : null;
+    const seller = invoice.userId 
+      ? await this.userRepository.findById(invoice.userId)
+      : null;
+    
+    return {
+      ...invoice,
+      client: client ? {
+        id: client.id,
+        firstName: client.firstName,
+        lastName: client.lastName,
+        email: client.email,
+        phone: client.phone,
+        address: client.address,
+      } : null,
+      seller: seller ? {
+        id: seller.id,
+        username: seller.username,
+        name: seller.name,
+        lastName: seller.lastName,
+        email: seller.email,
+      } : null,
+    };
   }
 
   @Get('by-number/:invoiceNumber')
