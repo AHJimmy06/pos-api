@@ -103,7 +103,12 @@ export class PrismaProductRepository extends IProductRepository {
         if (isNumericSearch) {
           orConditions.push({ id: searchNum });
           orConditions.push({ stock: searchNum });
-          orConditions.push({ price: { gte: new Prisma.Decimal(searchNum * 0.9), lte: new Prisma.Decimal(searchNum * 1.1) } });
+          orConditions.push({
+            price: {
+              gte: new Prisma.Decimal(searchNum * 0.9),
+              lte: new Prisma.Decimal(searchNum * 1.1),
+            },
+          });
         }
         orConditions.push({ name: { contains: search, mode: 'insensitive' } });
         where.OR = orConditions;

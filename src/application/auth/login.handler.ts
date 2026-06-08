@@ -1,15 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import {
-  Inject,
-  UnauthorizedException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Inject, UnauthorizedException } from '@nestjs/common';
 import { LoginCommand } from './login.command';
 import { IUserRepository } from '../common/interfaces/user.repository.interface';
 import { IBlockedUserRepository } from '../common/interfaces/blocked-user.repository.interface';
 import type { IPasswordService } from '../common/interfaces/password-service.interface';
 import { JwtService } from '@nestjs/jwt';
 import { TOKENS } from '../common/tokens/tokens';
+import { BusinessException } from '../../domain/exceptions/business.exception';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -41,8 +38,9 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     const blockedUser = await this.blockedUserRepository.findByUserId(user.id);
 
     if (blockedUser?.isBlocked()) {
-      throw new BadRequestException(
+      throw new BusinessException(
         'Account is blocked due to multiple failed login attempts',
+        'ACCOUNT_BLOCKED',
       );
     }
 
@@ -58,8 +56,9 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       );
 
       if (updated.isBlocked()) {
-        throw new BadRequestException(
+        throw new BusinessException(
           'Account is now blocked due to multiple failed attempts',
+          'ACCOUNT_BLOCKED',
         );
       }
 

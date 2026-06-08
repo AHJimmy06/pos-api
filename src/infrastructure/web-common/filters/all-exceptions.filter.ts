@@ -55,7 +55,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
           source: JSON.stringify({
             method: request.method,
             path: request.path,
-            query: Object.keys(request.query).length > 0 ? request.query : undefined,
+            query:
+              Object.keys(request.query).length > 0 ? request.query : undefined,
             ip: request.ip || request.socket?.remoteAddress,
           }),
         }),

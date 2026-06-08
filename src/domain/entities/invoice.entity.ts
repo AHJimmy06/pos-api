@@ -12,6 +12,10 @@ export class Invoice {
   paymentMethod: PaymentMethod = PaymentMethod.CASH;
   isActive: boolean = true;
   version: number = 0;
+  clientNameSnapshot?: string;
+  clientEmailSnapshot?: string;
+  sellerNameSnapshot?: string;
+  parentInvoiceId?: number;
   details: InvoiceDetail[] = [];
   private _subtotalSnapshot?: number;
   private _taxTotalSnapshot?: number;
@@ -29,24 +33,29 @@ export class Invoice {
   }
 
   get subtotalSnapshot(): number {
-    return (
-      this._subtotalSnapshot ??
-      this.details.reduce((sum, d) => sum + d.subtotal, 0)
-    );
+    const value = this._subtotalSnapshot;
+    if (value !== null && value !== undefined) {
+      return value;
+    }
+    return this.details.reduce((sum, d) => sum + d.subtotal, 0);
   }
 
   get taxTotalSnapshot(): number {
-    return (
-      this._taxTotalSnapshot ??
-      this.details.reduce((sum, d) => sum + d.taxTotal, 0)
-    );
+    const value = this._taxTotalSnapshot;
+    if (value !== null && value !== undefined) {
+      return value;
+    }
+    return this.details.reduce((sum, d) => sum + d.taxTotal, 0);
   }
 
   get totalSnapshot(): number {
-    return this._subtotalSnapshot !== undefined &&
-      this._taxTotalSnapshot !== undefined
-      ? this._subtotalSnapshot + this._taxTotalSnapshot
-      : this.subtotalSnapshot + this.taxTotalSnapshot;
+    const subtotalValue = this._subtotalSnapshot;
+    const taxTotalValue = this._taxTotalSnapshot;
+    if (subtotalValue !== null && subtotalValue !== undefined &&
+        taxTotalValue !== null && taxTotalValue !== undefined) {
+      return subtotalValue + taxTotalValue;
+    }
+    return this.subtotalSnapshot + this.taxTotalSnapshot;
   }
 
   setSnapshots(subtotal: number, taxTotal: number, total: number): void {

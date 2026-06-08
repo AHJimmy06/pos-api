@@ -40,7 +40,6 @@ export class PrismaInvoiceRepository extends IInvoiceRepository {
     limit: number,
     searchId?: number,
     userId?: number,
-    searchField?: string,
   ): Promise<{ data: InvoiceEntity[]; total: number }> {
     const where: Prisma.InvoiceWhereInput = {};
     if (searchId) where.id = searchId;

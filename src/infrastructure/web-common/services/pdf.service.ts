@@ -41,11 +41,18 @@ export class PdfService {
         .text('Client Information:', 50, 160)
         .fontSize(10)
         .text(
-          `Name: ${client ? `${client.firstName} ${client.lastName}` : 'N/A'}`,
+          `Name: ${
+            invoice.clientNameSnapshot ||
+            (client ? `${client.firstName} ${client.lastName}` : 'N/A')
+          }`,
           50,
           175,
         )
-        .text(`Email: ${client?.email || 'N/A'}`, 50, 190)
+        .text(
+          `Email: ${invoice.clientEmailSnapshot || client?.email || 'N/A'}`,
+          50,
+          190,
+        )
         .text(`Address: ${client?.address || 'N/A'}`, 50, 205);
 
       // Seller Info
@@ -54,7 +61,10 @@ export class PdfService {
         .text('Seller Info:', 350, 160)
         .fontSize(10)
         .text(
-          `Vendedor: ${seller ? `${seller.name} ${seller.lastName}` : 'N/A'}`,
+          `Vendedor: ${
+            invoice.sellerNameSnapshot ||
+            (seller ? `${seller.name} ${seller.lastName}` : 'N/A')
+          }`,
           350,
           175,
         )

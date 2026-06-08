@@ -44,6 +44,10 @@ import { IClientRepository } from '../../../application/common/interfaces/client
 import { IUserRepository } from '../../../application/common/interfaces/user.repository.interface';
 import { TOKENS } from '../../../application/common/tokens/tokens';
 
+import { InvoiceReconstructionDto } from '../../../application/dto/invoices/get-invoice-by-number.dto';
+import { Client } from '../../../domain/entities/client.entity';
+import { User } from '../../../domain/entities/user.entity';
+
 @ApiTags('invoices')
 @ApiBearerAuth('JWT-auth')
 @Controller('invoices')
@@ -93,14 +97,17 @@ export class InvoicesController {
 
   @Patch(':id')
   @Roles(UserRole.ADMINISTRATOR, UserRole.SELLER)
-  @ApiOperation({ summary: 'Update a draft invoice' })
+  @ApiOperation({
+    summary:
+      'Modify an invoice (generates a new revision and cancels the old one)',
+  })
   @ApiResponse({
     status: 200,
-    description: 'The invoice has been successfully updated.',
+    description: 'The invoice has been successfully revised.',
   })
   @ApiResponse({
     status: 409,
-    description: 'Invoice is not in a modifiable state (not DRAFT).',
+    description: 'Invoice is already cancelled and cannot be modified.',
   })
   @ApiResponse({
     status: 404,
@@ -201,42 +208,51 @@ export class InvoicesController {
   @ApiOperation({ summary: 'Get an invoice by id with client and seller' })
   @ApiResponse({ status: 404, description: 'Invoice not found.' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<any> {
-    const invoice = await this.queryBus.execute(new GetInvoiceQuery(id));
+    const invoice: Invoice | null = await this.queryBus.execute(
+      new GetInvoiceQuery(id),
+    );
     if (!invoice) {
       return null;
     }
-    
+
     // Get client and seller info
-    const client = invoice.clientId 
-      ? await this.clientRepository.findById(invoice.clientId)
+    const client = invoice.clientId
+      ? await this.clientRepository.findById(Number(invoice.clientId))
       : null;
-    const seller = invoice.userId 
-      ? await this.userRepository.findById(invoice.userId)
+    const seller = invoice.userId
+      ? await this.userRepository.findById(Number(invoice.userId))
       : null;
-    
+
     return {
       ...invoice,
-      client: client ? {
-        id: client.id,
-        firstName: client.firstName,
-        lastName: client.lastName,
-        email: client.email,
-        phone: client.phone,
-        address: client.address,
-      } : null,
-      seller: seller ? {
-        id: seller.id,
-        username: seller.username,
-        name: seller.name,
-        lastName: seller.lastName,
-        email: seller.email,
-      } : null,
+      client: {
+        id: invoice.clientId,
+        firstName:
+          invoice.clientNameSnapshot?.split(' ')[0] || client?.firstName,
+        lastName:
+          invoice.clientNameSnapshot?.split(' ').slice(1).join(' ') ||
+          client?.lastName,
+        email: invoice.clientEmailSnapshot || client?.email,
+        phone: client?.phone,
+        address: client?.address,
+      },
+      seller: {
+        id: invoice.userId,
+        username: seller?.username || 'N/A',
+        name: invoice.sellerNameSnapshot?.split(' ')[0] || seller?.name,
+        lastName:
+          invoice.sellerNameSnapshot?.split(' ').slice(1).join(' ') ||
+          seller?.lastName,
+        email: seller?.email || 'N/A',
+      },
     };
   }
 
   @Get('by-number/:invoiceNumber')
   @Roles(UserRole.ADMINISTRATOR, UserRole.AUDITOR)
-  @ApiOperation({ summary: 'Reconstruct an invoice by its invoice number (for audit)' })
+  @ApiOperation({
+    summary: 'Reconstruct an invoice by its invoice number (for audit)',
+  })
   @ApiResponse({ status: 404, description: 'Invoice not found.' })
   async findByInvoiceNumber(
     @Param('invoiceNumber') invoiceNumber: string,
@@ -253,9 +269,8 @@ export class InvoicesController {
     @Param('invoiceNumber') invoiceNumber: string,
     @Res() res: Response,
   ) {
-    const invoiceData = await this.queryBus.execute(
-      new GetInvoiceByNumberQuery(invoiceNumber),
-    );
+    const invoiceData: InvoiceReconstructionDto | null =
+      await this.queryBus.execute(new GetInvoiceByNumberQuery(invoiceNumber));
     if (!invoiceData) {
       return res.status(404).json({ message: 'Invoice not found' });
     }
@@ -264,19 +279,22 @@ export class InvoicesController {
     const invoice: Invoice = new Invoice(invoiceData.client?.id || 0);
     invoice.id = invoiceData.id;
     invoice.issueDate = new Date(invoiceData.issueDate);
-    invoice.status = invoiceData.status;
-    invoice.paymentMethod = invoiceData.paymentMethod;
-    invoice.transactionId = invoiceData.transactionId;
+    invoice.status = invoiceData.status as any;
+    invoice.paymentMethod = invoiceData.paymentMethod as any;
+    invoice.transactionId = invoiceData.transactionId || '';
     invoice.setSnapshots(
       invoiceData.subtotalSnapshot,
       invoiceData.taxTotalSnapshot,
       invoiceData.totalSnapshot,
     );
+    invoice.clientNameSnapshot = invoiceData.clientNameSnapshot;
+    invoice.clientEmailSnapshot = invoiceData.clientEmailSnapshot;
+    invoice.sellerNameSnapshot = invoiceData.sellerNameSnapshot;
 
     const buffer = await this.pdfService.generateInvoicePdf(
       invoice,
-      invoiceData.client,
-      invoiceData.seller,
+      invoiceData.client as unknown as Client,
+      invoiceData.seller as unknown as User,
     );
 
     res.set({

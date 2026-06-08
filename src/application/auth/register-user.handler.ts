@@ -16,7 +16,8 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<User> {
-    const { username, name, lastName, email, password, cedula, roles } = command;
+    const { username, name, lastName, email, password, cedula, roles } =
+      command;
 
     const passwordValidation = this.passwordService.validateStrength(password);
     if (!passwordValidation.valid) {

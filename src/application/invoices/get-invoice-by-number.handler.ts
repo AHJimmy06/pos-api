@@ -14,9 +14,7 @@ import {
 } from '../dto/invoices/get-invoice-by-number.dto';
 
 @QueryHandler(GetInvoiceByNumberQuery)
-export class GetInvoiceByNumberHandler
-  implements IQueryHandler<GetInvoiceByNumberQuery>
-{
+export class GetInvoiceByNumberHandler implements IQueryHandler<GetInvoiceByNumberQuery> {
   constructor(
     @Inject(TOKENS.INVOICE_REPOSITORY)
     private readonly invoiceRepository: IInvoiceRepository,
@@ -30,9 +28,9 @@ export class GetInvoiceByNumberHandler
     query: GetInvoiceByNumberQuery,
   ): Promise<InvoiceReconstructionDto> {
     // Buscar invoice por invoiceNumber
-    const invoice = await (
-      this.invoiceRepository as any
-    ).findByInvoiceNumber(query.invoiceNumber);
+    const invoice = await this.invoiceRepository.findByInvoiceNumber(
+      query.invoiceNumber,
+    );
 
     if (!invoice) {
       throw new NotFoundException(
@@ -42,25 +40,24 @@ export class GetInvoiceByNumberHandler
 
     // Obtener cliente y vendedor
     const client = invoice.clientId
-      ? await this.clientRepository.findById(invoice.clientId)
+      ? await this.clientRepository.findById(Number(invoice.clientId))
       : null;
 
     const seller = invoice.userId
-      ? await this.userRepository.findById(invoice.userId)
+      ? await this.userRepository.findById(Number(invoice.userId))
       : null;
 
     // Mapear detalles con taxes
-    const details: InvoiceDetailDto[] = (invoice.details || []).map(
+    const details: InvoiceDetailDto[] = ((invoice.details as any[]) || []).map(
       (detail: any) => {
-        const taxes: InvoiceDetailTaxDto[] = (detail.detailTaxes || []).map(
-          (dt: any) => ({
-            taxId: dt.taxId,
-            taxName: dt.tax?.name || 'Unknown',
-            rateSnapshot: Number(dt.rateSnapshot) || 0,
-            calculatedAmountSnapshot:
-              Number(dt.calculatedAmountSnapshot) || 0,
-          }),
-        );
+        const taxes: InvoiceDetailTaxDto[] = (
+          (detail.detailTaxes as any[]) || []
+        ).map((dt: any) => ({
+          taxId: dt.taxId,
+          taxName: dt.tax?.name || 'Unknown',
+          rateSnapshot: Number(dt.rateSnapshot) || 0,
+          calculatedAmountSnapshot: Number(dt.calculatedAmountSnapshot) || 0,
+        }));
 
         const unitPrice = Number(detail.unitPriceSnapshot) || 0;
         const quantity = detail.quantity || 0;
@@ -111,6 +108,10 @@ export class GetInvoiceByNumberHandler
       subtotalSnapshot: Number(invoice.subtotalSnapshot) || 0,
       taxTotalSnapshot: Number(invoice.taxTotalSnapshot) || 0,
       totalSnapshot: Number(invoice.totalSnapshot) || 0,
+      clientNameSnapshot: invoice.clientNameSnapshot,
+      clientEmailSnapshot: invoice.clientEmailSnapshot,
+      sellerNameSnapshot: invoice.sellerNameSnapshot,
+      parentInvoiceId: invoice.parentInvoiceId,
       client: clientInfo,
       seller: sellerInfo,
       details,

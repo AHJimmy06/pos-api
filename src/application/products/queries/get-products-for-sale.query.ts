@@ -1,5 +1,3 @@
-import { IProductRepository } from '../../common/interfaces/product.repository.interface';
-
 export class GetProductsForSaleQuery {
   constructor(
     public readonly page: number = 1,

@@ -13,6 +13,7 @@ import { StockMovement } from '../../domain/entities/stock-movement.entity';
 import { BusinessException } from '../../domain/exceptions/business.exception';
 import { InvoiceStatus } from '../../domain/enums/invoice-status.enum';
 import { MovementType } from '../../domain/enums/movement-type.enum';
+import { IUserRepository } from '../common/interfaces/user.repository.interface';
 import { TOKENS } from '../common/tokens/tokens';
 
 @CommandHandler(CreateInvoiceCommand)
@@ -28,6 +29,8 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
     private readonly taxRepository: ITaxRepository,
     @Inject(TOKENS.STOCK_MOVEMENT_REPOSITORY)
     private readonly stockMovementRepository: IStockMovementRepository,
+    @Inject(TOKENS.USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
     @Inject(TOKENS.UNIT_OF_WORK)
     private readonly uow: IUnitOfWork,
   ) {}
@@ -48,6 +51,8 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
       if (!client) {
         throw new NotFoundException(`Client with ID ${clientId} not found`);
       }
+
+      const seller = userId ? await this.userRepository.findById(userId) : null;
 
       // Validar productos duplicados en el detalle
       const productIds = items.map((i) => i.productId);
@@ -77,6 +82,13 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
       const invoice = new Invoice(clientId);
       invoice.userId = userId;
       invoice.status = status || InvoiceStatus.CONFIRMED;
+
+      // Guardar Snapshots de Cliente y Vendedor
+      invoice.clientNameSnapshot = `${client.firstName} ${client.lastName}`;
+      invoice.clientEmailSnapshot = client.email;
+      if (seller) {
+        invoice.sellerNameSnapshot = `${seller.name} ${seller.lastName}`;
+      }
 
       for (const item of items) {
         const productData = productMap.get(item.productId);

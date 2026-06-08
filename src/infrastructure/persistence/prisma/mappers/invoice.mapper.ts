@@ -29,6 +29,11 @@ export class InvoiceMapper {
     invoice.paymentMethod = prismaInvoice.paymentMethod as PaymentMethod;
     invoice.isActive = prismaInvoice.isActive ?? true;
     invoice.version = prismaInvoice.version ?? 0;
+    invoice.clientNameSnapshot = prismaInvoice.clientNameSnapshot || undefined;
+    invoice.clientEmailSnapshot =
+      prismaInvoice.clientEmailSnapshot || undefined;
+    invoice.sellerNameSnapshot = prismaInvoice.sellerNameSnapshot || undefined;
+    invoice.parentInvoiceId = prismaInvoice.parentInvoiceId || undefined;
 
     if (
       prismaInvoice.subtotalSnapshot !== null &&
@@ -83,6 +88,10 @@ export class InvoiceMapper {
       paymentMethod: entity.paymentMethod,
       isActive: entity.isActive,
       version: entity.version,
+      clientNameSnapshot: entity.clientNameSnapshot || null,
+      clientEmailSnapshot: entity.clientEmailSnapshot || null,
+      sellerNameSnapshot: entity.sellerNameSnapshot || null,
+      parentInvoiceId: entity.parentInvoiceId || null,
       details: {
         create: entity.details.map((detail) => ({
           productId: detail.productId,

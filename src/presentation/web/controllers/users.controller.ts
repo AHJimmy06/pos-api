@@ -107,6 +107,7 @@ export class UsersController {
     return this.commandBus.execute(
       new UpdateUserCommand(
         id,
+        dto.username,
         dto.name,
         dto.lastName,
         dto.email,

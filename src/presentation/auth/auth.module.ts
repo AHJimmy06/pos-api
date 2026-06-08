@@ -12,12 +12,18 @@ import { RolesGuard } from '../../infrastructure/security/guards/roles.guard';
 import { LoginHandler } from '../../application/auth/login.handler';
 import { RegisterUserHandler } from '../../application/auth/register-user.handler';
 import { UnlockUserHandler } from '../../application/auth/unlock-user.handler';
+import { GetCurrentUserHandler } from '../../application/auth/get-current-user.handler';
 import { PrismaUserRepository } from '../../infrastructure/persistence/prisma/repositories/user.repository';
 import { PrismaRoleRepository } from '../../infrastructure/persistence/prisma/repositories/role.repository';
 import { PrismaBlockedUserRepository } from '../../infrastructure/persistence/prisma/repositories/blocked-user.repository';
 import { TOKENS } from '../../application/common/tokens/tokens';
 
-const AuthHandlers = [LoginHandler, RegisterUserHandler, UnlockUserHandler];
+const AuthHandlers = [
+  LoginHandler,
+  RegisterUserHandler,
+  UnlockUserHandler,
+  GetCurrentUserHandler,
+];
 
 @Module({
   imports: [

@@ -43,6 +43,10 @@ describe('CreateInvoiceHandler (Optimization Verification)', () => {
           provide: TOKENS.STOCK_MOVEMENT_REPOSITORY,
           useValue: { create: jest.fn() },
         },
+        {
+          provide: TOKENS.USER_REPOSITORY,
+          useValue: { findById: jest.fn().mockResolvedValue(null) },
+        },
         { provide: TOKENS.UNIT_OF_WORK, useValue: uow },
       ],
     }).compile();

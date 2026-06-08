@@ -133,6 +133,12 @@ model Invoice {
   paymentMethod    PaymentMethod   @default(CASH) @map("payment_method")
   isActive         Boolean         @default(true) @map("is_active")
   version          Int             @default(0)
+  clientNameSnapshot String?       @map("client_name_snapshot") @db.VarChar(255)
+  clientEmailSnapshot String?      @map("client_email_snapshot") @db.VarChar(255)
+  sellerNameSnapshot String?        @map("seller_name_snapshot") @db.VarChar(255)
+  parentInvoiceId  Int?            @map("parent_invoice_id")
+  parentInvoice    Invoice?        @relation("InvoiceRevisions", fields: [parentInvoiceId], references: [id])
+  revisions        Invoice[]       @relation("InvoiceRevisions")
   client           Client?         @relation(fields: [clientId], references: [id])
   user             User?           @relation(fields: [userId], references: [id])
   details          InvoiceDetail[]

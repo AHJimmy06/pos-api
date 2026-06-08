@@ -1,15 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RegisterUserHandler } from './register-user.handler';
-import { RegisterUserCommand } from './register-user.command';
-import { ConflictException, BadRequestException } from '@nestjs/common';
-import { IUserRepository } from '../common/interfaces/user.repository.interface';
-import type { IPasswordService } from '../common/interfaces/password-service.interface';
+import { BadRequestException } from '@nestjs/common';
 import { User } from '../../domain/entities/user.entity';
 
 describe('RegisterUserHandler', () => {
   let handler: RegisterUserHandler;
-  let mockUserRepository: jest.MockedPartial<IUserRepository>;
-  let mockPasswordService: jest.MockedPartial<IPasswordService>;
+  let mockUserRepository: Record<string, jest.Mock>;
+  let mockPasswordService: Record<string, jest.Mock>;
 
   beforeEach(async () => {
     mockUserRepository = {
@@ -54,20 +51,20 @@ describe('RegisterUserHandler', () => {
       cedula: '12345678',
       isActive: true,
       roles: [],
-    } as unknown as User);
+    }) as unknown as User;
 
   // ─── TRIANGULATE: Valid registration ───────────────────────────────────────
 
   describe('TRIANGULATE: valid registration', () => {
     it('should register a user with valid data and valid password', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: true,
         errors: [],
       });
-      mockUserRepository.existsByEmail!.mockResolvedValue(false);
-      mockUserRepository.existsByUsername!.mockResolvedValue(false);
-      mockPasswordService.hash!.mockResolvedValue('hashedpassword');
-      mockUserRepository.create!.mockResolvedValue(createMockUser());
+      mockUserRepository.existsByEmail.mockResolvedValue(false);
+      mockUserRepository.existsByUsername.mockResolvedValue(false);
+      mockPasswordService.hash.mockResolvedValue('hashedpassword');
+      mockUserRepository.create.mockResolvedValue(createMockUser());
 
       const result = await handler.execute(validCommand);
 
@@ -79,17 +76,17 @@ describe('RegisterUserHandler', () => {
     });
 
     it('should accept cedula with V prefix', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: true,
         errors: [],
       });
-      mockUserRepository.existsByEmail!.mockResolvedValue(false);
-      mockUserRepository.existsByUsername!.mockResolvedValue(false);
-      mockPasswordService.hash!.mockResolvedValue('hashedpassword');
-      mockUserRepository.create!.mockResolvedValue({
+      mockUserRepository.existsByEmail.mockResolvedValue(false);
+      mockUserRepository.existsByUsername.mockResolvedValue(false);
+      mockPasswordService.hash.mockResolvedValue('hashedpassword');
+      mockUserRepository.create.mockResolvedValue({
         ...createMockUser(),
         cedula: 'V12345678',
-      } as unknown as User);
+      });
 
       const command = { ...validCommand, cedula: 'V12345678' };
       const result = await handler.execute(command);
@@ -98,14 +95,17 @@ describe('RegisterUserHandler', () => {
     });
 
     it('should accept cedula without V prefix', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: true,
         errors: [],
       });
-      mockUserRepository.existsByEmail!.mockResolvedValue(false);
-      mockUserRepository.existsByUsername!.mockResolvedValue(false);
-      mockPasswordService.hash!.mockResolvedValue('hashedpassword');
-      mockUserRepository.create!.mockResolvedValue(createMockUser());
+      mockUserRepository.existsByEmail.mockResolvedValue(false);
+      mockUserRepository.existsByUsername.mockResolvedValue(false);
+      mockPasswordService.hash.mockResolvedValue('hashedpassword');
+      mockUserRepository.create.mockResolvedValue({
+        ...createMockUser(),
+        cedula: '1234567890',
+      });
 
       const command = { ...validCommand, cedula: '1234567890' };
       const result = await handler.execute(command);
@@ -118,7 +118,7 @@ describe('RegisterUserHandler', () => {
 
   describe('PASSWORD STRENGTH ENFORCEMENT', () => {
     it('should reject password without uppercase letter', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: false,
         errors: ['Password must contain at least 1 uppercase letter'],
       });
@@ -129,7 +129,7 @@ describe('RegisterUserHandler', () => {
     });
 
     it('should reject password without special character', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: false,
         errors: [
           'Password must contain at least 1 special character (@$!%*?&)',
@@ -142,7 +142,7 @@ describe('RegisterUserHandler', () => {
     });
 
     it('should reject password shorter than 8 chars', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: false,
         errors: ['Password must be 8-10 characters'],
       });
@@ -153,7 +153,7 @@ describe('RegisterUserHandler', () => {
     });
 
     it('should reject password longer than 10 chars', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: false,
         errors: ['Password must be 8-10 characters'],
       });
@@ -164,7 +164,7 @@ describe('RegisterUserHandler', () => {
     });
 
     it('should collect multiple violations in error message', async () => {
-      mockPasswordService.validateStrength!.mockReturnValue({
+      mockPasswordService.validateStrength.mockReturnValue({
         valid: false,
         errors: [
           'Password must contain at least 1 uppercase letter',

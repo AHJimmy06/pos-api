@@ -5,6 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Get,
+  Req,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -12,10 +14,12 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import type { Request } from 'express';
 import { LoginDto, RegisterUserDto } from '../../../application/dto';
 import { LoginCommand } from '../../../application/auth/login.command';
 import { RegisterUserCommand } from '../../../application/auth/register-user.command';
+import { GetCurrentUserQuery } from '../../../application/auth/get-current-user.query';
 import { User } from '../../../domain/entities/user.entity';
 import { JwtAuthGuard } from '../../../infrastructure/security/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../infrastructure/security/guards/roles.guard';
@@ -25,7 +29,10 @@ import { UserRole } from '../../../domain/enums/user-role.enum';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -39,6 +46,25 @@ export class AuthController {
     return this.commandBus.execute(
       new LoginCommand(loginDto.email, loginDto.password),
     );
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get current authenticated user' })
+  @ApiResponse({ status: 200, description: 'Current user payload' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getMe(@Req() req: Request & { user?: { id: number } }): Promise<{
+    id: number;
+    username: string;
+    name: string;
+    lastName: string;
+    email: string;
+    cedula: string | null;
+    isActive: boolean;
+    roles: UserRole[];
+  }> {
+    return this.queryBus.execute(new GetCurrentUserQuery(req.user!.id));
   }
 
   @Post('register')

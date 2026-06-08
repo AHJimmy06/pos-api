@@ -42,6 +42,10 @@ export interface InvoiceReconstructionDto {
   subtotalSnapshot: number;
   taxTotalSnapshot: number;
   totalSnapshot: number;
+  clientNameSnapshot?: string;
+  clientEmailSnapshot?: string;
+  sellerNameSnapshot?: string;
+  parentInvoiceId?: number;
   client: ClientInfoDto | null;
   seller: SellerInfoDto | null;
   details: InvoiceDetailDto[];

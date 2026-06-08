@@ -27,6 +27,15 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
       }
     }
 
+    if (data.username && data.username !== user.username) {
+      const usernameExists = await this.userRepository.existsByUsername(
+        data.username,
+      );
+      if (usernameExists) {
+        throw new ConflictException('Username already taken');
+      }
+    }
+
     return this.userRepository.update(id, data);
   }
 }

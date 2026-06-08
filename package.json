@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "npm run lint || true && npm run format && nest build",
+    "build": "npm run lint && npm run format && npx nest build",
     "infra": "docker-compose up -d",
     "infra:down": "docker-compose down",
     "dev": "npm run infra && npm run start:dev",

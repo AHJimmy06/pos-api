@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsString,
   IsArray,
+  IsEnum,
   Length,
   Matches,
 } from 'class-validator';
@@ -26,11 +27,16 @@ export class RegisterUserDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ example: 'V-12345678', description: ' Ecuadorian ID: optional V prefix + 8-10 digits', required: false })
+  @ApiProperty({
+    example: 'V-12345678',
+    description: ' Ecuadorian ID: optional V prefix + 8-10 digits',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   @Matches(/^V?\d{8,10}$/, {
-    message: 'Cédula must be 8-10 digits, optional V prefix (e.g. 12345678 or V12345678)',
+    message:
+      'Cédula must be 8-10 digits, optional V prefix (e.g. 12345678 or V12345678)',
   })
   cedula?: string;
 
@@ -63,6 +69,6 @@ export class RegisterUserDto {
   })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  roles?: string[];
+  @IsEnum(UserRole, { each: true })
+  roles?: UserRole[];
 }

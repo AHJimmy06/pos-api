@@ -4,11 +4,16 @@ import { Inject, NotFoundException } from '@nestjs/common';
 import { IInvoiceRepository } from '../common/interfaces/invoice.repository.interface';
 import { IProductRepository } from '../common/interfaces/product.repository.interface';
 import { ITaxRepository } from '../common/interfaces/tax.repository.interface';
+import { IClientRepository } from '../common/interfaces/client.repository.interface';
+import { IUserRepository } from '../common/interfaces/user.repository.interface';
+import { IStockMovementRepository } from '../common/interfaces/stock-movement.repository.interface';
 import { IUnitOfWork } from '../common/interfaces/unit-of-work.interface';
 import { Invoice } from '../../domain/entities/invoice.entity';
 import { InvoiceDetail } from '../../domain/entities/invoice-detail.entity';
+import { StockMovement } from '../../domain/entities/stock-movement.entity';
 import { BusinessException } from '../../domain/exceptions/business.exception';
 import { InvoiceStatus } from '../../domain/enums/invoice-status.enum';
+import { MovementType } from '../../domain/enums/movement-type.enum';
 import { TOKENS } from '../common/tokens/tokens';
 
 @CommandHandler(UpdateInvoiceCommand)
@@ -16,106 +21,184 @@ export class UpdateInvoiceHandler implements ICommandHandler<UpdateInvoiceComman
   constructor(
     @Inject(TOKENS.INVOICE_REPOSITORY)
     private readonly invoiceRepository: IInvoiceRepository,
+    @Inject(TOKENS.CLIENT_REPOSITORY)
+    private readonly clientRepository: IClientRepository,
     @Inject(TOKENS.PRODUCT_REPOSITORY)
     private readonly productRepository: IProductRepository,
     @Inject(TOKENS.TAX_REPOSITORY)
     private readonly taxRepository: ITaxRepository,
+    @Inject(TOKENS.USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
+    @Inject(TOKENS.STOCK_MOVEMENT_REPOSITORY)
+    private readonly stockMovementRepository: IStockMovementRepository,
     @Inject(TOKENS.UNIT_OF_WORK)
     private readonly uow: IUnitOfWork,
   ) {}
 
   async execute(command: UpdateInvoiceCommand): Promise<Invoice> {
     return this.uow.runInTransaction(async () => {
-      const { id, clientId, items } = command;
+      const { id, clientId, items, userId } = command;
 
-      const invoice = await this.invoiceRepository.findByIdWithDetails(id);
-      if (!invoice) {
+      const oldInvoice = await this.invoiceRepository.findByIdWithDetails(id);
+      if (!oldInvoice) {
         throw new NotFoundException(`Invoice with ID ${id} not found`);
       }
 
-      // Validar que la factura esté en estado DRAFT
-      if (invoice.status !== InvoiceStatus.DRAFT) {
+      // Validar que la factura no esté ya cancelada
+      if (oldInvoice.status === InvoiceStatus.CANCELLED) {
         throw new BusinessException(
-          'Invoice is not in a modifiable state',
-          'INVOICE_NOT_MODIFIABLE',
+          'Cannot modify a cancelled invoice',
+          'INVOICE_ALREADY_CANCELLED',
         );
       }
 
-      // Actualizar clientId si se proporciona
-      if (clientId !== undefined) {
-        invoice.clientId = clientId;
-      }
-
-      // Actualizar items si se proporcionan
-      if (items && items.length > 0) {
-        // Limpiar detalles existentes
-        invoice.clearDetails();
-
-        // Validar productos duplicados
-        const productIds = items.map((i) => i.productId);
-        const uniqueProductIds = new Set(productIds);
-        if (uniqueProductIds.size !== productIds.length) {
-          throw new BusinessException(
-            'Duplicate products found in invoice details',
-            'DUPLICATE_PRODUCTS',
+      // 1. Restaurar stock de la factura vieja si estaba CONFIRMADA
+      if (oldInvoice.status === InvoiceStatus.CONFIRMED) {
+        for (const detail of oldInvoice.details) {
+          const product = await this.productRepository.findById(
+            detail.productId,
           );
-        }
+          if (product) {
+            await this.productRepository.addStock({
+              productId: detail.productId,
+              quantity: detail.quantity,
+              expectedVersion: product.version,
+            });
 
-        // 1. Batch fetching de Productos e Impuestos
-        const productsData = await this.productRepository.findByIds([
-          ...uniqueProductIds,
-        ]);
-        const productMap = new Map(productsData.map((p) => [p.id, p]));
-
-        const allTaxIds = new Set<number>();
-        items.forEach((item) => {
-          if (item.taxes) item.taxes.forEach((t) => allTaxIds.add(t.taxId));
-          if (item.impuestoIds)
-            item.impuestoIds.forEach((id) => allTaxIds.add(id));
-        });
-        const taxesData = await this.taxRepository.findByIds([...allTaxIds]);
-        const taxMap = new Map(taxesData.map((t) => [t.id, t]));
-
-        // Procesar cada item
-        for (const item of items) {
-          const productData = productMap.get(item.productId);
-          if (!productData) {
-            throw new NotFoundException(
-              `Product with ID ${item.productId} not found`,
+            await this.stockMovementRepository.create(
+              new StockMovement({
+                productId: detail.productId,
+                type: MovementType.ENTRY,
+                quantity: detail.quantity,
+                previousStock: product.stock,
+                newStock: product.stock + detail.quantity,
+                userId: userId,
+                reference: `Revisión de factura #${oldInvoice.id} - Anulación de stock previo`,
+              }),
             );
           }
-
-          const unitPrice = item.unitPrice ?? Number(productData.price);
-          const detail = new InvoiceDetail(
-            productData.id,
-            item.quantity,
-            unitPrice,
-          );
-          detail.productName = item.productName || productData.name;
-
-          if (item.taxes && item.taxes.length > 0) {
-            for (const t of item.taxes) {
-              detail.addTax(t.taxId, t.rate);
-              const lastTax = detail.detailTaxes[detail.detailTaxes.length - 1];
-              lastTax.calculatedAmountSnapshot = t.calculatedAmount;
-            }
-          } else if (item.impuestoIds && item.impuestoIds.length > 0) {
-            for (const taxId of item.impuestoIds) {
-              const tax = taxMap.get(taxId);
-              if (tax) {
-                detail.addTax(tax.id, Number(tax.currentRate));
-              }
-            }
-          }
-
-          invoice.addDetail(detail);
         }
       }
 
-      // Los snapshots se recalculan automáticamente a través de los getters
-      // ya que clearDetails() y addDetail() actualizan this.details
+      // 2. Cancelar la factura vieja
+      oldInvoice.status = InvoiceStatus.CANCELLED;
+      oldInvoice.isActive = false;
+      await this.invoiceRepository.update(oldInvoice.id!, oldInvoice);
 
-      return this.invoiceRepository.update(id, invoice);
+      // 3. Crear la NUEVA factura (revisión)
+      const finalClientId = clientId ?? oldInvoice.clientId;
+      const client = await this.clientRepository.findById(finalClientId);
+      if (!client) {
+        throw new NotFoundException(
+          `Client with ID ${finalClientId} not found`,
+        );
+      }
+
+      const seller = userId ? await this.userRepository.findById(userId) : null;
+
+      const newInvoice = new Invoice(finalClientId);
+      newInvoice.userId = userId;
+      newInvoice.status = InvoiceStatus.CONFIRMED; // La nueva se crea confirmada por defecto si es una modificación
+      newInvoice.parentInvoiceId = oldInvoice.id;
+      newInvoice.paymentMethod = oldInvoice.paymentMethod;
+
+      // Snapshots
+      newInvoice.clientNameSnapshot = `${client.firstName} ${client.lastName}`;
+      newInvoice.clientEmailSnapshot = client.email;
+      if (seller) {
+        newInvoice.sellerNameSnapshot = `${seller.name} ${seller.lastName}`;
+      }
+
+      // Procesar items para la nueva factura
+      const itemsToProcess =
+        items && items.length > 0
+          ? items
+          : oldInvoice.details.map((d) => ({
+              productId: d.productId,
+              quantity: d.quantity,
+              unitPrice: d.unitPriceSnapshot,
+              productName: d.productName,
+            }));
+
+      // Validar productos duplicados
+      const productIds = itemsToProcess.map((i) => i.productId);
+      const uniqueProductIds = new Set(productIds);
+      if (uniqueProductIds.size !== productIds.length) {
+        throw new BusinessException(
+          'Duplicate products found in invoice details',
+          'DUPLICATE_PRODUCTS',
+        );
+      }
+
+      // Fetch batch de productos e impuestos
+      const productsData = await this.productRepository.findByIds(
+        Array.from(uniqueProductIds) as number[],
+      );
+      const productMap = new Map(productsData.map((p) => [p.id, p]));
+
+      // Procesar cada item
+      for (const item of itemsToProcess) {
+        const productData = productMap.get(item.productId);
+        if (!productData) {
+          throw new NotFoundException(
+            `Product with ID ${item.productId} not found`,
+          );
+        }
+
+        // Reducir stock para la nueva factura
+        if (productData.stock < item.quantity) {
+          throw new BusinessException(
+            `Stock insuficiente para producto ${item.productId}. Disponible: ${productData.stock}, solicitado: ${item.quantity}`,
+          );
+        }
+
+        const success = await this.productRepository.reduceStock({
+          productId: item.productId,
+          quantity: item.quantity,
+          expectedVersion: productData.version,
+        });
+
+        if (!success) {
+          throw new BusinessException(
+            `Error de concurrencia para producto ${item.productId}. Reintente.`,
+          );
+        }
+
+        // Registrar movimiento de stock
+        await this.stockMovementRepository.create(
+          new StockMovement({
+            productId: item.productId,
+            type: MovementType.EXIT,
+            quantity: item.quantity,
+            previousStock: productData.stock,
+            newStock: productData.stock - item.quantity,
+            userId: userId,
+            reference: `Modificación de factura #${oldInvoice.id} -> Nueva factura #${newInvoice.transactionId}`,
+          }),
+        );
+
+        const detail = new InvoiceDetail(
+          productData.id,
+          item.quantity,
+          item.unitPrice ?? Number(productData.price),
+        );
+        detail.productName = item.productName || productData.name;
+
+        // Copiar o agregar impuestos (simplificado: re-asigna desde producto si no se proveen)
+        // En una implementación real, podrías querer copiar los taxes del snapshot original o buscar los actuales.
+        // Aquí buscaremos los actuales por simplicidad.
+        // Only user-provided items carry tax IDs; the snapshot fallback path doesn't.
+        const taxIds: number[] =
+          'impuestoIds' in item ? (item.impuestoIds ?? []) : [];
+        if (taxIds.length > 0) {
+          const taxes = await this.taxRepository.findByIds(taxIds);
+          taxes.forEach((t) => detail.addTax(t.id, Number(t.currentRate)));
+        }
+
+        newInvoice.addDetail(detail);
+      }
+
+      return this.invoiceRepository.create(newInvoice);
     });
   }
 }
