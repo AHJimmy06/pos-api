@@ -24,5 +24,5 @@ RUN npm run build
 # 8. Informamos el puerto que usará el contenedor (NestJS usa el 3000 por defecto)
 EXPOSE 3000
 
-# 9. Comando de arranque en producción: Sincroniza el esquema con Supabase y levanta la API
-CMD ["sh", "-x", "-c", "npx prisma db push && npm run start:prod"]
+# Ejecuta la sincronización de Prisma y arranca el archivo en su nueva ubicación
+CMD ["sh", "-x", "-c", "npx prisma db push && node dist/src/main"]
