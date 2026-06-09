@@ -59,7 +59,8 @@ describe('UpdateClientDto', () => {
     });
 
     const cedulaError = errors.find(
-      (e) => e.property === 'cedula' || e.property === dtoShape.cedula?.toString(),
+      (e) =>
+        e.property === 'cedula' || e.property === dtoShape.cedula?.toString(),
     );
     expect(cedulaError).toBeDefined();
     expect(cedulaError?.constraints?.whitelistValidation).toBe(

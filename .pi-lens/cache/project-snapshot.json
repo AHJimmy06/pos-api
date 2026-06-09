@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "projectRoot": "C:/Users/JIMMY/Desktop/PROYECTOS/PATRONES DE SOFTWARE/pos-api",
+  "generatedAt": "2026-06-09T12:36:28.898Z",
+  "seq": 0,
+  "files": {},
+  "symbols": {},
+  "reverseDeps": {},
+  "cachedExports": [],
+  "projectRulesScan": {
+    "rules": [],
+    "hasCustomRules": false
+  },
+  "startupScan": {
+    "cwd": "C:\\Users\\JIMMY\\Desktop\\PROYECTOS\\PATRONES DE SOFTWARE\\pos-api",
+    "scanRoot": "C:\\Users\\JIMMY\\Desktop\\PROYECTOS\\PATRONES DE SOFTWARE\\pos-api",
+    "projectRoot": "C:\\Users\\JIMMY\\Desktop\\PROYECTOS\\PATRONES DE SOFTWARE\\pos-api",
+    "canWarmCaches": true,
+    "sourceFileCount": 201
+  },
+  "languageProfile": {
+    "present": {
+      "jsts": true,
+      "python": false,
+      "go": false,
+      "rust": false,
+      "cxx": false,
+      "cmake": false,
+      "fish": false,
+      "shell": false,
+      "json": false,
+      "markdown": false,
+      "css": false,
+      "yaml": false,
+      "sql": false,
+      "ruby": false,
+      "html": false,
+      "docker": false,
+      "php": false,
+      "powershell": false,
+      "prisma": true,
+      "csharp": false,
+      "fsharp": false,
+      "java": false,
+      "kotlin": false,
+      "swift": false,
+      "dart": false,
+      "lua": false,
+      "zig": false,
+      "haskell": false,
+      "elixir": false,
+      "gleam": false,
+      "ocaml": false,
+      "clojure": false,
+      "terraform": false,
+      "nix": false,
+      "toml": false
+    },
+    "configured": {
+      "jsts": true,
+      "prisma": true
+    },
+    "counts": {
+      "jsts": 202
+    },
+    "detectedKinds": [
+      "jsts",
+      "prisma"
+    ]
+  },
+  "conventions": {
+    "frameworks": [],
+    "testRunners": [],
+    "buildTools": [],
+    "agentDocs": []
+  }
+}

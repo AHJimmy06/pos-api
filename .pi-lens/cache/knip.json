@@ -3,16 +3,6 @@
   "issues": [
     {
       "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
-    },
-    {
-      "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
-    },
-    {
-      "type": "file",
       "name": "test/app.e2e-spec.ts",
       "file": "test/app.e2e-spec.ts"
     },
@@ -23,33 +13,108 @@
     },
     {
       "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
+      "name": "src/application/auth/index.ts",
+      "file": "src/application/auth/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
+      "name": "src/application/clients/index.ts",
+      "file": "src/application/clients/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/invoices/queries/index.ts",
-      "file": "src/application/invoices/queries/index.ts"
+      "name": "src/application/invoices/index.ts",
+      "file": "src/application/invoices/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/products/commands/index.ts",
-      "file": "src/application/products/commands/index.ts"
+      "name": "src/application/products/index.ts",
+      "file": "src/application/products/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/commands/index.ts",
-      "file": "src/application/taxes/commands/index.ts"
+      "name": "src/application/taxes/index.ts",
+      "file": "src/application/taxes/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/queries/index.ts",
-      "file": "src/application/taxes/queries/index.ts"
+      "name": "src/application/users/index.ts",
+      "file": "src/application/users/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/queries/get-products-for-sale.query.ts",
+      "file": "src/application/products/queries/get-products-for-sale.query.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/auth/dto/login.dto.ts",
+      "file": "src/presentation/auth/dto/login.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/auth/dto/register-user.dto.ts",
+      "file": "src/presentation/auth/dto/register-user.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/clients/dto/create-client.dto.ts",
+      "file": "src/presentation/clients/dto/create-client.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/clients/dto/update-client.dto.ts",
+      "file": "src/presentation/clients/dto/update-client.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/common/dto/delete-result.dto.ts",
+      "file": "src/presentation/common/dto/delete-result.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/invoices/dto/change-invoice-status.dto.ts",
+      "file": "src/presentation/invoices/dto/change-invoice-status.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/invoices/dto/create-invoice.dto.ts",
+      "file": "src/presentation/invoices/dto/create-invoice.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/invoices/dto/update-invoice.dto.ts",
+      "file": "src/presentation/invoices/dto/update-invoice.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/products/dto/create-product.dto.ts",
+      "file": "src/presentation/products/dto/create-product.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/products/dto/update-product.dto.ts",
+      "file": "src/presentation/products/dto/update-product.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/taxes/dto/create-tax.dto.ts",
+      "file": "src/presentation/taxes/dto/create-tax.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/taxes/dto/update-tax.dto.ts",
+      "file": "src/presentation/taxes/dto/update-tax.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/users/dto/assign-roles.dto.ts",
+      "file": "src/presentation/users/dto/assign-roles.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/users/dto/update-user.dto.ts",
+      "file": "src/presentation/users/dto/update-user.dto.ts"
     },
     {
       "type": "dependency",
@@ -95,54 +160,44 @@
     },
     {
       "type": "export",
+      "name": "IsEcuadorianCedulaConstraint",
+      "file": "src/application/common/validators/is-ecuadorian-cedula.validator.ts",
+      "line": 47
+    },
+    {
+      "type": "export",
       "name": "isValidPageSize",
-      "file": "src/infrastructure/common/utils/page-size.util.ts",
+      "file": "src/infrastructure/web-common/utils/page-size.util.ts",
       "line": 27
     },
     {
       "type": "export",
-      "name": "GetProductsForSaleHandler",
-      "file": "src/application/products/queries/get-products-for-sale.query.ts",
-      "line": 15
-    },
-    {
-      "type": "export",
       "name": "PasswordValidationResult",
-      "file": "src/domain/interfaces/password-service.interface.ts",
+      "file": "src/application/common/interfaces/password-service.interface.ts",
       "line": 10
     }
   ],
   "unusedExports": [
     {
       "type": "export",
+      "name": "IsEcuadorianCedulaConstraint",
+      "file": "src/application/common/validators/is-ecuadorian-cedula.validator.ts",
+      "line": 47
+    },
+    {
+      "type": "export",
       "name": "isValidPageSize",
-      "file": "src/infrastructure/common/utils/page-size.util.ts",
+      "file": "src/infrastructure/web-common/utils/page-size.util.ts",
       "line": 27
     },
     {
       "type": "export",
-      "name": "GetProductsForSaleHandler",
-      "file": "src/application/products/queries/get-products-for-sale.query.ts",
-      "line": 15
-    },
-    {
-      "type": "export",
       "name": "PasswordValidationResult",
-      "file": "src/domain/interfaces/password-service.interface.ts",
+      "file": "src/application/common/interfaces/password-service.interface.ts",
       "line": 10
     }
   ],
   "unusedFiles": [
-    {
-      "type": "file",
-      "name": "scratch/read-memories.js",
-      "file": "scratch/read-memories.js"
-    },
-    {
-      "type": "file",
-      "name": "prisma/seed-large.ts",
-      "file": "prisma/seed-large.ts"
-    },
     {
       "type": "file",
       "name": "test/app.e2e-spec.ts",
@@ -155,33 +210,108 @@
     },
     {
       "type": "file",
-      "name": "src/application/clients/commands/index.ts",
-      "file": "src/application/clients/commands/index.ts"
+      "name": "src/application/auth/index.ts",
+      "file": "src/application/auth/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/clients/queries/index.ts",
-      "file": "src/application/clients/queries/index.ts"
+      "name": "src/application/clients/index.ts",
+      "file": "src/application/clients/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/invoices/queries/index.ts",
-      "file": "src/application/invoices/queries/index.ts"
+      "name": "src/application/invoices/index.ts",
+      "file": "src/application/invoices/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/products/commands/index.ts",
-      "file": "src/application/products/commands/index.ts"
+      "name": "src/application/products/index.ts",
+      "file": "src/application/products/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/commands/index.ts",
-      "file": "src/application/taxes/commands/index.ts"
+      "name": "src/application/taxes/index.ts",
+      "file": "src/application/taxes/index.ts"
     },
     {
       "type": "file",
-      "name": "src/application/taxes/queries/index.ts",
-      "file": "src/application/taxes/queries/index.ts"
+      "name": "src/application/users/index.ts",
+      "file": "src/application/users/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/application/products/queries/get-products-for-sale.query.ts",
+      "file": "src/application/products/queries/get-products-for-sale.query.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/auth/dto/login.dto.ts",
+      "file": "src/presentation/auth/dto/login.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/auth/dto/register-user.dto.ts",
+      "file": "src/presentation/auth/dto/register-user.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/clients/dto/create-client.dto.ts",
+      "file": "src/presentation/clients/dto/create-client.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/clients/dto/update-client.dto.ts",
+      "file": "src/presentation/clients/dto/update-client.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/common/dto/delete-result.dto.ts",
+      "file": "src/presentation/common/dto/delete-result.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/invoices/dto/change-invoice-status.dto.ts",
+      "file": "src/presentation/invoices/dto/change-invoice-status.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/invoices/dto/create-invoice.dto.ts",
+      "file": "src/presentation/invoices/dto/create-invoice.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/invoices/dto/update-invoice.dto.ts",
+      "file": "src/presentation/invoices/dto/update-invoice.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/products/dto/create-product.dto.ts",
+      "file": "src/presentation/products/dto/create-product.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/products/dto/update-product.dto.ts",
+      "file": "src/presentation/products/dto/update-product.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/taxes/dto/create-tax.dto.ts",
+      "file": "src/presentation/taxes/dto/create-tax.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/taxes/dto/update-tax.dto.ts",
+      "file": "src/presentation/taxes/dto/update-tax.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/users/dto/assign-roles.dto.ts",
+      "file": "src/presentation/users/dto/assign-roles.dto.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/presentation/users/dto/update-user.dto.ts",
+      "file": "src/presentation/users/dto/update-user.dto.ts"
     }
   ],
   "unusedDeps": [
@@ -229,5 +359,5 @@
     }
   ],
   "unlistedDeps": [],
-  "summary": "Found 20 issues"
+  "summary": "Found 33 issues"
 }
