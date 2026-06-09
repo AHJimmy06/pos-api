@@ -16,6 +16,8 @@ COPY . .
 # 6. ¡CRUCIAL PARA PRISMA! Generamos el cliente para la arquitectura Linux del contenedor
 RUN npx prisma generate
 
+RUN npx prisma db seed
+
 # 7. Compilamos el código de TypeScript a JavaScript ejecutable
 RUN npm run build
 
