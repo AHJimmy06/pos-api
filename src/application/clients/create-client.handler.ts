@@ -13,10 +13,11 @@ export class CreateClientHandler implements ICommandHandler<CreateClientCommand>
   ) {}
 
   async execute(command: CreateClientCommand): Promise<Client> {
-    const { firstName, lastName, phone, address, email } = command;
+    const { firstName, lastName, phone, address, email, cedula } = command;
     const client = new Client(firstName, lastName, email);
     client.phone = phone;
     client.address = address;
+    client.cedula = cedula ?? null;
 
     return this.clientRepository.create(client);
   }

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEcuadorianCedula } from '../../common/validators/is-ecuadorian-cedula.validator';
 
 export class CreateClientDto {
   @ApiProperty({ example: 'Juan' })
@@ -11,6 +12,17 @@ export class CreateClientDto {
   @IsString()
   @IsNotEmpty()
   lastName: string;
+
+  @ApiProperty({
+    example: '1712345678',
+    description:
+      'Cédula ecuatoriana de 10 dígitos (con dígito verificador válido)',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
+  @IsEcuadorianCedula()
+  cedula: string;
 
   @ApiProperty({ example: '123456789' })
   @IsString()

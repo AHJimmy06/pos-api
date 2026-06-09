@@ -6,6 +6,7 @@ export class Client {
   private _firstName: Name;
   private _lastName: Name;
   private _email: Email;
+  cedula: string | null = null;
   phone: string = '';
   address: string = '';
   isActive: boolean = true;

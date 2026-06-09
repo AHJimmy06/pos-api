@@ -50,8 +50,12 @@ export class Invoice {
   get totalSnapshot(): number {
     const subtotalValue = this._subtotalSnapshot;
     const taxTotalValue = this._taxTotalSnapshot;
-    if (subtotalValue !== null && subtotalValue !== undefined &&
-        taxTotalValue !== null && taxTotalValue !== undefined) {
+    if (
+      subtotalValue !== null &&
+      subtotalValue !== undefined &&
+      taxTotalValue !== null &&
+      taxTotalValue !== undefined
+    ) {
       return subtotalValue + taxTotalValue;
     }
     return this.subtotalSnapshot + this.taxTotalSnapshot;

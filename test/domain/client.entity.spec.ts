@@ -45,4 +45,17 @@ describe('Client Entity', () => {
     client.updateEmail('jane.smith@example.com');
     expect(client.email).toBe('jane.smith@example.com');
   });
+
+  it('should default cedula to null', () => {
+    const client = new Client('John', 'Doe', 'john.doe@example.com');
+    expect(client.cedula).toBeNull();
+  });
+
+  it('should allow assigning cedula (write-once enforced at application layer)', () => {
+    const client = new Client('John', 'Doe', 'john.doe@example.com');
+    client.cedula = '30123456';
+    expect(client.cedula).toBe('30123456');
+    // La inmutabilidad de cedula se enforce en el DTO/handler/repository,
+    // no en el entity. Ver tests del DTO y del repository.
+  });
 });

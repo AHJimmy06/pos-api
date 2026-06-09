@@ -65,6 +65,7 @@ export class ClientsController {
         createClientDto.phone,
         createClientDto.address,
         createClientDto.email,
+        createClientDto.cedula ?? null,
       ),
     );
   }

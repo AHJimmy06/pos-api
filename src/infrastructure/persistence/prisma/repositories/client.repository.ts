@@ -106,6 +106,9 @@ export class PrismaClientRepository extends IClientRepository {
     client: Partial<ClientEntity>,
   ): Promise<ClientEntity> {
     try {
+      // Cedula es write-once: el repository NO la persiste en update,
+      // aunque el handler (o un caller futuro) la mande. Defensa en
+      // profundidad sobre la regla de dominio.
       const data: Prisma.ClientUpdateInput = {};
       if (client.firstName) data.firstName = client.firstName;
       if (client.lastName) data.lastName = client.lastName;

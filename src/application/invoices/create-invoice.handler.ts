@@ -118,7 +118,7 @@ export class CreateInvoiceHandler implements ICommandHandler<CreateInvoiceComman
             );
           }
 
-          // AuditorÃ­a: Registrar Movimiento de Stock
+          // Audit: register stock movement
           await this.stockMovementRepository.create(
             new StockMovement({
               productId: item.productId,

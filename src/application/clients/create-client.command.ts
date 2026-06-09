@@ -5,5 +5,6 @@ export class CreateClientCommand {
     public readonly phone: string,
     public readonly address: string,
     public readonly email: string,
+    public readonly cedula: string | null = null,
   ) {}
 }

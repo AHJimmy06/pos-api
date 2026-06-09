@@ -249,7 +249,7 @@ export class InvoicesController {
   }
 
   @Get('by-number/:invoiceNumber')
-  @Roles(UserRole.ADMINISTRATOR, UserRole.AUDITOR)
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({
     summary: 'Reconstruct an invoice by its invoice number (for audit)',
   })
@@ -261,7 +261,7 @@ export class InvoicesController {
   }
 
   @Get('by-number/:invoiceNumber/pdf')
-  @Roles(UserRole.ADMINISTRATOR, UserRole.AUDITOR)
+  @Roles(UserRole.ADMINISTRATOR)
   @ApiOperation({ summary: 'Export invoice PDF by invoice number (for audit)' })
   @ApiResponse({ status: 200, description: 'PDF generated' })
   @ApiResponse({ status: 404, description: 'Invoice not found' })

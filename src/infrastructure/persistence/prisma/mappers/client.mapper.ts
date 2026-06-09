@@ -9,6 +9,7 @@ export class ClientMapper {
       prismaClient.email || '',
     );
     entity.id = prismaClient.id;
+    entity.cedula = prismaClient.cedula ?? null;
     entity.phone = prismaClient.phone || '';
     entity.address = prismaClient.address || '';
     entity.isActive = prismaClient.isActive;
@@ -20,6 +21,7 @@ export class ClientMapper {
       firstName: entity.firstName,
       lastName: entity.lastName,
       email: entity.email,
+      cedula: entity.cedula,
       phone: entity.phone,
       address: entity.address,
       isActive: entity.isActive,
