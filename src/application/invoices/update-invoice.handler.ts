@@ -99,6 +99,7 @@ export class UpdateInvoiceHandler implements ICommandHandler<UpdateInvoiceComman
       const newInvoice = new Invoice(finalClientId);
       newInvoice.userId = userId;
       newInvoice.status = InvoiceStatus.CONFIRMED; // La nueva se crea confirmada por defecto si es una modificación
+      newInvoice.parentInvoiceId = oldInvoice.id;
       newInvoice.paymentMethod = oldInvoice.paymentMethod;
 
       // Snapshots
