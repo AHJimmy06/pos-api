@@ -15,7 +15,6 @@ export class Invoice {
   clientNameSnapshot?: string;
   clientEmailSnapshot?: string;
   sellerNameSnapshot?: string;
-  parentInvoiceId?: number;
   details: InvoiceDetail[] = [];
   private _subtotalSnapshot?: number;
   private _taxTotalSnapshot?: number;

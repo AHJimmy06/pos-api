@@ -45,7 +45,6 @@ function invoiceToPlain(invoice: Invoice): Record<string, unknown> {
     clientNameSnapshot: invoice.clientNameSnapshot,
     clientEmailSnapshot: invoice.clientEmailSnapshot,
     sellerNameSnapshot: invoice.sellerNameSnapshot,
-    parentInvoiceId: invoice.parentInvoiceId,
     // Include details so getters can calculate if snapshots are null
     details: invoice.details.map(detailToPlain),
   };
