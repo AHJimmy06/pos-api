@@ -1,43 +1,26 @@
-# Base image
-FROM node:22-alpine AS development
+# 1. Usamos una imagen ligera de Node.js para producción
+FROM node:18-alpine
 
-WORKDIR /usr/src/app
+# 2. Directorio de trabajo dentro del contenedor
+WORKDIR /app
 
+# 3. Copiamos los archivos de dependencias primero (aprovecha la caché de Docker)
 COPY package*.json ./
 
+# 4. Instalamos las dependencias del proyecto
 RUN npm install
 
+# 5. Copiamos todo el código fuente del backend
 COPY . .
 
+# 6. ¡CRUCIAL PARA PRISMA! Generamos el cliente para la arquitectura Linux del contenedor
 RUN npx prisma generate
 
-# Build stage
-FROM node:22-alpine AS build
-
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-COPY --from=development /usr/src/app/node_modules ./node_modules
-
-COPY . .
-
+# 7. Compilamos el código de TypeScript a JavaScript ejecutable
 RUN npm run build
 
-RUN npm prune --production
+# 8. Informamos el puerto que usará el contenedor (NestJS usa el 3000 por defecto)
+EXPOSE 3000
 
-# Production stage
-FROM node:22-alpine AS production
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-
-WORKDIR /usr/src/app
-
-COPY --from=build /usr/src/app/dist ./dist
-COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/package*.json ./
-COPY --from=build /usr/src/app/prisma ./prisma
-
-EXPOSE 3001
-
-CMD ["node", "dist/main"]
+# 9. Comando de arranque en producción: Sincroniza el esquema con Supabase y levanta la API
+CMD ["sh", "-x", "-c", "npx prisma db push && npm run start:prod"]
