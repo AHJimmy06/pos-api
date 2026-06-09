@@ -9,6 +9,16 @@ import {
 import { InvoiceStatus } from '../../../../domain/enums/invoice-status.enum';
 import { PaymentMethod } from '../../../../domain/enums/payment-method.enum';
 
+/**
+ * Shape de los snapshots serializados como JSON en `client_snapshot`
+ * y `seller_snapshot` de la tabla `invoices`. Solo se leen `name` y `email`
+ * en este mapper; si en el futuro se necesitan más campos, se agregan acá.
+ */
+interface InvoicePartySnapshot {
+  name?: string;
+  email?: string;
+}
+
 export type PrismaInvoiceWithRelations = PrismaInvoice & {
   details: (PrismaInvoiceDetail & {
     detailTaxes: PrismaInvoiceDetailTax[];
@@ -29,9 +39,11 @@ export class InvoiceMapper {
     invoice.paymentMethod = prismaInvoice.paymentMethod as PaymentMethod;
     invoice.isActive = prismaInvoice.isActive ?? true;
     invoice.version = prismaInvoice.version ?? 0;
-    // 1. Extraemos los campos JSON asegurando el tipado (puedes usar 'any' o crear una interfaz)
-    const clientSnapshot = prismaInvoice.client_snapshot as Record<string, any> | null;
-    const sellerSnapshot = prismaInvoice.seller_snapshot as Record<string, any> | null;
+    // 1. Extraemos los campos JSON con su shape conocido (InvoicePartySnapshot).
+    const clientSnapshot =
+      prismaInvoice.client_snapshot as InvoicePartySnapshot | null;
+    const sellerSnapshot =
+      prismaInvoice.seller_snapshot as InvoicePartySnapshot | null;
 
     // 2. Mapeamos las propiedades leyendo DENTRO de los objetos JSON
     invoice.clientNameSnapshot = clientSnapshot?.name || undefined;
