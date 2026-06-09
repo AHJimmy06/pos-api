@@ -29,22 +29,11 @@ export class InvoiceMapper {
     invoice.paymentMethod = prismaInvoice.paymentMethod as PaymentMethod;
     invoice.isActive = prismaInvoice.isActive ?? true;
     invoice.version = prismaInvoice.version ?? 0;
-<<<<<<< HEAD
     invoice.clientNameSnapshot = prismaInvoice.clientNameSnapshot || undefined;
     invoice.clientEmailSnapshot =
       prismaInvoice.clientEmailSnapshot || undefined;
     invoice.sellerNameSnapshot = prismaInvoice.sellerNameSnapshot || undefined;
     invoice.parentInvoiceId = prismaInvoice.parentInvoiceId || undefined;
-=======
-    // 1. Extraemos los campos JSON asegurando el tipado (puedes usar 'any' o crear una interfaz)
-    const clientSnapshot = prismaInvoice.client_snapshot as Record<string, any> | null;
-    const sellerSnapshot = prismaInvoice.seller_snapshot as Record<string, any> | null;
-
-    // 2. Mapeamos las propiedades leyendo DENTRO de los objetos JSON
-    invoice.clientNameSnapshot = clientSnapshot?.name || undefined;
-    invoice.clientEmailSnapshot = clientSnapshot?.email || undefined;
-    invoice.sellerNameSnapshot = sellerSnapshot?.name || undefined;
->>>>>>> parent of 3253524 (fix: regenerar Prisma client + tipar snapshots como InvoicePartySnapshot)
 
     if (
       prismaInvoice.subtotalSnapshot !== null &&
